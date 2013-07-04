@@ -20,36 +20,47 @@ function PlayAreaController($scope) {
   $scope.grayscales = [];
   $scope.selectedColor = "black12";
   $scope.selectedColorFactory = "black12";
-  $scope.newSquareBoxes = [[],[],[]];
+  $scope.newSquareBoxes = [];
   $scope.selectedLayer = $scope.newSquareBoxes[0];
-  $scope.selectedLayerNum = 0;
-  $scope.showThisPanel = 1;
+  $scope.showThisPanel = null;
+  $scope.customBlocks = [];
 
+  var showThisPanelIndex = 0;
   setInterval(function() {
     $scope.$apply(function() {
-      if ($scope.showThisPanel === 2) {
-        $scope.showThisPanel = 0;
+      if (showThisPanelIndex === $scope.newSquareBoxes.length - 1) {
+        showThisPanelIndex = 0;
       } else {
-        $scope.showThisPanel++;
+        showThisPanelIndex++;
       }
+
+      $scope.showThisPanel = $scope.newSquareBoxes[showThisPanelIndex];
     });
   }, 500);
+
+  var Layer = function (numberOfBoxes) {
+    var self = this;
+    self.boxes = [];
+
+    var init = function () {
+      _.times(numberOfBoxes, function () {
+        self.boxes.push({color: "black2"});
+      });
+    };
+
+    init();
+  };
 
   _.times(300, function() {
     $scope.boxes.push({color:"black2"});
   });
 
-  _.times(100, function() {
-    $scope.newSquareBoxes[0].push({color:"black2"});
-  });
 
-  _.times(100, function() {
-    $scope.newSquareBoxes[1].push({color:"black2"});
-  });
+  $scope.newLayerBox = function () {
+    $scope.newSquareBoxes.push(new Layer(100));
+  }
 
-  _.times(100, function() {
-    $scope.newSquareBoxes[2].push({color:"black2"});
-  });
+  $scope.newLayerBox();
 
   _.each(colorDictionary, function (value, key, obj) {
     $scope.colors.push({color: key});
@@ -87,10 +98,42 @@ function PlayAreaController($scope) {
     $scope.selectedColorFactory = color;
   };
 
-  $scope.selectLayer = function (num) {
-    $scope.selectedLayerNum = num;
-    $scope.selectedLayer = $scope.newSquareBoxes[num];
+  $scope.selectLayer = function (layer) {
+    $scope.selectedLayer = layer;
   };
+
+  $scope.selectLayerByIndex = function (index) {
+    $scope.selectLayer($scope.newSquareBoxes[index]);
+  };  
+
+  $scope.selectFirstLayer = function () {
+    $scope.selectLayer($scope.newSquareBoxes[0]);
+  };
+
+  $scope.selectLastLayer = function () {
+    $scope.selectLayer(_.last($scope.newSquareBoxes));
+  };
+
+  $scope.selectFirstLayer();
+
+  $scope.makeNewLayer = function () {
+    $scope.newSquareBoxes.push(new Layer(100));
+    $scope.selectLastLayer();
+  };
+
+  $scope.deleteSelectedLayer = function (index) {
+    $scope.newSquareBoxes.splice(index, 1);
+    if ($scope.newSquareBoxes[index - 1]) {
+      $scope.selectLayerByIndex(index - 1);
+    } else {
+      $scope.selectLayerByIndex(index);
+    }
+  };
+
+  $scope.saveCustomBlock = function () {
+    $scope.customBlocks.push($scope.newSquareBoxes.slice(0));
+  };
+
 }
 
 

@@ -29,52 +29,60 @@
         <ul class="play-area-color-palette-column-2">
           <li ng-repeat="color in grayscales" ng-click="select(color.color)" class="square {{color.color}}"></li>
         </ul>
+        <ul class="play-area-color-palette-column-3">
+          <li ng-repeat="block in customBlocks" ng-click="select(block.color)" class="square {{block.color}}"></li>
+        </ul>
       </div>
-
     </div>
+
+
+
 
     <div class="factory-container">
       <div class="column1">
+
+        <h3 class="section-heading">Preview</h3>
+
         <ul class="animation-preview-container">
-          <li class="square layer" ng-show="showThisPanel == 0">
+          <li class="square layer" ng-repeat="layer in newSquareBoxes" ng-show="layer == showThisPanel">
             <ul class="tiny-squares-container">
-              <li ng-repeat="box in newSquareBoxes[0]" class="square tiny-square {{box.color}}"></li>
-            </ul>
-          </li>
-          <li class="square layer" ng-show="showThisPanel == 1">
-            <ul class="tiny-squares-container">
-              <li ng-repeat="box in newSquareBoxes[1]" class="square tiny-square {{box.color}}"></li>
-            </ul>
-          </li>
-          <li class="square layer" ng-show="showThisPanel == 2">
-            <ul class="tiny-squares-container">
-              <li ng-repeat="box in newSquareBoxes[2]" class="square tiny-square {{box.color}}"></li>
+              <li ng-repeat="box in layer.boxes" class="square tiny-square {{box.color}}"></li>
             </ul>
           </li>
         </ul>
-        <ul class="new-square-layer-container icons-ul">
-          <li class="square layer" ng-click="selectLayer(0)" ng-class="{selected: selectedLayerNum==0}"><i class="icon-li icon-circle-arrow-right"></i>
-            <ul class="tiny-squares-container">
-              <li ng-repeat="box in newSquareBoxes[0]" class="square tiny-square {{box.color}}"></li>
-            </ul>
-          </li>
-          <li class="square layer" ng-click="selectLayer(1)" ng-class="{selected: selectedLayerNum==1}"><i class="icon-li icon-circle-arrow-right"></i>
-            <ul class="tiny-squares-container">
-              <li ng-repeat="box in newSquareBoxes[1]" class="square tiny-square {{box.color}}"></li>
-            </ul>
-          </li>
-          <li class="square layer" ng-click="selectLayer(2)" ng-class="{selected: selectedLayerNum==2}"><i class="icon-li icon-circle-arrow-right"></i>
-            <ul class="tiny-squares-container">
-              <li ng-repeat="box in newSquareBoxes[2]" class="square tiny-square {{box.color}}"></li>
-            </ul>
-          </li>
-        </ul>
+
+        <div class="layer-button-container">
+          <a class="new-layer-button button" href ng-click="makeNewLayer()">New Layer</a>
+          <a class="button" href ng-click="saveCustomBlock()">Save Block</a>
+        </div>
+
+        <div class="preview-layers-container" ng-show="newSquareBoxes.length > 1">
+          <h3 class="section-heading">Layers</h3>
+
+          <ul class="new-square-layer-container icons-ul">
+            <li class="square layer" ng-repeat="layer in newSquareBoxes" ng-click="selectLayer(layer)" ng-class="{selected: selectedLayer == layer, last: $last}"><i class="icon-li icon-circle-arrow-right"></i>
+              <ul class="tiny-squares-container">
+                <li ng-repeat="box in layer.boxes" class="square tiny-square {{box.color}}"></li>
+              </ul>
+            </li>
+          </ul>
+
+          <div class="layer-button-container">
+            <a class="delete-layer-button" href ng-click="deleteSelectedLayer(newSquareBoxes.indexOf(selectedLayer))">Remove Selected Layer</a>
+          </div>
+        </div>
+
       </div>
+
+
       <div class="column2">
+
         <ul class="new-square-creation-area">
-          <li ng-repeat="box in selectedLayer" ng-click="drawFactory(box)" ng-mouseover="drawOnMousedownFactory(box)" class="square {{box.color}}"></li>
+          <li ng-repeat="box in selectedLayer.boxes" ng-click="drawFactory(box)" ng-mouseover="drawOnMousedownFactory(box)" class="square {{box.color}}"></li>
         </ul>
+
       </div>
+
       <div class="column3">
         <div class="factory-color-palette">
           <ul class="factory-color-palette-column-1">
@@ -84,6 +92,7 @@
             <li ng-repeat="color in grayscales" ng-click="selectFactory(color.color)" class="square {{color.color}}"></li>
           </ul>
         </div>
+
       </div>
 
     </div>
