@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app>
+<html ng-app="JourneyShipApp">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,9 @@
     <link rel="stylesheet" type="text/css" href="css/journey.css">
     <link rel="stylesheet" type="text/css" href="css/normalize-v2.1.2.css">
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+    <script src="js/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="js/angular.min.js" type="text/javascript"></script>
     <script src="js/underscore-v1.4.4.js" type="text/javascript"></script>
-    <script src="js/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="js/jquery.cookie-v1.3.1.js" type="text/javascript"></script>
     <script src="js/tools.js" type="text/javascript"></script>
     <script src="js/page.js" type="text/javascript"></script>
@@ -30,11 +30,13 @@
           <li ng-repeat="color in grayscales" ng-click="select(color.color)" class="square {{color.color}}"></li>
         </ul>
         <ul class="play-area-color-palette-column-3">
-          <li ng-repeat="block in customBlocks" ng-click="select(block.color)" class="square {{block.color}}"></li>
+          <li ng-repeat="layersInBlock in customBlocks" class="square">
+            <ul animated-boxes="layersInBlock">
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
-
 
 
 
@@ -43,32 +45,27 @@
 
         <h3 class="section-heading">Preview</h3>
 
-        <ul class="animation-preview-container">
-          <li class="square layer" ng-repeat="layer in newSquareBoxes" ng-show="layer == showThisPanel">
-            <ul class="tiny-squares-container">
-              <li ng-repeat="box in layer.boxes" class="square tiny-square {{box.color}}"></li>
-            </ul>
-          </li>
+        <ul class="animation-preview-container" animated-boxes="layersInNewSquare">
         </ul>
 
         <div class="layer-button-container">
+          <a class="save-block-button button" href ng-click="saveCustomBlock()">Save Block</a>
           <a class="new-layer-button button" href ng-click="makeNewLayer()">New Layer</a>
-          <a class="button" href ng-click="saveCustomBlock()">Save Block</a>
         </div>
 
-        <div class="preview-layers-container" ng-show="newSquareBoxes.length > 1">
+        <div class="preview-layers-container" ng-show="layersInNewSquare.length > 1">
           <h3 class="section-heading">Layers</h3>
 
           <ul class="new-square-layer-container icons-ul">
-            <li class="square layer" ng-repeat="layer in newSquareBoxes" ng-click="selectLayer(layer)" ng-class="{selected: selectedLayer == layer, last: $last}"><i class="icon-li icon-circle-arrow-right"></i>
+            <li class="square layer" ng-repeat="layer in layersInNewSquare" ng-click="selectLayer(layer)" ng-class="{selected: selectedLayer == layer, last: $last}"><i class="icon-li icon-circle-arrow-right"></i>
               <ul class="tiny-squares-container">
-                <li ng-repeat="box in layer.boxes" class="square tiny-square {{box.color}}"></li>
+                <li ng-repeat="box in layer" class="square tiny-square {{box.color}}"></li>
               </ul>
             </li>
           </ul>
 
           <div class="layer-button-container">
-            <a class="delete-layer-button" href ng-click="deleteSelectedLayer(newSquareBoxes.indexOf(selectedLayer))">Remove Selected Layer</a>
+            <a class="delete-layer-button" href ng-click="deleteSelectedLayer(layersInNewSquare.indexOf(selectedLayer))">Remove Selected Layer</a>
           </div>
         </div>
 
@@ -78,7 +75,7 @@
       <div class="column2">
 
         <ul class="new-square-creation-area">
-          <li ng-repeat="box in selectedLayer.boxes" ng-click="drawFactory(box)" ng-mouseover="drawOnMousedownFactory(box)" class="square {{box.color}}"></li>
+          <li ng-repeat="box in selectedLayer" ng-click="drawFactory(box)" ng-mouseover="drawOnMousedownFactory(box)" class="square {{box.color}}"></li>
         </ul>
 
       </div>

@@ -45,7 +45,7 @@ ul {
   float: right;
 }
 
-.play-area-color-palette-column-1, .play-area-color-palette-column-2, .factory-color-palette-column-1, .factory-color-palette-column-2 {
+.play-area-color-palette-column-1, .play-area-color-palette-column-2, .play-area-color-palette-column-3, .factory-color-palette-column-1, .factory-color-palette-column-2 {
   float: left;
   width: 30px;
 }
@@ -88,7 +88,7 @@ ul {
   box-shadow: 0 0 1px #888;
 }
 
-.animation-preview-container .layer {
+.animation-preview-container .layer, .play-area-color-palette-column-3 .layer {
   position: absolute;
 }
 
@@ -130,8 +130,8 @@ ul {
   border-radius: 10px;
   overflow: hidden;
   float: left;
-  width: 302px;
-  height: 302px;
+  width: 300px;
+  height: 300px;
   border: 1px solid #333;
   -moz-box-shadow: 0 0 1px #888;
   -webkit-box-shadow: 0 0 1px #888;
@@ -161,7 +161,7 @@ ul {
   font-size: 12px;
   display:  block;
   text-decoration: none;
-  border: 1px solid #ccc;
+  border: 1px solid #aaa;
   background-color: #fafafa;
   float: left;
   clear: both;
@@ -171,16 +171,18 @@ ul {
   border-radius: 3px;
 }
 
-.new-layer-button {
+.save-block-button {
   margin-bottom: 10px;
 }
 
 .delete-layer-button {
-  color: #DE786F;
-  border-color: #F9C1BB;
+  color: #222;
   font-size: 12px;
 }
 
+.delete-layer-button:hover {
+  color: #DE786F;
+}
 
 
 
