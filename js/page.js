@@ -19,7 +19,7 @@ app.value('newLayer', function (numberOfBoxes, color) {
   var arrayOfBoxes = [];
 
   _.times(numberOfBoxes, function () {
-    arrayOfBoxes.push({color: color});
+    arrayOfBoxes.push(color);
   });
 
   return arrayOfBoxes;
@@ -37,38 +37,39 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
   $scope.customBlocks = [];
 
   _.times(300, function() {
-    $scope.boxes.push({color:"black2"});
+    $scope.boxes.push("black2");
   });
 
   _.each(colorDictionary, function (value, key, obj) {
-    $scope.colors.push({color: key});
+    $scope.colors.push(key);
   });
 
   _.each(grayscaleDictionary, function (value, key, obj) {
-    $scope.grayscales.push({color: key});
+    $scope.grayscales.push(key);
   });
 
-  $scope.draw = function (box) {
-    box.color = $scope.selectedColor;
+  $scope.draw = function (boxes, index) {
+    boxes[index] = $scope.selectedColor;
   };
 
-  $scope.drawOnMousedown = function (box) {
+  $scope.drawOnMousedown = function (boxes, index) {
     if (mouseIsDown) {
-      box.color = $scope.selectedColor;
+      boxes[index] = $scope.selectedColor;
     }
   };
 
   $scope.select = function (color) {
+    console.log(color);
     $scope.selectedColor = color;
   };
 
-  $scope.drawOnLayer = function (box) {
-    box.color = $scope.selectedLayerColor;
+  $scope.drawOnLayer = function (boxes, index) {
+    boxes[index] = $scope.selectedLayerColor;
   };
 
-  $scope.drawOnLayerOnMousedown = function (box) {
+  $scope.drawOnLayerOnMousedown = function (boxes, index) {
     if (mouseIsDown) {
-      box.color = $scope.selectedLayerColor;
+      boxes[index] = $scope.selectedLayerColor;
     }
   };
 
@@ -122,7 +123,7 @@ app.directive('animatedBoxes', function ($timeout) {
     template: "<li class='square layer' ng-repeat='layer in layers' " +
     "ng-click='selectAnimatedBlock(layers)'" +
     "ng-show='showThis == $index'><ul class='tiny-squares-container'>" +
-    "<li ng-repeat='box in layer' class='square tiny-square {{box.color}}'>" +
+    "<li ng-repeat='color in layer' class='square tiny-square {{color}}'>" +
     "</li></ul></li>",
     link: function (scope, elem, attrs) {
       scope.showThis = 0;

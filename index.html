@@ -19,15 +19,15 @@
 
     <div class="main-container">
       <ul class="play-area">
-        <li ng-repeat="box in boxes" ng-click="draw(box)" ng-mouseover="drawOnMousedown(box)" class="square {{box.color}}"></li>
+        <li ng-repeat="color in boxes" ng-click="draw(boxes, $index)" ng-mouseover="drawOnMousedown(boxes, $index)" class="square {{color}}"></li>
       </ul>
 
       <div class="play-area-color-palette">
         <ul class="play-area-color-palette-column-1">
-          <li ng-repeat="color in colors" ng-click="select(color.color)" class="square {{color.color}}"></li>
+          <li ng-repeat="color in colors" ng-click="select(color)" class="square {{color}}"></li>
         </ul>
         <ul class="play-area-color-palette-column-2">
-          <li ng-repeat="color in grayscales" ng-click="select(color.color)" class="square {{color.color}}"></li>
+          <li ng-repeat="color in grayscales" ng-click="select(color)" class="square {{color}}"></li>
         </ul>
         <ul class="play-area-color-palette-column-3">
           <li ng-repeat="layersInBlock in customBlocks" class="square">
@@ -59,7 +59,7 @@
           <ul class="new-square-layer-container icons-ul">
             <li class="square layer" ng-repeat="layer in layersInNewSquare" ng-click="selectLayer(layer)" ng-class="{selected: selectedLayer == layer, last: $last}"><i class="icon-li icon-circle-arrow-right"></i>
               <ul class="tiny-squares-container">
-                <li ng-repeat="box in layer" class="square tiny-square {{box.color}}"></li>
+                <li ng-repeat="color in layer" class="square tiny-square {{color}}"></li>
               </ul>
             </li>
           </ul>
@@ -75,7 +75,7 @@
       <div class="column2">
 
         <ul class="new-square-creation-area">
-          <li ng-repeat="box in selectedLayer" ng-click="drawOnLayer(box)" ng-mouseover="drawOnLayerOnMousedown(box)" class="square {{box.color}}"></li>
+          <li ng-repeat="color in selectedLayer" ng-click="drawOnLayer(selectedLayer, $index)" ng-mouseover="drawOnLayerOnMousedown(selectedLayer, $index)" class="square {{color}}"></li>
         </ul>
 
       </div>
@@ -83,10 +83,10 @@
       <div class="column3">
         <div class="factory-color-palette">
           <ul class="factory-color-palette-column-1">
-            <li ng-repeat="color in colors" ng-click="selectColorForLayer(color.color)" class="square {{color.color}}"></li>
+            <li ng-repeat="color in colors" ng-click="selectColorForLayer(color)" class="square {{color}}"></li>
           </ul>
           <ul class="factory-color-palette-column-2">
-            <li ng-repeat="color in grayscales" ng-click="selectColorForLayer(color.color)" class="square {{color.color}}"></li>
+            <li ng-repeat="color in grayscales" ng-click="selectColorForLayer(color)" class="square {{color}}"></li>
           </ul>
         </div>
 
