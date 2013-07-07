@@ -75,7 +75,7 @@
       <div class="column2">
 
         <ul class="new-square-creation-area">
-          <li ng-repeat="box in selectedLayer" ng-click="drawFactory(box)" ng-mouseover="drawOnMousedownFactory(box)" class="square {{box.color}}"></li>
+          <li ng-repeat="box in selectedLayer" ng-click="drawOnLayer(box)" ng-mouseover="drawOnLayerOnMousedown(box)" class="square {{box.color}}"></li>
         </ul>
 
       </div>
@@ -83,10 +83,10 @@
       <div class="column3">
         <div class="factory-color-palette">
           <ul class="factory-color-palette-column-1">
-            <li ng-repeat="color in colors" ng-click="selectFactory(color.color)" class="square {{color.color}}"></li>
+            <li ng-repeat="color in colors" ng-click="selectColorForLayer(color.color)" class="square {{color.color}}"></li>
           </ul>
           <ul class="factory-color-palette-column-2">
-            <li ng-repeat="color in grayscales" ng-click="selectFactory(color.color)" class="square {{color.color}}"></li>
+            <li ng-repeat="color in grayscales" ng-click="selectColorForLayer(color.color)" class="square {{color.color}}"></li>
           </ul>
         </div>
 

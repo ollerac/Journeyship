@@ -15,11 +15,11 @@ $(function() {
 
 var app = angular.module('JourneyShipApp', []);
 
-app.value('newLayer', function (numberOfBoxes) {
+app.value('newLayer', function (numberOfBoxes, color) {
   var arrayOfBoxes = [];
 
   _.times(numberOfBoxes, function () {
-    arrayOfBoxes.push({color: "black2"});
+    arrayOfBoxes.push({color: color});
   });
 
   return arrayOfBoxes;
@@ -30,23 +30,15 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
   $scope.colors = [];
   $scope.grayscales = [];
   $scope.selectedColor = "black12";
-  $scope.selectedColorFactory = "black12";
+  $scope.selectedLayerColor= "black12";
   $scope.layersInNewSquare = [];
   $scope.selectedLayer = null;
   $scope.showThisPanel = null;
-  $scope.selectedAnimatedBlock = null;
   $scope.customBlocks = [];
 
   _.times(300, function() {
     $scope.boxes.push({color:"black2"});
   });
-
-
-  $scope.newLayerBox = function () {
-    $scope.layersInNewSquare.push(newLayer(100));
-  };
-
-  $scope.newLayerBox();
 
   _.each(colorDictionary, function (value, key, obj) {
     $scope.colors.push({color: key});
@@ -70,22 +62,18 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
     $scope.selectedColor = color;
   };
 
-  $scope.selectAnimatedBlock = function (layers) {
-    $scope.selectedAnimatedBlock = layers;
+  $scope.drawOnLayer = function (box) {
+    box.color = $scope.selectedLayerColor;
   };
 
-  $scope.drawFactory = function (box) {
-    box.color = $scope.selectedColorFactory;
-  };
-
-  $scope.drawOnMousedownFactory = function (box) {
+  $scope.drawOnLayerOnMousedown = function (box) {
     if (mouseIsDown) {
-      box.color = $scope.selectedColorFactory;
+      box.color = $scope.selectedLayerColor;
     }
   };
 
-  $scope.selectFactory = function (color) {
-    $scope.selectedColorFactory = color;
+  $scope.selectColorForLayer = function (color) {
+    $scope.selectedLayerColor = color;
   };
 
   $scope.selectLayer = function (layer) {
@@ -104,12 +92,12 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
     $scope.selectLayer(_.last($scope.layersInNewSquare));
   };
 
-  $scope.selectFirstLayer();
-
   $scope.makeNewLayer = function () {
-    $scope.layersInNewSquare.push(newLayer(100));
+    $scope.layersInNewSquare.push(newLayer(100, "black2"));
     $scope.selectLastLayer();
   };
+
+  $scope.makeNewLayer();
 
   $scope.deleteSelectedLayer = function (index) {
     $scope.layersInNewSquare.splice(index, 1);
@@ -121,7 +109,8 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
   };
 
   $scope.saveCustomBlock = function () {
-    $scope.customBlocks.push($.extend(true, [], $scope.layersInNewSquare));
+    var copyOfNewLayer = $.extend(true, [], $scope.layersInNewSquare);
+    $scope.customBlocks.push(copyOfNewLayer);
   };
 });
 
