@@ -25,8 +25,14 @@ app.value('newLayer', function (numberOfBoxes, color) {
   return arrayOfBoxes;
 });
 
+/*
+collection of blocks [block, block, block]
+block (collection of layers) [layer, layer, layer]
+layer (collection of colors) [colorName, colorName, colorName)
+*/
+
 app.controller('PlayAreaController', function ($scope, newLayer) {
-  $scope.boxes = [];
+  $scope.blocks = [];
   $scope.colors = [];
   $scope.grayscales = [];
   $scope.selectedColor = "black12";
@@ -37,7 +43,7 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
   $scope.customBlocks = [];
 
   _.times(300, function() {
-    $scope.boxes.push("black2");
+    $scope.blocks.push("black2");
   });
 
   _.each(colorDictionary, function (value, key, obj) {
@@ -115,6 +121,7 @@ app.controller('PlayAreaController', function ($scope, newLayer) {
   };
 });
 
+
 app.directive('animatedBoxes', function ($timeout) {
   return {
     scope: {
@@ -122,9 +129,9 @@ app.directive('animatedBoxes', function ($timeout) {
     },
     template: "<li class='square layer' ng-repeat='layer in layers' " +
     "ng-click='selectAnimatedBlock(layers)'" +
-    "ng-show='showThis == $index'><ul class='tiny-squares-container'>" +
-    "<li ng-repeat='color in layer' class='square tiny-square {{color}}'>" +
-    "</li></ul></li>",
+    "ng-show='showThis == $index'><ul class='tiny-squares-container' layer='layer'>" +
+    "" +
+    "</ul></li>",
     link: function (scope, elem, attrs) {
       scope.showThis = 0;
       var count = 0;
@@ -146,10 +153,38 @@ app.directive('animatedBoxes', function ($timeout) {
 });
 
 
+app.directive('layer', function () {
+  return {
+    scope: {
+      layer: '=layer'
+    },
+    template: "",
+    link: function (scope, elem, attrs) {
 
+      scope.$watch('layer', function (value) {
+        var tinySquares = [];
 
+        _.each(value, function (color, index, list) {
+          tinySquares.push("<li class='square tiny-square " + color + "'></li>");
+        });
 
+        elem.html(tinySquares.join(""));
+      }, true);
 
+    }
+  };
+});
 
+// console.time("asd");
+// blocks = [];
+// hundredTinyBlocks = [];
+// _.times(100, function () {
+//   hundredTinyBlocks.push("<li class='square tiny-square black12'></li>");
+// });
 
+// _.times(300, function () {
+//   blocks.push("<li class='square layer'><ul class='tiny-squares-container' layer='layer'>" + hundredTinyBlocks.join("") + "</ul></li>");
+// });
 
+// $("#main .play-area").html(blocks.join(""));
+// console.timeEnd("asd");

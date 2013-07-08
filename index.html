@@ -19,7 +19,7 @@
 
     <div class="main-container">
       <ul class="play-area">
-        <li ng-repeat="color in boxes" ng-click="draw(boxes, $index)" ng-mouseover="drawOnMousedown(boxes, $index)" class="square {{color}}"></li>
+        <li ng-repeat="color in blocks" ng-click="draw(blocks, $index)" ng-mouseover="drawOnMousedown(blocks, $index)" class="square {{color}}"></li>
       </ul>
 
       <div class="play-area-color-palette">
@@ -58,8 +58,7 @@
 
           <ul class="new-square-layer-container icons-ul">
             <li class="square layer" ng-repeat="layer in layersInNewSquare" ng-click="selectLayer(layer)" ng-class="{selected: selectedLayer == layer, last: $last}"><i class="icon-li icon-circle-arrow-right"></i>
-              <ul class="tiny-squares-container">
-                <li ng-repeat="color in layer" class="square tiny-square {{color}}"></li>
+              <ul class="tiny-squares-container" layer="layer">
               </ul>
             </li>
           </ul>
