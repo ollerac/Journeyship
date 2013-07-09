@@ -17,6 +17,11 @@
   <body ng-controller="PlayAreaController">
     <h1 class="page-heading">Journey Ship</h1>
 
+    <div class="main-container" id="main">
+      <ul class="play-area">
+      </ul>
+    </div>
+
     <div class="main-container">
       <ul class="play-area">
         <li ng-repeat="color in blocks" ng-click="draw(blocks, $index)" ng-mouseover="drawOnMousedown(blocks, $index)" class="square {{color}}"></li>

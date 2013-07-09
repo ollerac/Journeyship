@@ -11,6 +11,38 @@ $(function() {
           mouseIsDown = false;
       }
   });
+
+  var blocks = [];
+  var hundredTinyBlocks = [[],[],[]];
+  _.times(100, function () {
+    hundredTinyBlocks[0].push("<li class='square tiny-square black12'></li>");
+    hundredTinyBlocks[1].push("<li class='square tiny-square black6'></li>");
+    hundredTinyBlocks[2].push("<li class='square tiny-square black1'></li>");
+  });
+
+  _.times(300, function () {
+    blocks.push("<li class='square layer'><ul class='tiny-squares-container layer1'>" + hundredTinyBlocks[0].join("") + "</ul><ul class='tiny-squares-container layer2'>" + hundredTinyBlocks[1].join("") + "</ul><ul class='tiny-squares-container layer3'>" + hundredTinyBlocks[2].join("") + "</ul></li>");
+  });
+
+  $("#main .play-area").html(blocks.join(""));
+
+  $(".layer1, .layer2, .layer3").hide()
+
+  var num = 1;
+  var prevNum = 3;
+  setInterval(function() {
+    if (num == 4) num = 1;
+    if (prevNum == 4) prevNum = 1;
+    console.log(num, prevNum);
+
+    $(".layer" + prevNum).hide();
+    $(".layer" + num).show();
+    num++;
+    prevNum++;
+
+    
+
+  }, 500);
 });
 
 var app = angular.module('JourneyShipApp', []);
@@ -174,17 +206,3 @@ app.directive('layer', function () {
     }
   };
 });
-
-// console.time("asd");
-// blocks = [];
-// hundredTinyBlocks = [];
-// _.times(100, function () {
-//   hundredTinyBlocks.push("<li class='square tiny-square black12'></li>");
-// });
-
-// _.times(300, function () {
-//   blocks.push("<li class='square layer'><ul class='tiny-squares-container' layer='layer'>" + hundredTinyBlocks.join("") + "</ul></li>");
-// });
-
-// $("#main .play-area").html(blocks.join(""));
-// console.timeEnd("asd");
