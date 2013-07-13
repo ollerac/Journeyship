@@ -1,4 +1,6 @@
 ### working on now:
+- left it in a half finished state. making an animation (which should be an extension of the CanvasObject but isn't) be drawn to from the constructor canvas. it updates the first layer. need to make it so new layers can be selected and drawn to too and make these update the animation object. there's a property on every CanvasObject called selectedLayerNum which tells you the selected layer. also, i broke the preview container by making the animation's main element the constructor canvas. maybe i shouldn't do that. it could be called the `currentLayerCanvas` instead and i could draw to that element. then the main element of an animation would be the canvas element that's animating. i think that would be a good idea.
+
 
 ### what i *need* before launching:
 - layers

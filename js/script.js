@@ -4,7 +4,7 @@ var defaultCellSize = 30;
 var defaultTinyCellSize = 3;
 
 
-function CanvasObject (element, cellSize, mirrors, layers) {
+function CanvasObject (element, cellSize, mirrors, layers, currentLayerCanvas) {
   this.element = element;
   this.context = this.element.getContext('2d');
   this.selectedColor = '#000';
@@ -15,24 +15,35 @@ function CanvasObject (element, cellSize, mirrors, layers) {
   this.cellSize = cellSize || defaultCellSize;
   this.layers = layers || [];
   this.layerIndex = -1;
+  this.selectedLayerNum = 0;
+  this.currentLayerCanvas = currentLayerCanvas || null;
+  this.currentLayerCanvasContext = this.currentLayerCanvas ? this.currentLayerCanvas.getContext('2d') : null;
 }
 
-CanvasObject.prototype.addMirror = function (mirror) {
-  this.mirrors.push(mirror);
+CanvasObject.prototype.addMirror = function (mirror, indexOfPattern) {
+  this.mirrors.push({object: mirror, patternNum: indexOfPattern});
 };
 
 CanvasObject.prototype.updateMirrors = function () {
   var mirrors = this.mirrors;
-  var map = this.map;
+  var layers = this.layers;
 
   _.each(mirrors, function (mirror) {
-    applyMapToCanvasObject(map, mirror);
+    applyMapToCanvasObject(layers[mirror.patternNum], mirror.object);
   });
 };
 
 // layer is just a map, a list
 CanvasObject.prototype.addLayer = function (layer) {
-  this.layers.push(layer);
+  if (layer) {
+    this.layers.push(layer);
+  } else {
+    var defaultLayer = [];
+    _.times(100, function () {
+      defaultLayer.push("#fff");
+    });
+    this.layers.push(defaultLayer);
+  }
 };
 
 CanvasObject.prototype.nextLayer = function () {
@@ -57,12 +68,10 @@ CanvasObject.prototype.animate = function () {
 };
 
 function applyMapToCanvasObject (map, canvasObject) {
-
   var context = canvasObject.context;
   var cellSize = canvasObject.cellSize;
   var rows = canvasObject.element.height / cellSize;
   var columns = canvasObject.element.width / cellSize;
-
   _.each(map, function (cell, index) {
     if (cell) {
       var cellRowAndColumn = getCellRowAndColumnFromIndex(index, columns);
@@ -71,9 +80,9 @@ function applyMapToCanvasObject (map, canvasObject) {
   });
 }
 
-var mainCanvas = new CanvasObject(document.getElementById("main-area"), defaultCellSize);
+//var mainCanvas = new CanvasObject(document.getElementById("main-area"), defaultCellSize);
 //var previewCanvas = new CanvasObject(document.getElementById("preview"), defaultTinyCellSize);
-var constructorCanvas = new CanvasObject(document.getElementById("constructor-area"), defaultTinyCellSize);
+//var constructorCanvas = new CanvasObject(document.getElementById("constructor-area"), defaultTinyCellSize);
 
 
 function drawCell (context, x, y, size, color) {
@@ -103,7 +112,7 @@ function getCellRowAndColumnFromPosition (roundedX, roundedY) {
   return {
     row: roundedY / defaultCellSize,
     column: roundedX / defaultCellSize
-  }
+  };
 }
 
 function getCellPositionInArray (row, column, containerColumns) {
@@ -113,29 +122,31 @@ function getCellPositionInArray (row, column, containerColumns) {
 
 
 function setupCanvasForDrawing (canvasObject) {
-  canvasObject.element.addEventListener('mousedown', function (event) {
+  canvasObject.currentLayerCanvas.addEventListener('mousedown', function (event) {
     var cellPosition = getCellPosition(event.offsetX, event.offsetY);
-    drawCell(canvasObject.context, cellPosition.x, cellPosition.y, defaultCellSize, canvasObject.selectedColor);
+    drawCell(canvasObject.currentLayerCanvasContext, cellPosition.x, cellPosition.y, defaultCellSize, canvasObject.selectedColor);
     var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y);
     var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.columns);
+    canvasObject.layers[canvasObject.selectedLayerNum][cellPositionInArray] = canvasObject.selectedColor;
     canvasObject.map[cellPositionInArray] = canvasObject.selectedColor;
-    canvasObject.updateMirrors();
+    //canvasObject.updateMirrors();
   }, false);
 
-  canvasObject.element.addEventListener('mousemove', function (event) {
+  canvasObject.currentLayerCanvas.addEventListener('mousemove', function (event) {
     if (mouseIsDown) {
       var cellPosition = getCellPosition(event.offsetX, event.offsetY);
-      drawCell(canvasObject.context, cellPosition.x, cellPosition.y, defaultCellSize, canvasObject.selectedColor);
+      drawCell(canvasObject.currentLayerCanvasContext, cellPosition.x, cellPosition.y, defaultCellSize, canvasObject.selectedColor);
       var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y);
       var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.columns);
+      canvasObject.layers[canvasObject.selectedLayerNum][cellPositionInArray] = canvasObject.selectedColor;
       canvasObject.map[cellPositionInArray] = canvasObject.selectedColor;
-      canvasObject.updateMirrors();
+      //canvasObject.updateMirrors();
     }
   }, false);
 }
 
-setupCanvasForDrawing(mainCanvas);
-setupCanvasForDrawing(constructorCanvas);
+//setupCanvasForDrawing(mainCanvas);
+//setupCanvasForDrawing(constructorCanvas);
 
 
 function addColorsToPalette (paletteElement, colors, canvasObject) {
@@ -153,13 +164,12 @@ function addColorsToPalette (paletteElement, colors, canvasObject) {
   });
 }
 
-addColorsToPalette(qs('#main-color-palette .column5'), colorDictionary, mainCanvas);
-addColorsToPalette(qs('#main-color-palette .column4'), grayscaleDictionary, mainCanvas);
-addColorsToPalette(qs('#constructor-color-palette .column2'), colorDictionary, constructorCanvas);
-addColorsToPalette(qs('#constructor-color-palette .column1'), grayscaleDictionary, constructorCanvas);
+// addColorsToPalette(qs('#main-color-palette .column5'), colorDictionary, mainCanvas);
+// addColorsToPalette(qs('#main-color-palette .column4'), grayscaleDictionary, mainCanvas);
 
 
-function makeNewLayer () {
+
+function makeNewLayer (pattern) {
   var layerElement = makeNewElement("canvas");
   layerElement.className = "layer block";
   layerElement.width = defaultCellSize;
@@ -173,47 +183,52 @@ function makeNewLayer () {
 
   qs(".layers").appendChild(layerContainer);
 
-  constructorCanvas.addMirror(layer);
+  applyMapToCanvasObject(pattern, layer);
+
+  return layer;
 }
 
-makeNewLayer();
-
-document.getElementById('new-layer').addEventListener('mousedown', function (event) {
-  makeNewLayer();
-});
-
 // each layer is a map
-function Animation (layers) {
-  this.layers = layers;
-
+function makeNewAnimation (layers) {
   var animationElement = makeNewElement("canvas");
   animationElement.className = "preview";
   animationElement.width = defaultCellSize;
   animationElement.height = defaultCellSize;
 
-  var animation = new CanvasObject(animationElement, defaultTinyCellSize, [], layers);
+  var currentLayerCanvas = document.getElementById("constructor-area");
+
+  var animation = new CanvasObject(animationElement, defaultTinyCellSize, [], layers, currentLayerCanvas);
 
   document.getElementById('preview-container').appendChild(animation.element);
 
+  _.each(layers, function (pattern, index) {
+    var layer = makeNewLayer(pattern);
+    animation.addMirror(layer, index);
+  });
+
+  //animation.updateMirrors();
+
   animation.animate();
+
+  return animation;
 }
 
-var layers = [[],[],[]];
-var colors = ["red", "gray", "blue"];
-_.each(layers, function (layer, index) {
-  var color = colors[index];
-  _.times(100, function () {
-    layer.push(color);
-  });
+layers = [[]];
+_.times(100, function () {
+  layers[0].push("#fff");
 });
 
-new Animation(layers);
+var animation = makeNewAnimation(layers);
 
+document.getElementById('new-layer').addEventListener('mousedown', function (event) {
+  animation.addLayer(null);
+  makeNewLayer([]);
+});
 
+addColorsToPalette(qs('#constructor-color-palette .column2'), colorDictionary, animation);
+addColorsToPalette(qs('#constructor-color-palette .column1'), grayscaleDictionary, animation);
 
-
-
-
+setupCanvasForDrawing(animation);
 
 
 
