@@ -1,0 +1,137 @@
+body {
+  color: #222;
+  font-size: 12px;
+  margin-bottom: 200px;
+  overflow: auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+.block {
+  height: 30px;
+  width: 30px;
+}
+
+.color {
+  float: left;
+}
+
+.page-heading {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.section-heading {
+  font-size: 16px;
+  font-weight: normal;
+  margin-bottom: 20px;
+}
+
+.button {
+  color: #333;
+  font-size: 12px;
+  display:  block;
+  float: left;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  background-color: #fafafa;
+  clear: both;
+  padding: 4px 7px 5px;
+  margin-bottom: 10px;
+}
+
+.button:hover {
+  border: 1px solid #999;
+}
+
+.buttons-container {
+  overflow: auto;
+}
+
+.area-container {
+  border: 1px solid #333;
+}
+
+/* Color Palette */
+
+.color-palette .column {
+  float: right;
+  width: 30px
+}
+
+.color-palette {
+  float: right;
+  width: 180px;
+}
+
+/* Main Section */
+
+#main-container {
+  width: 1100px;
+  height: 400px;
+  margin: 0 auto;
+}
+
+#main-area-container {
+  width: 900px;
+  height: 300px;
+}
+
+/* Constructor */
+
+#constructor-container {
+  width: 540px;
+  margin: 0 auto;
+  overflow: auto;
+}
+
+#constructor-layers-container {
+  width: 120px;
+  float: left;
+}
+
+#constructor-layers-container .buttons-container {
+  margin-bottom: 20px;
+}
+
+#constructor-area-container {
+  float: left;
+}
+
+#constructor-color-palette {
+  width: 90px;
+}
+
+.preview-container {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 20px;
+}
+
+.layers {
+  margin-bottom: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

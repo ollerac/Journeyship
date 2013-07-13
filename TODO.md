@@ -1,8 +1,19 @@
 ### working on now:
-- be able to paint with custom boxes
+- layers
 
 ### what i *need* before launching:
+- backup last version and commit this new version with cruft removed
+- layers
+  - add
+  - remove
+  - show selected
+  - select
+  - show previous layer
+  - link with preview
+  - animate preview
+- save block
 - be able to paint with custom boxes
+- show selected color
 - be able to check a box to specify a box as a background layer or a foreground object
 - be able to check a box to see that last layer that you're painting over for an object
 - delete objects from main board

@@ -4,99 +4,73 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello!</title>
-    <link rel="stylesheet" type="text/css" href="css/journey.css">
     <link rel="stylesheet" type="text/css" href="css/normalize-v2.1.2.css">
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-    <script src="js/jquery-1.9.1.js" type="text/javascript"></script>
-    <script src="js/angular.js" type="text/javascript"></script>
-    <script src="js/underscore-v1.4.4.js" type="text/javascript"></script>
-    <script src="js/jquery.cookie-v1.3.1.js" type="text/javascript"></script>
-    <script src="js/tools.js" type="text/javascript"></script>
-    <script src="js/page.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">   
   </head>
   <body ng-controller="PlayAreaController">
     <h1 class="page-heading">Journey Ship</h1>
 
-    <div class="main-container" id="main">
-      <ul class="play-area">
-      </ul>
-    </div>
+    <div id="main-container">
+      <div id="main-color-palette" class="color-palette">
+        <div class="column column1"></div>
+        <div class="column column2"></div>
+        <div class="column column3"></div>
+        <div class="column column4"></div>
+        <div class="column column5"></div>
+      </div>
 
-    <div class="main-container">
-      <ul class="play-area">
-        <li ng-repeat="color in blocks" ng-click="draw(blocks, $index)" ng-mouseover="drawOnMousedown(blocks, $index)" class="square {{color}}"></li>
-      </ul>
-
-      <div class="play-area-color-palette">
-        <ul class="play-area-color-palette-column-1">
-          <li ng-repeat="color in colors" ng-click="select(color)" class="square {{color}}"></li>
-        </ul>
-        <ul class="play-area-color-palette-column-2">
-          <li ng-repeat="color in grayscales" ng-click="select(color)" class="square {{color}}"></li>
-        </ul>
-        <ul class="play-area-color-palette-column-3">
-          <li ng-repeat="layersInBlock in customBlocks" class="square">
-            <ul animated-boxes="layersInBlock">
-            </ul>
-          </li>
-        </ul>
+      <div id="main-area-container" class="area-container">
+        <canvas id="main-area" width="900" height="300"></canvas>
       </div>
     </div>
 
+    <div id="constructor-container">
+      <div id="constructor-color-palette" class="color-palette">
+        <div class="column column1"></div>
+        <div class="column column2"></div>
+      </div>
 
-
-    <div class="factory-container">
-      <div class="column1">
-
-        <h3 class="section-heading">Preview</h3>
-
-        <ul class="animation-preview-container" animated-boxes="layersInNewSquare">
-        </ul>
-
-        <div class="layer-button-container">
-          <a class="save-block-button button" href ng-click="saveCustomBlock()">Save Block</a>
-          <a class="new-layer-button button" href ng-click="makeNewLayer()">New Layer</a>
+      <div id="constructor-layers-container">
+        <h3 class="section-heading">Block</h3>
+        <div class="preview-container area-container">
+          <canvas id="preview" width="30" height="30"></canvas>
         </div>
 
-        <div class="preview-layers-container" ng-show="layersInNewSquare.length > 1">
-          <h3 class="section-heading">Layers</h3>
+        <div class="buttons-container">
+          <a class="button" href="#">New</a>
+          <a class="button" href="#">Save</a>
+        </div>
 
-          <ul class="new-square-layer-container icons-ul">
-            <li class="square layer" ng-repeat="layer in layersInNewSquare" ng-click="selectLayer(layer)" ng-class="{selected: selectedLayer == layer, last: $last}"><i class="icon-li icon-circle-arrow-right"></i>
-              <ul class="tiny-squares-container" layer="layer">
-              </ul>
-            </li>
-          </ul>
-
-          <div class="layer-button-container">
-            <a class="delete-layer-button" href ng-click="deleteSelectedLayer(layersInNewSquare.indexOf(selectedLayer))">Remove Selected Layer</a>
+        <h3 class="section-heading">Layers</h3>
+        <div class="layers">
+          <div class="block area-container">
+            <canvas class="layer layer1" width="30" height="30"></canvas>
           </div>
         </div>
-
-      </div>
-
-
-      <div class="column2">
-
-        <ul class="new-square-creation-area">
-          <li ng-repeat="color in selectedLayer" ng-click="drawOnLayer(selectedLayer, $index)" ng-mouseover="drawOnLayerOnMousedown(selectedLayer, $index)" class="square {{color}}"></li>
-        </ul>
-
-      </div>
-
-      <div class="column3">
-        <div class="factory-color-palette">
-          <ul class="factory-color-palette-column-1">
-            <li ng-repeat="color in colors" ng-click="selectColorForLayer(color)" class="square {{color}}"></li>
-          </ul>
-          <ul class="factory-color-palette-column-2">
-            <li ng-repeat="color in grayscales" ng-click="selectColorForLayer(color)" class="square {{color}}"></li>
-          </ul>
+        <div class="buttons-container">
+          <a class="button" href="#">New</a>
+          <a class="button warning" href="#">Remove</a>
         </div>
-
       </div>
 
+      <div id="constructor-area-container" class="area-container">
+        <canvas id="constructor-area" width="300" height="300"></canvas>
+      </div>
     </div>
 
+    <script src="js/underscore-v1.4.4.js" type="text/javascript"></script>
+    <script src="js/tools.js" type="text/javascript"></script>
+    <script src="js/helpers.js" type="text/javascript"></script>
+    <script src="js/script.js" type="text/javascript"></script>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
