@@ -1,9 +1,9 @@
 ### working on now:
-- layers
 
 ### what i *need* before launching:
-- backup last version and commit this new version with cruft removed
 - layers
+  - new layer button, new layer function
+  - mirror
   - add
   - remove
   - show selected
@@ -12,6 +12,8 @@
   - link with preview
   - animate preview
 - save block
+  - unique id (underscore)
+  - add to main color palette
 - be able to paint with custom boxes
 - show selected color
 - be able to check a box to specify a box as a background layer or a foreground object
@@ -38,6 +40,14 @@
 
 
 ### recently finishished:
-- added ability to add more than one layer to each box
-- added an animated preview for new boxes via a directive "animatedBoxes"
-- added the ability to save a new box with layers to the main color palette
+- got the animation preview working
+  - new properties for CanvasObject
+    - layers
+    - layerIndex
+  - new functions for CanvasObject
+    - addLayer
+    - nextLayer
+    - animate
+- preview updates on changing the contructor block
+- backup last version and commit this new version with cruft removed
+

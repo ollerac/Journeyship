@@ -99,6 +99,8 @@ h1, h2, h3, h4, h5, h6 {
 
 #constructor-area-container {
   float: left;
+  height: 300px;
+  width: 300px;
 }
 
 #constructor-color-palette {
@@ -115,7 +117,9 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
-
+.layers .block {
+  margin-bottom: 5px;
+}
 
 
 
