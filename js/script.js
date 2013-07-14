@@ -4,20 +4,23 @@ var defaultCellSize = 30;
 var defaultTinyCellSize = 3;
 
 
-function CanvasObject (element, cellSize, mirrors, layers, currentLayerCanvas) {
+function CanvasObject (element, cellSize, mirrors, layers, currentLayerCanvas, currentLayerCanvasCellSize) {
   this.element = element;
   this.context = this.element.getContext('2d');
   this.selectedColor = '#000';
-  this.rows = this.element.height / defaultCellSize;
-  this.columns = this.element.width / defaultCellSize;
+  this.cellSize = cellSize || defaultCellSize;
+  this.rows = this.element.height / this.cellSize;
+  this.columns = this.element.width / this.cellSize;
   this.map = new Array(this.columns * this.rows);
   this.mirrors = mirrors || [];
-  this.cellSize = cellSize || defaultCellSize;
   this.layers = layers || [];
   this.layerIndex = -1;
-  this.selectedLayerNum = 0;
+  this.currentLayerNum = 0;
   this.currentLayerCanvas = currentLayerCanvas || null;
+  this.currentLayerCanvasCellSize = currentLayerCanvasCellSize || defaultCellSize;
   this.currentLayerCanvasContext = this.currentLayerCanvas ? this.currentLayerCanvas.getContext('2d') : null;
+  this.currentLayerCanvasRows = this.currentLayerCanvas ? this.currentLayerCanvas.height / this.currentLayerCanvasCellSize : null;
+  this.currentLayerCanvasColumns = this.currentLayerCanvas ? this.currentLayerCanvas.width / this.currentLayerCanvasCellSize : null;
 }
 
 CanvasObject.prototype.addMirror = function (mirror, indexOfPattern) {
@@ -93,11 +96,11 @@ function drawCell (context, x, y, size, color) {
   context.fillRect(x,y,size,size);
 }
 
-// input x, y and output clean x, y
-function getCellPosition (x,y) {
+// input x, y and outputs x and y rounded down to the nearest multiple of cellSize
+function getCellPosition (x, y, cellSize) {
   return {
-    x: Math.floor(x/30.0) * 30,
-    y: Math.floor(y/30.0) * 30
+    x: Math.floor(x/cellSize) * cellSize,
+    y: Math.floor(y/cellSize) * cellSize
   };
 }
 
@@ -108,10 +111,14 @@ function getCellRowAndColumnFromIndex (index, containerColumns) {
   };
 }
 
-function getCellRowAndColumnFromPosition (roundedX, roundedY) {
+function getCellRowAndColumnFromPosition (roundedX, roundedY, cellSize) {
+  if (!cellSize) {
+    cellSize = defaultCellSize;
+  }
+
   return {
-    row: roundedY / defaultCellSize,
-    column: roundedX / defaultCellSize
+    row: roundedY / cellSize,
+    column: roundedX / cellSize
   };
 }
 
@@ -123,22 +130,22 @@ function getCellPositionInArray (row, column, containerColumns) {
 
 function setupCanvasForDrawing (canvasObject) {
   canvasObject.currentLayerCanvas.addEventListener('mousedown', function (event) {
-    var cellPosition = getCellPosition(event.offsetX, event.offsetY);
-    drawCell(canvasObject.currentLayerCanvasContext, cellPosition.x, cellPosition.y, defaultCellSize, canvasObject.selectedColor);
-    var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y);
-    var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.columns);
-    canvasObject.layers[canvasObject.selectedLayerNum][cellPositionInArray] = canvasObject.selectedColor;
+    var cellPosition = getCellPosition(event.offsetX, event.offsetY, canvasObject.currentLayerCanvasCellSize);
+    drawCell(canvasObject.currentLayerCanvasContext, cellPosition.x, cellPosition.y, canvasObject.currentLayerCanvasCellSize, canvasObject.selectedColor);
+    var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y, canvasObject.currentLayerCanvasCellSize);
+    var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.currentLayerCanvasColumns);
+    canvasObject.layers[canvasObject.currentLayerNum][cellPositionInArray] = canvasObject.selectedColor;
     canvasObject.map[cellPositionInArray] = canvasObject.selectedColor;
     //canvasObject.updateMirrors();
   }, false);
 
   canvasObject.currentLayerCanvas.addEventListener('mousemove', function (event) {
     if (mouseIsDown) {
-      var cellPosition = getCellPosition(event.offsetX, event.offsetY);
-      drawCell(canvasObject.currentLayerCanvasContext, cellPosition.x, cellPosition.y, defaultCellSize, canvasObject.selectedColor);
-      var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y);
-      var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.columns);
-      canvasObject.layers[canvasObject.selectedLayerNum][cellPositionInArray] = canvasObject.selectedColor;
+      var cellPosition = getCellPosition(event.offsetX, event.offsetY, canvasObject.currentLayerCanvasCellSize);
+      drawCell(canvasObject.currentLayerCanvasContext, cellPosition.x, cellPosition.y, canvasObject.currentLayerCanvasCellSize, canvasObject.selectedColor);
+      var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y, canvasObject.currentLayerCanvasCellSize);
+      var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.currentLayerCanvasColumns);
+      canvasObject.layers[canvasObject.currentLayerNum][cellPositionInArray] = canvasObject.selectedColor;
       canvasObject.map[cellPositionInArray] = canvasObject.selectedColor;
       //canvasObject.updateMirrors();
     }

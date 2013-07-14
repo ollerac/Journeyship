@@ -1,9 +1,23 @@
+function convertToArray (arrayLike) {
+  var newArray = [];
+  _.each(arrayLike, function (item) {
+    newArray.push(item);
+  });
+  return newArray;
+}
+
 function qsa (selector) {
-  return document.querySelectorAll(selector);
+   var results = document.querySelectorAll(selector);
+
+   return results ? convertToArray(results) : null;
 }
 
 function qs (selector) {
   return document.querySelector(selector);
+}
+
+function eid (id) {
+  return document.getElementById(id);
 }
 
 function makeNewElement (type) {
@@ -17,4 +31,12 @@ function makeNewElement (type) {
     case "canvas":
       return document.createElement("canvas");
   }
+}
+
+function makeNewBlock () {
+  var block = makeNewElement('canvas');
+  block.className = 'block';
+  block.width = defaultCellSize;
+  block.height = defaultCellSize;
+  return block;
 }

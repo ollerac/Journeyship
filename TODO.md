@@ -1,20 +1,23 @@
 ### working on now:
-- left it in a half finished state. making an animation (which should be an extension of the CanvasObject but isn't) be drawn to from the constructor canvas. it updates the first layer. need to make it so new layers can be selected and drawn to too and make these update the animation object. there's a property on every CanvasObject called selectedLayerNum which tells you the selected layer. also, i broke the preview container by making the animation's main element the constructor canvas. maybe i shouldn't do that. it could be called the `currentLayerCanvas` instead and i could draw to that element. then the main element of an animation would be the canvas element that's animating. i think that would be a good idea.
+- getting drawing on the constructorBlock to update the selected layer in the sidebar and the animation (it should just update the layer map thingie and that should broadcast the changes and then they can re-render and stuff)
+
+
+
 
 
 ### what i *need* before launching:
 - layers
   - new layer button, new layer function
-  - mirror
+  - mirror objects that watch a map-like list property and update their canvas when an update method is called
   - add
   - remove
-  - show selected
-  - select
-  - show previous layer
-  - link with preview
-  - animate preview
+  - show which layer is selected with an icon or something
+  - ability to select a layer ✔
+  - show previous layer on top of current layer with some transparency
+  - link each layer to the preview animation
+  - get the animate preview working
 - save block
-  - unique id (underscore)
+  - unique id (from underscore)
   - add to main color palette
 - be able to paint with custom boxes
 - show selected color
@@ -42,6 +45,12 @@
 
 
 ### recently finishished:
+- cleaned up code
+  - animation objects are primary
+    - layers (each a map)
+    - selected layer
+  - new: DrawableSurface object replaces original CanvasObject
+- got updating the animated preview to work
 - got the animation preview working
   - new properties for CanvasObject
     - layers
