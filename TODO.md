@@ -1,4 +1,7 @@
 ### working on now:
+- made an editorArea object to manage the editing area. it creates layers and has an animatedBlock and a drawableSurface as properties.
+
+- FIRST PRIORITY: do a test with a bunch of animating blocks so you can see what the performance will be like and so you can see how you should organize your code
 - getting drawing on the constructorBlock to update the selected layer in the sidebar and the animation (it should just update the layer map thingie and that should broadcast the changes and then they can re-render and stuff)
 
 

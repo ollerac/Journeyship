@@ -123,7 +123,6 @@ function getCellRowAndColumnFromPosition (roundedX, roundedY, cellSize) {
 }
 
 function getCellPositionInArray (row, column, containerColumns) {
-  // say it's 2x2 in a 30x30
   return containerColumns * row + column;
 }
 

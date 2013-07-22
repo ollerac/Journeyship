@@ -16,12 +16,20 @@ function AnimatedBlock (layers) {
   });
 }
 
-AnimatedBlock.prototype.addLayer = function (layerNum, layer) {
+AnimatedBlock.prototype.addLayer = function (layer, layerNum) {
+  layerNum = layerNum || this.layers.length;
   this.layers.splice(layerNum, 0, layer);
-  PubSub.publish('added layer', layer);
+  PubSub.publish('added layer', {
+    layer: layer,
+    animatedBlock: this
+  });
 };
 
 AnimatedBlock.prototype.changeLayerValue = function (layerNum, indexNum, newValue) {
+  if (!this.layers[layerNum]) {
+    throw("Attempted to change a layer value of a layer that doesn't exist")
+  }
+
   this.layers[layerNum][indexNum] = newValue;
   PubSub.publish('changed layer value');
 };
@@ -80,112 +88,197 @@ function getCellRowAndColumnFromIndex (index, containerColumns) {
   };
 }
 
-function applyMapToContext (map, context, cellSize, columns) {
+function getCellRowAndColumnFromPosition (roundedX, roundedY, cellSize) {
+  if (!cellSize) {
+    cellSize = defaultCellSize;
+  }
+
+  return {
+    row: roundedY / cellSize,
+    column: roundedX / cellSize
+  };
+}
+
+function getCellPositionInArray (row, column, containerColumns) {
+  return containerColumns * row + column;
+}
+
+function getCellPositionFromRowAndColumn (row, column, cellSize) {
+  if (!cellSize) {
+    cellSize = defaultCellSize;
+  }
+
+  return {
+    x: column * cellSize,
+    y: row * cellSize
+  }
+}
+
+function applyMapToContext (map, context, cellSize, columns, options) {
+  if (!options) {
+    options = {x: 0, y: 0};
+  }
+
   _.each(map, function (color, index) {
     var cellRowAndColumn = getCellRowAndColumnFromIndex(index, columns);
-    drawCell(context, cellRowAndColumn.column * cellSize, cellRowAndColumn.row * cellSize, cellSize, color);
+    drawCell(context, options.x + cellRowAndColumn.column * cellSize, options.y + cellRowAndColumn.row * cellSize, cellSize, color);
   });
 }
 
-// add layer to dom and set up ability to select layer
-
-// gets pattern as second argument passed to it in the subscribe
-function makeNewLayer (msg, layer) {
-  var layerElement = makeNewBlock();
-  var layerContainer = makeNewElement();
-  layerContainer.className = 'block area-container layer-container';
-  layerContainer.appendChild(layerElement);
-  qs('.layers').appendChild(layerContainer);
-
-  layerContainer.addEventListener('mousedown', function (event) {
-    PubSub.publish('selected layer', qsa('.layers .layer-container').indexOf(event.currentTarget));
-  });
-
-  var context = layerElement.getContext('2d');
-  var columns = layerElement.width / defaultTinyCellSize;
-  applyMapToContext(layer, context, defaultTinyCellSize, columns);
-}
-
-PubSub.subscribe('added layer', makeNewLayer);
 
 
-// create animated block and start animating its element in the dom
-
-layers = [[],[],[]];
-colors = ['red', 'blue', 'orange'];
-_.each(layers, function (layer, index) {
-  _.times(100, function () {
-    layer.push(colors[index]);
-  });
-});
-
-var animatedBlock = new AnimatedBlock(layers);
-var animatedElement = makeNewBlock();
-document.getElementById('preview-container').appendChild(animatedElement);
-animatedBlock.animate(animatedElement);
 
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface (element, animatedBlock, cellSize, map) {
+function DrawableSurface (element, cellSize, defaultCellColor) {
   var self = this;
   self.element = element;
-  self.selectedLayerNum = 0;
-  self.animatedBlock = animatedBlock;
   self.cellSize = cellSize || defaultCellSize;
   self.columns = self.element.width / self.cellSize;
-  self.map = map || null;
-  self.selectedColor = "#000";
+  self.rows = self.element.height / self.cellSize;
+  self.selectedColor = '#000';
+
+  if (!defaultCellColor) {
+    defaultCellColor = '#fff';
+  }
+
+  self.map = self.makeMap(defaultCellColor);
 }
 
+DrawableSurface.prototype.makeMap = function (cellColor) {
+  var map = [];
+  _.times(this.columns * this.rows, function () {
+    map.push(cellColor);
+  });
+  return map;
+};
+
 DrawableSurface.prototype.render = function () {
-  if (this.animatedBlock) {
-    applyMapToContext(this.animatedBlock.layers[this.selectedLayerNum], this.element.getContext('2d'), this.cellSize, this.columns);
-  } else if (this.map) {
-    applyMapToContext(this.map, this.element.getContext('2d'), this.cellSize, this.columns);
-  } else {
-    throw("DrawableSurface needs either an animated block or a map to render.");
+  applyMapToContext(this.map, this.element.getContext('2d'), this.cellSize, this.columns);
+};
+
+DrawableSurface.prototype.updateMap = function (x, y) {
+  var cellRowAndColumn = getCellRowAndColumnFromPosition(x, y, this.cellSize);
+  var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, this.columns);
+  this.map[cellPositionInArray] = this.selectedColor;
+
+  PubSub.publish("updated map", {
+    surface: this,
+    index: cellPositionInArray,
+    value: this.selectedColor
+  });
+};
+
+DrawableSurface.prototype.drawHere = function (x, y) {
+  drawCell(this.element.getContext('2d'), x, y, this.cellSize, this.selectedColor);
+  this.updateMap(x,y);
+};
+
+var editorArea = {
+  animatedBlock: new AnimatedBlock(),
+  drawableSurface: new DrawableSurface(eid('constructor-area'), defaultCellSize),
+  selectedLayerNum: 0,
+  layersContainerElement: qs('.layers'),
+  renderSelectedLayer: function () {
+    var selectedLayer = this.animatedBlock.layers[this.selectedLayerNum],
+    drawableContext = this.drawableSurface.element.getContext('2d');
+
+    if (selectedLayer) {
+      applyMapToContext(selectedLayer, drawableContext, this.drawableSurface.cellSize, this.drawableSurface.columns);
+    }
+
+    // this renders the thumbnail of the selected layer
+    var smallLayer = qsa('.layers .layer-container .block')[this.selectedLayerNum];
+    var columns = smallLayer.width / defaultTinyCellSize;
+    applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns);
+  },
+  addLayer: function (layerPattern) {
+    var self = this;
+    var layerElement = makeNewBlock();
+    var layerContainer = makeNewElement();
+    layerContainer.className = 'block area-container layer-container';
+    layerContainer.appendChild(layerElement);
+    this.layersContainerElement.appendChild(layerContainer);
+
+    layerContainer.addEventListener('mousedown', function (event) {
+      self.selectedLayerNum =  qsa('.layers .layer-container').indexOf(event.currentTarget);
+      self.renderSelectedLayer();
+    });
+
+    var context = layerElement.getContext('2d');
+    var columns = layerElement.width / defaultTinyCellSize;
+    applyMapToContext(layerPattern, context, defaultTinyCellSize, columns);
+  },
+  removeLayer: function (layerNum) {
+    qsa('.layers .layer-container')[layerNum].remove();
   }
 };
 
-// set up the constructor canvas, have it watch the animated block's selected layer
-// based on dom position, i don't like it, might be better if each layer had an id and this id was stored in the dom as a data attribute
-
-var constructorElement = makeNewElement('canvas');
-constructorElement.width = 300;
-constructorElement.height = 300;
-document.getElementById('constructor-area-container').appendChild(constructorElement);
-
-constructorBlock = new DrawableSurface(constructorElement, animatedBlock, defaultCellSize);
-constructorBlock.render();
-
-PubSub.subscribe('selected layer', function (msg, selectedLayerNum) {
-  constructorBlock.selectedLayerNum = selectedLayerNum;
-  constructorBlock.render();
+PubSub.subscribe('added layer', function (msg, stuff) {
+  if (editorArea.animatedBlock == stuff.animatedBlock) {
+    editorArea.addLayer(stuff.layer);
+    // should only call the following when drawing
+    editorArea.renderSelectedLayer();
+  }
 });
 
+PubSub.subscribe('removed layer', function (msg, layerNum) {
+  editorArea.removeLayer(layerNum);
+});
+
+
+// create animated block and start animating its element in the dom
+
+colors = ['red', 'blue', 'orange'];
+_.times(3, function (index) {
+  var layer = [];
+  _.times(100, function () {
+    layer.push(colors[index]);
+  });
+  editorArea.animatedBlock.addLayer(layer);
+});
+
+var animatedElement = makeNewBlock();
+document.getElementById('preview-container').appendChild(animatedElement);
+editorArea.animatedBlock.animate(animatedElement);
+
+
+
+// remove layer dom event
+
+eid('remove-layer').addEventListener('mousedown', function () {
+  editorArea.animatedBlock.removeLayer(editorArea.selectedLayerNum);
+});
+
+// add blank layer dom event
+
+eid('new-layer').addEventListener('mousedown', function () {
+  var newLayer = [];
+  _.times(100, function () {
+    newLayer.push("#fff");
+  });
+
+  editorArea.animatedBlock.addLayer(newLayer);
+});
+
+// random
+
+PubSub.subscribe('updated map', function (msg, update) {
+  if (update.surface === editorArea.drawableSurface) {
+    editorArea.animatedBlock.changeLayerValue(editorArea.selectedLayerNum, update.index, update.value);
+    editorArea.renderSelectedLayer();
+  }
+});
 
 // set up main canvas
 
-mainArea = new DrawableSurface(eid('main-area'), null, defaultCellSize);
-
-
-// add ability to remove layer from animated block and from dom
-
-eid('remove-layer').addEventListener('mousedown', function () {
-  animatedBlock.removeLayer(constructorBlock.selectedLayerNum);
-});
-
-function removeLayer (msg, index) {
-  qsa('.layers .layer-container')[index].remove();
-}
-
-PubSub.subscribe('removed layer', removeLayer);
+var mainArea = new DrawableSurface(eid('main-area'), defaultCellSize);
 
 
 // add color palettes
 
-function addColorsToPalette (paletteElement, colors, canvasObject) {
+function addColorsToPalette (paletteElement, colors, area) {
   _.each(colors, function (value, key, list) {
     colorElement = makeNewElement();
     colorElement.className = "color block";
@@ -193,7 +286,7 @@ function addColorsToPalette (paletteElement, colors, canvasObject) {
 
     colorElement.addEventListener("click", function(event) {
       element = event.currentTarget;
-      canvasObject.selectedColor = element.style.backgroundColor;
+      area.selectedColor = element.style.backgroundColor;
     });
 
     paletteElement.appendChild(colorElement);
@@ -202,8 +295,8 @@ function addColorsToPalette (paletteElement, colors, canvasObject) {
 
 addColorsToPalette(qs('#main-color-palette .column5'), colorDictionary, mainArea);
 addColorsToPalette(qs('#main-color-palette .column4'), grayscaleDictionary, mainArea);
-addColorsToPalette(qs('#constructor-color-palette .column2'), colorDictionary, constructorBlock);
-addColorsToPalette(qs('#constructor-color-palette .column1'), grayscaleDictionary, constructorBlock);
+addColorsToPalette(qs('#constructor-color-palette .column2'), colorDictionary, editorArea.drawableSurface);
+addColorsToPalette(qs('#constructor-color-palette .column1'), grayscaleDictionary, editorArea.drawableSurface);
 
 
 
@@ -211,9 +304,12 @@ addColorsToPalette(qs('#constructor-color-palette .column1'), grayscaleDictionar
 
 function drawIt (event, drawableSurface) {
   var cellPosition = getCellPosition(event.offsetX, event.offsetY, drawableSurface.cellSize);
-  drawCell(drawableSurface.element.getContext('2d'), cellPosition.x, cellPosition.y, drawableSurface.cellSize, drawableSurface.selectedColor);
-  // var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y, canvasObject.currentLayerCanvasCellSize);
-  // var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, canvasObject.currentLayerCanvasColumns);
+  drawableSurface.drawHere(cellPosition.x, cellPosition.y);
+
+  // var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y, drawableSurface.cellSize);
+  // var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, drawableSurface.columns);
+  // drawableSurface.updateMap(cellPositionInArray);
+
   // canvasObject.layers[canvasObject.currentLayerNum][cellPositionInArray] = canvasObject.selectedColor;
   // canvasObject.map[cellPositionInArray] = canvasObject.selectedColor;
   // canvasObject.updateMirrors();
@@ -232,13 +328,42 @@ function setupCanvasForDrawing (drawableSurface) {
 }
 
 setupCanvasForDrawing(mainArea);
-setupCanvasForDrawing(constructorBlock);
+setupCanvasForDrawing(editorArea.drawableSurface);
 
 
 
+// var bunchOfAnimatedBlocks = [];
+
+// _.times(300, function() {
+//   var newAnimatedBlock = new AnimatedBlock();
+//   colors = ['red', 'blue', 'orange'];
+//   _.times(3, function (index) {
+//     var layer = [];
+//     _.times(100, function () {
+//       layer.push(colors[index]);
+//     });
+//     newAnimatedBlock.addLayer(layer);
+//   });
+//   bunchOfAnimatedBlocks.push(newAnimatedBlock);
+// });
+
+// var drawOnThisContext = mainArea.element.getContext('2d');
+
+// setInterval(function(){
+//   _.each(bunchOfAnimatedBlocks, function(block, index, list) {
+//     var rowAndColumn = getCellRowAndColumnFromIndex(index, 30);
+//     var position = getCellPositionFromRowAndColumn(rowAndColumn.row, rowAndColumn.column);
+//     var options = {
+//       x: position.x,
+//       y: position.y
+//     };
+//     applyMapToContext(block.nextLayer(), drawOnThisContext, defaultTinyCellSize, 10, options);
+//   });
+// }, 300);
 
 
-
+console.log(editorArea.animatedBlock);
+console.log(mainArea);
 
 
 
