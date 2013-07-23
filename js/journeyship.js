@@ -59,6 +59,7 @@ AnimatedBlock.prototype.animate = function (animatedElement) {
   applyMapToContext(self.nextLayer(), context, defaultTinyCellSize, animatedElement.width / defaultTinyCellSize);
 
   setInterval(function () {
+    // this should show and hide elements instead of drawing over and over again
     applyMapToContext(self.nextLayer(), context, defaultTinyCellSize, animatedElement.width / defaultTinyCellSize);
   }, 400);
 };
@@ -144,6 +145,7 @@ function DrawableSurface (element, cellSize, defaultCellColor) {
   }
 
   self.map = self.makeMap(defaultCellColor);
+  self.makeDrawable();
 }
 
 DrawableSurface.prototype.makeMap = function (cellColor) {
@@ -174,6 +176,28 @@ DrawableSurface.prototype.drawHere = function (x, y) {
   drawCell(this.element.getContext('2d'), x, y, this.cellSize, this.selectedColor);
   this.updateMap(x,y);
 };
+
+DrawableSurface.prototype.makeDrawable = function () {
+  var self = this;
+
+  function drawIt (event) {
+    var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
+    self.drawHere(cellPosition.x, cellPosition.y);
+  }
+
+  self.element.addEventListener('mousedown', function (event) {
+    drawIt(event);
+  }, false);
+
+  self.element.addEventListener('mousemove', function (event) {
+    if (mouseIsDown) {
+      drawIt(event);
+    }
+  }, false);
+};
+
+
+// set up editor area, below the main area
 
 var editorArea = {
   animatedBlock: new AnimatedBlock(),
@@ -273,62 +297,63 @@ PubSub.subscribe('updated map', function (msg, update) {
 
 // set up main canvas
 
-var mainArea = new DrawableSurface(eid('main-area'), defaultCellSize);
+var mainArea = {
+  drawableSurface: new DrawableSurface(eid('main-area'), defaultCellSize)
+};
 
 
-// add color palettes
+function ColorPalette (colors, container, parent) {
+  var self = this;
+  self.colors = [];
+  self.containerElement = container;
+  self.colorElements = [];
+  self.parent = parent;
 
-function addColorsToPalette (paletteElement, colors, area) {
-  _.each(colors, function (value, key, list) {
-    colorElement = makeNewElement();
-    colorElement.className = "color block";
-    colorElement.style.backgroundColor = value;
-
-    colorElement.addEventListener("click", function(event) {
-      element = event.currentTarget;
-      area.selectedColor = element.style.backgroundColor;
-    });
-
-    paletteElement.appendChild(colorElement);
+  _.each(colors, function (color) {
+    self.addColor(color);
   });
+
+  self.render();
+  self.addEventListeners();
 }
 
-addColorsToPalette(qs('#main-color-palette .column5'), colorDictionary, mainArea);
-addColorsToPalette(qs('#main-color-palette .column4'), grayscaleDictionary, mainArea);
-addColorsToPalette(qs('#constructor-color-palette .column2'), colorDictionary, editorArea.drawableSurface);
-addColorsToPalette(qs('#constructor-color-palette .column1'), grayscaleDictionary, editorArea.drawableSurface);
+ColorPalette.prototype.addColor = function (color) {
+  this.colors.push(color);
+};
+
+ColorPalette.prototype.generateColorElement = function (color) {
+  var colorElement = makeNewElement();
+  colorElement.className = "color block";
+  colorElement.style.backgroundColor = color;
+  this.colorElements.push(colorElement);
+  return colorElement;
+};
+
+ColorPalette.prototype.render = function () {
+  var self = this;
+  _.each(this.colors, function (color) {
+    self.containerElement.appendChild(self.generateColorElement(color));
+  });
+};
+
+ColorPalette.prototype.addEventListeners = function () {
+  var self = this;
+  _.each(this.colorElements, function (element) {
+    element.addEventListener('click', function (event) {
+      var element = event.currentTarget;
+      self.parent.drawableSurface.selectedColor = element.style.backgroundColor;
+    });
+  });
+};
+
+
+new ColorPalette(_.values(colorDictionary), qs('#main-color-palette .column5'), mainArea);
+new ColorPalette(_.values(grayscaleDictionary), qs('#main-color-palette .column4'), mainArea);
+new ColorPalette(_.values(colorDictionary), qs('#constructor-color-palette .column2'), editorArea);
+new ColorPalette(_.values(grayscaleDictionary), qs('#constructor-color-palette .column1'), editorArea);
 
 
 
-// make areas drawable
-
-function drawIt (event, drawableSurface) {
-  var cellPosition = getCellPosition(event.offsetX, event.offsetY, drawableSurface.cellSize);
-  drawableSurface.drawHere(cellPosition.x, cellPosition.y);
-
-  // var cellRowAndColumn = getCellRowAndColumnFromPosition(cellPosition.x, cellPosition.y, drawableSurface.cellSize);
-  // var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, drawableSurface.columns);
-  // drawableSurface.updateMap(cellPositionInArray);
-
-  // canvasObject.layers[canvasObject.currentLayerNum][cellPositionInArray] = canvasObject.selectedColor;
-  // canvasObject.map[cellPositionInArray] = canvasObject.selectedColor;
-  // canvasObject.updateMirrors();
-}
-
-function setupCanvasForDrawing (drawableSurface) {
-  drawableSurface.element.addEventListener('mousedown', function (event) {
-    drawIt(event, drawableSurface);
-  }, false);
-
-  drawableSurface.element.addEventListener('mousemove', function (event) {
-    if (mouseIsDown) {
-      drawIt(event, drawableSurface);
-    }
-  }, false);
-}
-
-setupCanvasForDrawing(mainArea);
-setupCanvasForDrawing(editorArea.drawableSurface);
 
 
 
@@ -360,10 +385,6 @@ setupCanvasForDrawing(editorArea.drawableSurface);
 //     applyMapToContext(block.nextLayer(), drawOnThisContext, defaultTinyCellSize, 10, options);
 //   });
 // }, 300);
-
-
-console.log(editorArea.animatedBlock);
-console.log(mainArea);
 
 
 
