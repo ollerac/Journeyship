@@ -1,4 +1,6 @@
 ### working on now:
+- allow saving animated blocks to the main canvas color palette
+- have animated blocks that are added to the main canvas start at the same index as the other blocks... how? when a new block is added just reset everyone to zero
 - saving blocks from the editor area to the main color palette
   - either:
     - color palettes area going to be able to have patterns instead of colors (i.e. an array of colors in place of a color) or

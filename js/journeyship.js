@@ -12,18 +12,38 @@ function AnimatedBlock (layers) {
   this.layerIndex = -1;
 
   _.each(layers, function (layer) {
-    self.addLayer(self.layers.length, layer);
+    self.addLayer(layer);
   });
 }
 
-AnimatedBlock.prototype.addLayer = function (layer, layerNum) {
+AnimatedBlock.prototype.addLayer = function (value, layerNum) {
+  var layer = [];
+  if (typeof value === 'string') {
+    var color = value;
+    _.times(100, function () {
+      layer.push(color);
+    });
+  } else if (typeof value === 'object') {
+    layer = value;
+  }
+
   layerNum = layerNum || this.layers.length;
   this.layers.splice(layerNum, 0, layer);
+
   PubSub.publish('added layer', {
     layer: layer,
     animatedBlock: this
   });
 };
+
+AnimatedBlock.prototype.addLayers = function (layers) {
+  var self = this;
+
+  _.each(layers, function (layer) {
+    self.addLayer(layer);
+  });
+};
+
 
 AnimatedBlock.prototype.changeLayerValue = function (layerNum, indexNum, newValue) {
   if (!this.layers[layerNum]) {
@@ -74,6 +94,11 @@ function drawCell (context, x, y, size, color) {
   context.fillRect(x,y,size,size);
 }
 
+function getCellPositionInArrayFromPosition (x, y, cellSize, columns) {
+  var rowAndColumn = getCellRowAndColumnFromPosition(x, y, cellSize);
+  return getCellPositionInArray(rowAndColumn.row, rowAndColumn.column, columns);
+}
+
 // input x, y and outputs x and y rounded down to the nearest multiple of cellSize
 function getCellPosition (x, y, cellSize) {
   return {
@@ -95,8 +120,8 @@ function getCellRowAndColumnFromPosition (roundedX, roundedY, cellSize) {
   }
 
   return {
-    row: roundedY / cellSize,
-    column: roundedX / cellSize
+    row: Math.floor(roundedY / cellSize),
+    column: Math.floor(roundedX / cellSize)
   };
 }
 
@@ -112,7 +137,12 @@ function getCellPositionFromRowAndColumn (row, column, cellSize) {
   return {
     x: column * cellSize,
     y: row * cellSize
-  }
+  };
+}
+
+function getCellPositionFromIndex (index, columns) {
+  var rowAndColumn = getCellRowAndColumnFromIndex(index, columns);
+  return getCellPositionFromRowAndColumn(rowAndColumn.row, rowAndColumn.column);
 }
 
 function applyMapToContext (map, context, cellSize, columns, options) {
@@ -138,14 +168,14 @@ function DrawableSurface (element, cellSize, defaultCellColor) {
   self.cellSize = cellSize || defaultCellSize;
   self.columns = self.element.width / self.cellSize;
   self.rows = self.element.height / self.cellSize;
-  self.selectedColor = '#000';
-
-  if (!defaultCellColor) {
-    defaultCellColor = '#fff';
-  }
-
-  self.map = self.makeMap(defaultCellColor);
+  self.selectedStyle = '#000';
+  self.map = self.makeMap(defaultCellColor || '#fff');
+  self.animatedMap = self.makeMap(null);
   self.makeDrawable();
+
+  setInterval(function() {
+    self.renderAnimatedMap();
+  }, 300);
 }
 
 DrawableSurface.prototype.makeMap = function (cellColor) {
@@ -163,17 +193,17 @@ DrawableSurface.prototype.render = function () {
 DrawableSurface.prototype.updateMap = function (x, y) {
   var cellRowAndColumn = getCellRowAndColumnFromPosition(x, y, this.cellSize);
   var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, this.columns);
-  this.map[cellPositionInArray] = this.selectedColor;
+  this.map[cellPositionInArray] = this.selectedStyle;
 
   PubSub.publish("updated map", {
     surface: this,
     index: cellPositionInArray,
-    value: this.selectedColor
+    value: this.selectedStyle
   });
 };
 
 DrawableSurface.prototype.drawHere = function (x, y) {
-  drawCell(this.element.getContext('2d'), x, y, this.cellSize, this.selectedColor);
+  drawCell(this.element.getContext('2d'), x, y, this.cellSize, this.selectedStyle);
   this.updateMap(x,y);
 };
 
@@ -181,8 +211,13 @@ DrawableSurface.prototype.makeDrawable = function () {
   var self = this;
 
   function drawIt (event) {
-    var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
-    self.drawHere(cellPosition.x, cellPosition.y);
+    if (typeof(self.selectedStyle) === 'string') {
+      var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
+      self.drawHere(cellPosition.x, cellPosition.y);
+    } else if (typeof(self.selectedStyle) === 'object' && self.selectedStyle.layers) {
+      var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+      self.animatedMap[positionInArray] = self.selectedStyle;
+    }
   }
 
   self.element.addEventListener('mousedown', function (event) {
@@ -196,6 +231,35 @@ DrawableSurface.prototype.makeDrawable = function () {
   }, false);
 };
 
+
+//!! working on
+DrawableSurface.prototype.renderAnimatedMap = function () {
+  var self = this;
+  var context = self.element.getContext('2d');
+
+  _.each(self.animatedMap, function (block, index) {
+    if (block) {
+      var position = getCellPositionFromIndex(index, self.columns);
+      applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, 10, {
+        x: position.x,
+        y: position.y
+      });
+    }
+  });
+};
+
+
+// setInterval(function(){
+//   _.each(bunchOfAnimatedBlocks, function(block, index, list) {
+//     var rowAndColumn = getCellRowAndColumnFromIndex(index, 30);
+//     var position = getCellPositionFromRowAndColumn(rowAndColumn.row, rowAndColumn.column);
+//     var options = {
+//       x: position.x,
+//       y: position.y
+//     };
+//     applyMapToContext(block.nextLayer(), drawOnThisContext, defaultTinyCellSize, 10, options);
+//   });
+// }, 300);
 
 // set up editor area, below the main area
 
@@ -254,17 +318,10 @@ PubSub.subscribe('removed layer', function (msg, layerNum) {
 
 // create animated block and start animating its element in the dom
 
-colors = ['red', 'blue', 'orange'];
-_.times(3, function (index) {
-  var layer = [];
-  _.times(100, function () {
-    layer.push(colors[index]);
-  });
-  editorArea.animatedBlock.addLayer(layer);
-});
+editorArea.animatedBlock.addLayers(['red', 'blue', 'orange']);
 
 var animatedElement = makeNewBlock();
-document.getElementById('preview-container').appendChild(animatedElement);
+eid('preview-container').appendChild(animatedElement);
 editorArea.animatedBlock.animate(animatedElement);
 
 
@@ -302,46 +359,63 @@ var mainArea = {
 };
 
 
-function ColorPalette (colors, container, parent) {
+var customAnimatedBlocks = {};
+
+function ColorPalette (map, container, parent) {
   var self = this;
-  self.colors = [];
+  self.map = [];
   self.containerElement = container;
-  self.colorElements = [];
+  self.paletteElements = [];
   self.parent = parent;
 
-  _.each(colors, function (color) {
-    self.addColor(color);
+  _.each(map, function (value) {
+    self.addMapValue(value);
   });
 
   self.render();
   self.addEventListeners();
 }
 
-ColorPalette.prototype.addColor = function (color) {
-  this.colors.push(color);
+ColorPalette.prototype.addMapValue = function (value) {
+  this.map.push(value);
 };
 
-ColorPalette.prototype.generateColorElement = function (color) {
-  var colorElement = makeNewElement();
-  colorElement.className = "color block";
-  colorElement.style.backgroundColor = color;
-  this.colorElements.push(colorElement);
-  return colorElement;
+ColorPalette.prototype.generatePaletteElement = function (value) {
+  if (typeof(value) === 'object' && value.layers) {
+    var animatedElement = makeNewBlock();
+    animatedElement.className = animatedElement.className ? animatedElement.className + " animated" : "animated";
+    var unique = _.uniqueId('id-');
+    animatedElement.setAttribute('data-id', unique);
+    customAnimatedBlocks[unique] = value;
+    value.animate(animatedElement);
+    this.paletteElements.push(animatedElement);
+    return animatedElement;
+  } else if (typeof(value) === 'string') {
+    var colorElement = makeNewElement();
+    colorElement.className = "color block";
+    colorElement.style.backgroundColor = value;
+    this.paletteElements.push(colorElement);
+    return colorElement;
+  }
 };
 
 ColorPalette.prototype.render = function () {
   var self = this;
-  _.each(this.colors, function (color) {
-    self.containerElement.appendChild(self.generateColorElement(color));
+  _.each(this.map, function (value) {
+    self.containerElement.appendChild(self.generatePaletteElement(value));
   });
 };
 
 ColorPalette.prototype.addEventListeners = function () {
   var self = this;
-  _.each(this.colorElements, function (element) {
+  _.each(this.paletteElements, function (element) {
     element.addEventListener('click', function (event) {
       var element = event.currentTarget;
-      self.parent.drawableSurface.selectedColor = element.style.backgroundColor;
+      if (/color/.test(element.className)) {
+        self.parent.drawableSurface.selectedStyle = element.style.backgroundColor;
+      } else {
+        self.parent.drawableSurface.selectedStyle = customAnimatedBlocks[element.getAttribute('data-id')];
+      }
     });
   });
 };
@@ -353,6 +427,11 @@ new ColorPalette(_.values(colorDictionary), qs('#constructor-color-palette .colu
 new ColorPalette(_.values(grayscaleDictionary), qs('#constructor-color-palette .column1'), editorArea);
 
 
+var customBlocks = [];
+var block = new AnimatedBlock(['red', 'blue']);
+customBlocks.push(block);
+
+new ColorPalette(customBlocks, qs('#main-color-palette .column3'), mainArea);
 
 
 
