@@ -5,3 +5,13 @@ document.body.addEventListener('mousedown', function () {
 document.body.addEventListener('mouseup', function () {
   mouseIsDown = false;
 });
+
+function preventDefaultClickEventsOnTheseIds (listOfIds) {
+  _.each(listOfIds, function (id) {
+    eid(id).addEventListener('click', function (event) {
+      event.preventDefault();
+    });
+  });
+}
+
+preventDefaultClickEventsOnTheseIds(['save-block', 'new-layer', 'remove-layer']);

@@ -1,11 +1,5 @@
 ### working on now:
-- allow saving animated blocks to the main canvas color palette
-- have animated blocks that are added to the main canvas start at the same index as the other blocks... how? when a new block is added just reset everyone to zero
-- saving blocks from the editor area to the main color palette
-  - either:
-    - color palettes area going to be able to have patterns instead of colors (i.e. an array of colors in place of a color) or
-    - there will be custom palettes
-  - either way the main drawable area will have to be able to have animated blocks as part of its map... i think. unless there's just an array of animated blocks that get rendered every 300ms. okay, but either way the main drawable area will have to have patterns as part of its map, so that it can draw its area over and over again. and then the animated blocks should be on top of that... but wait, animated blocks should be able to be backgrounds too. some should be able to move. and some should stay stationary. make them all moveable but just let them stay stationary if they're stationary. so... layers? layers of layers of layers? where does it end?? just layers of layers. and just one layer deep. for now. and a background layer that's static. stuff in front can be static or animated. those will be animated blocks. and then there's just patterns. i can make those after i'm done adding animated blocks to the main color palette. so the main drawable area will be able to have animatedBlocks and patterns inside of its map.
+
 
 ### what i *need* before launching:
 - layers
@@ -15,38 +9,55 @@
   - ✔ remove
   - show which layer is selected with an icon or something
   - ✔ ability to select a layer 
-  - show previous layer on top of current layer with some transparency
-  - link each layer to the preview animation
+  - checkbox option: show previous layer on top of current layer with some transparency
+  - ✔ link each layer to the preview animation
   - get the animate preview working
-- save block
-  - unique id (from underscore)
-  - add to main color palette
-- be able to paint with custom boxes
+  - checkbox option: indicate a layer is a background or foreground object... necessary?
+- ✔ save block
+  - ✔ unique id (from underscore)
+  - ✔ add to main color palette
+- new block button working
+- ✔ color palette
+- ✔ be able to paint with custom boxes
 - show selected color
-- be able to check a box to specify a box as a background layer or a foreground object
-- be able to check a box to see that last layer that you're painting over for an object
-- delete objects from main board
+- delete objects from main area
 - delete objects from main color palette
-- data persistence
-
+- !!! data persistence
 
 ### would be *really* nice to have:
 - a transparent color
+  - is this possible? would require redrawing transparent blocks the same as the underlying canvas. possible.
 - add journeyship logo (with sail moving)
-- use version control
 - speech bubbles
-
+- select a block in the main area or the main color palette in order to edit it
+- selected block follows cursor
 
 ### would be nice to have:
 - add arbitrary colors to the main color palette and the object color palette
-- interaction rules
-- custom animation interval
+- paths for movable blocks to move on top of
+- rules for specifying how blocks interact
+- global custom animation interval
 
-
+### eventually:
+- clean up rendering
+  - there's currently two ways that blocks get rendered, by drawing and by updating a map and then rendering the layer. make sure these don't both get called on the same thing.
 
 
 
 ### recently finishished:
+- save block
+  - unique id (from underscore)
+  - add to main color palette- BUG: removing the first layer breaks the animation
+- BUG: removing the first layer breaks the animation
+- allow saving animated blocks to the main canvas color palette
+- have animated blocks that are added to the main canvas start at the same index as the other blocks... how? when a new block is added just reset everyone to zero
+- BUG: saving a block more than once adds more than one block
+- lined up the animations of custom blocks added to the main color palette
+- enhancement: remove margin from animated blocks in main color palette
+- BUG: saving a new animation alters the patterns of existing saved animations
+  - needed a _.cloneDeep() on the layers being passed to new AnimatedBlocks
+
+### finished:
 - made an editorArea object to manage the editing area. it creates layers and has an animatedBlock and a drawableSurface as properties.
 - do a test with a bunch of animating blocks so you can see what the performance will be like and so you can see how you should organize your code
 - getting drawing on the constructorBlock to update the selected layer in the sidebar and the animation (it should just update the layer map thingie and that should broadcast the changes and then they can re-render and stuff)
