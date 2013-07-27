@@ -69,7 +69,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .color-palette .block {
   display: block;
-  border: 3px solid #fff;
+}
+
+.color-palette .palette-element-container {
+  padding: 2px;
+  border: 1px solid #fff;
+  overflow: auto;
+}
+
+.color-palette .palette-element-container.selected {
+  border: 1px solid #000;
 }
 
 /* Main Section */

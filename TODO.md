@@ -45,6 +45,14 @@
 
 
 ### recently finishished:
+- transfered entire project to jquery
+
+
+
+
+
+### finished:
+- BUG: can select more than one color in one color palette as long as it's in different row. time to use a query selector engine like sizzle? or rye.js? or jquery? jquery it is.
 - save block
   - unique id (from underscore)
   - add to main color palette- BUG: removing the first layer breaks the animation
@@ -56,8 +64,6 @@
 - enhancement: remove margin from animated blocks in main color palette
 - BUG: saving a new animation alters the patterns of existing saved animations
   - needed a _.cloneDeep() on the layers being passed to new AnimatedBlocks
-
-### finished:
 - made an editorArea object to manage the editing area. it creates layers and has an animatedBlock and a drawableSurface as properties.
 - do a test with a bunch of animating blocks so you can see what the performance will be like and so you can see how you should organize your code
 - getting drawing on the constructorBlock to update the selected layer in the sidebar and the animation (it should just update the layer map thingie and that should broadcast the changes and then they can re-render and stuff)

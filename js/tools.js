@@ -1,42 +1,53 @@
-function convertToArray (arrayLike) {
-  var newArray = [];
-  _.each(arrayLike, function (item) {
-    newArray.push(item);
-  });
-  return newArray;
-}
+(function($) {
 
-function qsa (selector) {
-   var results = document.querySelectorAll(selector);
+  var o = $({});
 
-   return results ? convertToArray(results) : null;
-}
+  $.subscribe = function() {
+    o.on.apply(o, arguments);
+  };
 
-function qs (selector) {
-  return document.querySelector(selector);
-}
+  $.unsubscribe = function() {
+    o.off.apply(o, arguments);
+  };
 
-function eid (id) {
-  return document.getElementById(id);
-}
+  $.publish = function() {
+    o.trigger.apply(o, arguments);
+  };
+
+}(jQuery));
 
 function makeNewElement (type) {
   if (!type) {
-    return document.createElement("div");
+    type = 'div';
   }
 
   switch (type) {
     case "div":
-      return document.createElement("div");
+      return $('<div></div>');
     case "canvas":
-      return document.createElement("canvas");
+      return $('<canvas></canvas>');
   }
 }
 
+
 function makeNewBlock () {
   var block = makeNewElement('canvas');
-  block.className = 'block';
-  block.width = defaultCellSize;
-  block.height = defaultCellSize;
+  block.addClass('block');
+  block.attr('width', defaultCellSize);
+  block.attr('height', defaultCellSize);
   return block;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

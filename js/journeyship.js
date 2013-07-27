@@ -11,7 +11,7 @@ function AnimatedBlock (layers) {
   self.layers = [];
   self.layerIndex = -1;
   self.animationInterval = null;
-  self.animatedElement = null;
+  self.$animatedElement = null;
 
   _.each(layers, function (layer) {
     self.addLayer(layer);
@@ -36,7 +36,7 @@ AnimatedBlock.prototype.addLayer = function (value, layerNum) {
   layerNum = layerNum || this.layers.length;
   this.layers.splice(layerNum, 0, layer);
 
-  PubSub.publish('added layer', {
+  $.publish('added-layer', {
     layer: layer,
     animatedBlock: this
   });
@@ -57,12 +57,12 @@ AnimatedBlock.prototype.changeLayerValue = function (layerNum, indexNum, newValu
   }
 
   this.layers[layerNum][indexNum] = newValue;
-  //PubSub.publish('changed layer value'); // nothing subscribed
+  //$.publish('changed-layer-value'); // nothing subscribed
 };
 
 AnimatedBlock.prototype.removeLayer = function (layerNum) {
   this.layers.splice(layerNum, 1);
-  PubSub.publish('removed layer', layerNum);
+  $.publish('removed-layer', layerNum);
 };
 
 AnimatedBlock.prototype.nextLayer = function () {
@@ -80,9 +80,9 @@ AnimatedBlock.prototype.nextLayer = function () {
 
 AnimatedBlock.prototype.animate = function () {
   var self = this;
-  var context = self.animatedElement.getContext('2d');
+  var context = self.$animatedElement[0].getContext('2d');
   // this should show and hide elements instead of drawing over and over again
-  applyMapToContext(self.nextLayer(), context, defaultTinyCellSize, self.animatedElement.width / defaultTinyCellSize);
+  applyMapToContext(self.nextLayer(), context, defaultTinyCellSize, self.$animatedElement.width() / defaultTinyCellSize);
 };
 
 AnimatedBlock.prototype.startAnimation = function () {
@@ -174,12 +174,12 @@ function applyMapToContext (map, context, cellSize, columns, options) {
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface (element, cellSize, defaultCellColor) {
+function DrawableSurface ($element, cellSize, defaultCellColor) {
   var self = this;
-  self.element = element;
+  self.$element = $element;
   self.cellSize = cellSize || defaultCellSize;
-  self.columns = self.element.width / self.cellSize;
-  self.rows = self.element.height / self.cellSize;
+  self.columns = self.$element.width() / self.cellSize;
+  self.rows = self.$element.height() / self.cellSize;
   self.selectedStyle = '#000';
   self.map = self.makeMap(defaultCellColor || '#fff');
   self.animatedMap = self.makeMap(null);
@@ -210,7 +210,7 @@ DrawableSurface.prototype.makeMap = function (cellColor) {
 };
 
 DrawableSurface.prototype.render = function () {
-  applyMapToContext(this.map, this.element.getContext('2d'), this.cellSize, this.columns);
+  applyMapToContext(this.map, this.$element[0].getContext('2d'), this.cellSize, this.columns);
 };
 
 DrawableSurface.prototype.updateMap = function (x, y) {
@@ -218,7 +218,7 @@ DrawableSurface.prototype.updateMap = function (x, y) {
   var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, this.columns);
   this.map[cellPositionInArray] = this.selectedStyle;
 
-  PubSub.publish("updated map", {
+  $.publish("updated-map", {
     surface: this,
     index: cellPositionInArray,
     value: this.selectedStyle
@@ -226,7 +226,7 @@ DrawableSurface.prototype.updateMap = function (x, y) {
 };
 
 DrawableSurface.prototype.drawHere = function (x, y) {
-  drawCell(this.element.getContext('2d'), x, y, this.cellSize, this.selectedStyle);
+  drawCell(this.$element[0].getContext('2d'), x, y, this.cellSize, this.selectedStyle);
   this.updateMap(x,y);
 };
 
@@ -249,20 +249,20 @@ DrawableSurface.prototype.makeDrawable = function () {
     }
   }
 
-  self.element.addEventListener('mousedown', function (event) {
+  self.$element.on('mousedown', function (event) {
     drawIt(event);
-  }, false);
+  });
 
-  self.element.addEventListener('mousemove', function (event) {
+  self.$element.on('mousemove', function (event) {
     if (mouseIsDown) {
       drawIt(event);
     }
-  }, false);
+  });
 };
 
 DrawableSurface.prototype.renderAnimatedMap = function () {
   var self = this;
-  var context = self.element.getContext('2d');
+  var context = self.$element[0].getContext('2d');
 
   _.each(self.animatedMap, function (block, index) {
     if (block) {
@@ -279,13 +279,13 @@ DrawableSurface.prototype.renderAnimatedMap = function () {
 
 var editorArea = {
   animatedBlock: new AnimatedBlock(),
-  drawableSurface: new DrawableSurface(eid('constructor-area'), defaultCellSize),
+  drawableSurface: new DrawableSurface($('#constructor-area'), defaultCellSize),
   selectedLayerNum: 0,
-  layersContainerElement: qs('.layers'),
+  $layersContainerElement: $('.layers'),
   renderSelectedLayer: function () {
     // renders the selected layer based on the selected layer in the attached animated block
     var selectedLayer = this.animatedBlock.layers[this.selectedLayerNum],
-    drawableContext = this.drawableSurface.element.getContext('2d');
+    drawableContext = this.drawableSurface.$element[0].getContext('2d');
 
     if (selectedLayer) {
       // this might be a little redundant. need to decide whether to update the layer by drawing on it directly or by updating a map, not both
@@ -293,41 +293,41 @@ var editorArea = {
     }
 
     // this renders the thumbnail of the selected layer
-    var smallLayer = qsa('.layers .layer-container .block')[this.selectedLayerNum];
+    var smallLayer = $('.layers .layer-container .block')[this.selectedLayerNum];
     var columns = smallLayer.width / defaultTinyCellSize;
     applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns);
   },
   addLayer: function (layerPattern) {
     var self = this;
-    var layerElement = makeNewBlock();
-    var layerContainer = makeNewElement();
-    layerContainer.className = 'block area-container layer-container';
-    layerContainer.appendChild(layerElement);
-    this.layersContainerElement.appendChild(layerContainer);
+    var $layerElement = makeNewBlock();
+    var $layerContainer = makeNewElement();
+    $layerContainer.addClass('block area-container layer-container');
+    $layerContainer.append($layerElement);
+    this.$layersContainerElement.append($layerContainer);
 
-    layerContainer.addEventListener('mousedown', function (event) {
-      self.selectedLayerNum =  qsa('.layers .layer-container').indexOf(event.currentTarget);
+    $layerContainer.on('mousedown', function (event) {
+      self.selectedLayerNum =  $('.layers .layer-container').indexOf(event.currentTarget);
       self.renderSelectedLayer();
     });
 
-    var context = layerElement.getContext('2d');
-    var columns = layerElement.width / defaultTinyCellSize;
+    var context = $layerElement[0].getContext('2d');
+    var columns = $layerElement.width() / defaultTinyCellSize;
     applyMapToContext(layerPattern, context, defaultTinyCellSize, columns);
   },
   removeLayer: function (layerNum) {
-    qsa('.layers .layer-container')[layerNum].remove();
+    $('.layers .layer-container')[layerNum].remove();
   }
 };
 
-PubSub.subscribe('added layer', function (msg, stuff) {
-  if (editorArea.animatedBlock == stuff.animatedBlock) {
-    editorArea.addLayer(stuff.layer);
+$.subscribe('added-layer', function (event, addedLayerUpdate) {
+  if (editorArea.animatedBlock == addedLayerUpdate.animatedBlock) {
+    editorArea.addLayer(addedLayerUpdate.layer);
     // should only call the following when drawing
     editorArea.renderSelectedLayer();
   }
 });
 
-PubSub.subscribe('removed layer', function (msg, layerNum) {
+$.subscribe('removed-layer', function (event, layerNum) {
   editorArea.removeLayer(layerNum);
   editorArea.animatedBlock.resetIndex();
 });
@@ -337,28 +337,28 @@ PubSub.subscribe('removed layer', function (msg, layerNum) {
 
 editorArea.animatedBlock.addLayers(['red', 'blue', 'orange']);
 
-var animatedElement = makeNewBlock();
-eid('preview-container').appendChild(animatedElement);
-editorArea.animatedBlock.animatedElement = animatedElement;
+var $animatedElement = makeNewBlock();
+$('#preview-container').append($animatedElement);
+editorArea.animatedBlock.$animatedElement = $animatedElement;
 editorArea.animatedBlock.startAnimation();
 
 
 
-// remove layer dom event
+// remove layer: dom event
 
-eid('remove-layer').addEventListener('mousedown', function () {
+$('#remove-layer').on('mousedown', function () {
   editorArea.animatedBlock.removeLayer(editorArea.selectedLayerNum);
 });
 
 // add blank layer dom event
 
-eid('new-layer').addEventListener('mousedown', function () {
+$('#new-layer').on('mousedown', function () {
   editorArea.animatedBlock.addLayer("#fff");
 });
 
 // this makes sure the editor area's layers and animated block get updated
 
-PubSub.subscribe('updated map', function (msg, update) {
+$.subscribe('updated-map', function (event, update) {
   if (update.surface === editorArea.drawableSurface) {
     editorArea.animatedBlock.changeLayerValue(editorArea.selectedLayerNum, update.index, update.value);
     // updates the thumbnail of the selected layer (and the selected layer itself) based on the selected layer of the attached animated block
@@ -369,16 +369,16 @@ PubSub.subscribe('updated map', function (msg, update) {
 // set up main canvas
 
 var mainArea = {
-  drawableSurface: new DrawableSurface(eid('main-area'), defaultCellSize)
+  drawableSurface: new DrawableSurface($('#main-area'), defaultCellSize)
 };
 
 // there should be a better way than this
 var customAnimatedBlocks = {};
 
-function ColorPalette (map, container, parent) {
+function ColorPalette (map, $container, parent) {
   var self = this;
   self.map = [];
-  self.containerElement = container;
+  self.$containerElement = $container;
   self.paletteElements = [];
   self.parent = parent;
 
@@ -395,61 +395,80 @@ ColorPalette.prototype.addMapValue = function (value) {
 };
 
 ColorPalette.prototype.generatePaletteElement = function (value) {
+  var $paletteElementContainer = makeNewElement();
+  $paletteElementContainer.addClass('palette-element-container');
+
   if (typeof(value) === 'object' && value.layers) {
-    var animatedElement = makeNewBlock();
-    animatedElement.className = animatedElement.className ? animatedElement.className + " animated" : "animated";
+    var animatedBlock = value;
+
+    var $animatedElement = makeNewBlock();
+    $animatedElement.addClass('animated');
+
     var unique = _.uniqueId('id-');
-    animatedElement.setAttribute('data-id', unique);
-    customAnimatedBlocks[unique] = value;
-    value.animatedElement = animatedElement;
-    value.startAnimation();
-    this.paletteElements.push(animatedElement);
-    return animatedElement;
+    $animatedElement.attr('data-id', unique);
+    customAnimatedBlocks[unique] = animatedBlock;
+
+    animatedBlock.$animatedElement = $animatedElement;
+    animatedBlock.startAnimation();
+
+    $paletteElementContainer.append($animatedElement);
+
+    this.paletteElements.push($paletteElementContainer);
+    return $paletteElementContainer;
   } else if (typeof(value) === 'string') {
-    var colorElement = makeNewElement();
-    colorElement.className = "color block";
-    colorElement.style.backgroundColor = value;
-    this.paletteElements.push(colorElement);
-    return colorElement;
+    var $colorElement = makeNewElement();
+    $colorElement.addClass("color block");
+    $colorElement.css('background-color', value);
+
+    $paletteElementContainer.append($colorElement);
+
+    this.paletteElements.push($paletteElementContainer);
+    return $paletteElementContainer;
   }
 };
 
 ColorPalette.prototype.render = function (mapNum) {
-  // this should be called something other than render and should probably be called as a subscription to adding a map value
+  // this should be called something other than render and should probably be called as a subscription to adding a map value or something
   var self = this;
-  if (mapNum) {
-    self.containerElement.appendChild(self.generatePaletteElement(self.map[mapNum]));
+  if (typeof(mapNum) != 'undefined') {
+    self.$containerElement.append(self.generatePaletteElement(self.map[mapNum]));
   } else {
     _.each(self.map, function (value) {
-      self.containerElement.appendChild(self.generatePaletteElement(value));
+      self.$containerElement.append(self.generatePaletteElement(value));
     });
   }
 };
 
 ColorPalette.prototype.addEventListeners = function () {
+  // this should unbind the previous event listeners before attaching new ones
   var self = this;
-  _.each(this.paletteElements, function (element) {
-    element.addEventListener('click', function (event) {
-      var element = event.currentTarget;
-      if (/color/.test(element.className)) {
-        self.parent.drawableSurface.selectedStyle = element.style.backgroundColor;
+
+  _.each(self.paletteElements, function ($element) {
+    $element.on('click', function (event) {
+      var $clickedElement = $(event.currentTarget);
+
+      $clickedElement.parent().parent().find('.palette-element-container.selected').removeClass('selected');
+      $clickedElement.addClass('selected');
+
+      var childrenThatAreColors = $clickedElement.children('.color');
+      if (childrenThatAreColors.length) {
+        self.parent.drawableSurface.selectedStyle = childrenThatAreColors.eq(0).css('background-color');
       } else {
-        self.parent.drawableSurface.selectedStyle = customAnimatedBlocks[element.getAttribute('data-id')];
+        self.parent.drawableSurface.selectedStyle = customAnimatedBlocks[$clickedElement.children().eq(0).attr('data-id')];
       }
     });
   });
 };
 
 
-new ColorPalette(_.values(colorDictionary), qs('#main-color-palette .column5'), mainArea);
-new ColorPalette(_.values(grayscaleDictionary), qs('#main-color-palette .column4'), mainArea);
-new ColorPalette(_.values(colorDictionary), qs('#constructor-color-palette .column2'), editorArea);
-new ColorPalette(_.values(grayscaleDictionary), qs('#constructor-color-palette .column1'), editorArea);
+new ColorPalette(_.values(colorDictionary), $('#main-color-palette .column5'), mainArea);
+new ColorPalette(_.values(grayscaleDictionary), $('#main-color-palette .column4'), mainArea);
+new ColorPalette(_.values(colorDictionary), $('#constructor-color-palette .column2'), editorArea);
+new ColorPalette(_.values(grayscaleDictionary), $('#constructor-color-palette .column1'), editorArea);
 
-var customBlocksColorPalette = new ColorPalette([], qs('#main-color-palette .column3'), mainArea);
+var customBlocksColorPalette = new ColorPalette([], $('#main-color-palette .column3'), mainArea);
 
-eid('save-block').addEventListener('mousedown', function (event) {
-  console.log(editorArea.animatedBlock.layers);
+$('#save-block').on('mousedown', function (event) {
   customBlocksColorPalette.addMapValue(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers)));
   // add map should automatically call the following or something
   customBlocksColorPalette.render(customBlocksColorPalette.map.length - 1);

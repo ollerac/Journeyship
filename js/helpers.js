@@ -8,10 +8,10 @@ document.body.addEventListener('mouseup', function () {
 
 function preventDefaultClickEventsOnTheseIds (listOfIds) {
   _.each(listOfIds, function (id) {
-    eid(id).addEventListener('click', function (event) {
+    $(id).on('click', function (event) {
       event.preventDefault();
     });
   });
 }
 
-preventDefaultClickEventsOnTheseIds(['save-block', 'new-layer', 'remove-layer']);
+preventDefaultClickEventsOnTheseIds(['#save-block', '#new-layer', '#remove-layer']);
