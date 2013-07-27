@@ -78,7 +78,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .color-palette .palette-element-container.selected {
-  border: 1px solid #000;
+  border: 1px solid #666;
 }
 
 /* Main Section */
@@ -99,12 +99,26 @@ h1, h2, h3, h4, h5, h6 {
 #constructor-container {
   width: 540px;
   margin: 0 auto;
-  overflow: auto;
 }
 
 #constructor-layers-container {
   width: 120px;
   float: left;
+}
+
+.layer-container {
+  position: relative;
+}
+
+.arrow {
+  display: none;
+}
+
+.layer-container.selected .arrow {
+  position: absolute;
+  left: -30px;
+  top: 0;
+  display: block;
 }
 
 #constructor-layers-container .buttons-container {
@@ -136,7 +150,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-
+.clear {
+  clear: both;
+}
 
 
 

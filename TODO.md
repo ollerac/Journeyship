@@ -7,11 +7,11 @@
   - ✔ mirror objects that watch a map-like list property and update their canvas when an update method is called
   - ✔ add
   - ✔ remove
-  - show which layer is selected with an icon or something
+  - ✔ show which layer is selected with an icon or something
   - ✔ ability to select a layer 
   - checkbox option: show previous layer on top of current layer with some transparency
   - ✔ link each layer to the preview animation
-  - get the animate preview working
+  - ✔ get the animate preview working
   - checkbox option: indicate a layer is a background or foreground object... necessary?
 - ✔ save block
   - ✔ unique id (from underscore)
@@ -19,12 +19,14 @@
 - new block button working
 - ✔ color palette
 - ✔ be able to paint with custom boxes
-- show selected color
+- ✔ show selected color
 - delete objects from main area
 - delete objects from main color palette
 - !!! data persistence
+- ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
 ### would be *really* nice to have:
+- double click on a color to reveal similar colors, add a back button to go back to main color palette
 - a transparent color
   - is this possible? would require redrawing transparent blocks the same as the underlying canvas. possible.
 - add journeyship logo (with sail moving)
@@ -41,14 +43,18 @@
 ### eventually:
 - clean up rendering
   - there's currently two ways that blocks get rendered, by drawing and by updating a map and then rendering the layer. make sure these don't both get called on the same thing.
+- add EventEmitter2 library to make handling events easier. object could inherit from event emitters.
+- maybe: add javascript-state-machine library. what could i use it for?
 
 
 
 ### recently finishished:
-- transfered entire project to jquery
-
-
-
+- ENHANCEMENT: saved layers should be selected by default
+- ENHANCEMENT: palettes should be responsible for multiple columns of colors and animated blocks and should be able to add new columns
+- ENHANCEMENT: new layers should be selected by default
+- removed font awesome
+- BUG: no color is shown as selected at startup
+- BUG: removing the selected layer doesn't update the editor's selected layer
 
 
 ### finished:

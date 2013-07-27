@@ -293,20 +293,31 @@ var editorArea = {
     }
 
     // this renders the thumbnail of the selected layer
-    var smallLayer = $('.layers .layer-container .block')[this.selectedLayerNum];
-    var columns = smallLayer.width / defaultTinyCellSize;
-    applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns);
+    if (this.selectedLayerNum >= 0) {
+      var smallLayer = $('.layers .layer-container .block')[this.selectedLayerNum];
+      var columns = smallLayer.width / defaultTinyCellSize;
+      applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns);
+    }
   },
   addLayer: function (layerPattern) {
     var self = this;
     var $layerElement = makeNewBlock();
     var $layerContainer = makeNewElement();
-    $layerContainer.addClass('block area-container layer-container');
-    $layerContainer.append($layerElement);
+    var $arrowElement = $('<div class="arrow"><img src="img/arrow.png" /></div>');
+    $layerContainer.addClass('block area-container layer-container selected');    
+    $layerContainer.append($layerElement.add($arrowElement));
     this.$layersContainerElement.append($layerContainer);
+    $layerContainer.siblings('.layer-container').removeClass('selected');
+    self.selectedLayerNum = $('.layers .layer-container').index($layerContainer);
+    self.renderSelectedLayer();
 
     $layerContainer.on('mousedown', function (event) {
-      self.selectedLayerNum =  $('.layers .layer-container').indexOf(event.currentTarget);
+      $clickedElement = $(event.currentTarget);
+
+      $clickedElement.addClass('selected');
+      $clickedElement.siblings('.layer-container').removeClass('selected');
+
+      self.selectedLayerNum =  $('.layers .layer-container').index($clickedElement);
       self.renderSelectedLayer();
     });
 
@@ -315,56 +326,63 @@ var editorArea = {
     applyMapToContext(layerPattern, context, defaultTinyCellSize, columns);
   },
   removeLayer: function (layerNum) {
-    $('.layers .layer-container')[layerNum].remove();
+    $('.layers .layer-container').eq(layerNum).remove();
+
+    if (layerNum == self.selectedLayerNum) {
+      if (self.selectedLayerNum === self.animatedBlock.layers.length) {
+        self.selectedLayerNum = self.selectedLayerNum - 1;
+
+        if (self.selectedLayerNum === -1) {
+          self.animatedBlock.addLayer('#fff');
+          self.selectedLayerNum = 0;
+        }
+      }
+
+      $('.layers .layer-container').eq(self.selectedLayerNum).addClass('selected');;
+      self.renderSelectedLayer();
+    }
+  },
+  setup: function () {
+    self = this;
+
+    $.subscribe('added-layer', function (event, addedLayerUpdate) {
+      if (self.animatedBlock == addedLayerUpdate.animatedBlock) {
+        self.addLayer(addedLayerUpdate.layer);
+      }
+    });
+
+    $.subscribe('removed-layer', function (event, layerNum) {
+      self.removeLayer(layerNum);
+      self.animatedBlock.resetIndex();
+    });
+
+    $.subscribe('updated-map', function (event, update) {
+      if (update.surface === editorArea.drawableSurface) {
+        editorArea.animatedBlock.changeLayerValue(editorArea.selectedLayerNum, update.index, update.value);
+        // updates the thumbnail of the selected layer (and the selected layer itself) based on the selected layer of the attached animated block
+        editorArea.renderSelectedLayer();
+      }
+    });
+
+    self.animatedBlock.addLayers(['red', 'blue', 'orange']);
+    var $animatedElement = makeNewBlock();
+    $('#preview-container').append($animatedElement);
+    self.animatedBlock.$animatedElement = $animatedElement;
+    self.animatedBlock.startAnimation();
+
+    $('#remove-layer').on('mousedown', function () {
+      editorArea.animatedBlock.removeLayer(editorArea.selectedLayerNum);
+    });
+
+    $('#new-layer').on('mousedown', function () {
+      editorArea.animatedBlock.addLayer("#fff");
+    });
+
   }
 };
 
-$.subscribe('added-layer', function (event, addedLayerUpdate) {
-  if (editorArea.animatedBlock == addedLayerUpdate.animatedBlock) {
-    editorArea.addLayer(addedLayerUpdate.layer);
-    // should only call the following when drawing
-    editorArea.renderSelectedLayer();
-  }
-});
+editorArea.setup();
 
-$.subscribe('removed-layer', function (event, layerNum) {
-  editorArea.removeLayer(layerNum);
-  editorArea.animatedBlock.resetIndex();
-});
-
-
-// create animated block and start animating its element in the dom
-
-editorArea.animatedBlock.addLayers(['red', 'blue', 'orange']);
-
-var $animatedElement = makeNewBlock();
-$('#preview-container').append($animatedElement);
-editorArea.animatedBlock.$animatedElement = $animatedElement;
-editorArea.animatedBlock.startAnimation();
-
-
-
-// remove layer: dom event
-
-$('#remove-layer').on('mousedown', function () {
-  editorArea.animatedBlock.removeLayer(editorArea.selectedLayerNum);
-});
-
-// add blank layer dom event
-
-$('#new-layer').on('mousedown', function () {
-  editorArea.animatedBlock.addLayer("#fff");
-});
-
-// this makes sure the editor area's layers and animated block get updated
-
-$.subscribe('updated-map', function (event, update) {
-  if (update.surface === editorArea.drawableSurface) {
-    editorArea.animatedBlock.changeLayerValue(editorArea.selectedLayerNum, update.index, update.value);
-    // updates the thumbnail of the selected layer (and the selected layer itself) based on the selected layer of the attached animated block
-    editorArea.renderSelectedLayer();
-  }
-});
 
 // set up main canvas
 
@@ -381,18 +399,13 @@ function ColorPalette (map, $container, parent) {
   self.$containerElement = $container;
   self.paletteElements = [];
   self.parent = parent;
+  self.columnElements = [];
+  self.fillThisColumn = 0;
 
   _.each(map, function (value) {
-    self.addMapValue(value);
+    self.addStyle(value);
   });
-
-  self.render();
-  self.addEventListeners();
 }
-
-ColorPalette.prototype.addMapValue = function (value) {
-  this.map.push(value);
-};
 
 ColorPalette.prototype.generatePaletteElement = function (value) {
   var $paletteElementContainer = makeNewElement();
@@ -412,73 +425,104 @@ ColorPalette.prototype.generatePaletteElement = function (value) {
     animatedBlock.startAnimation();
 
     $paletteElementContainer.append($animatedElement);
-
-    this.paletteElements.push($paletteElementContainer);
-    return $paletteElementContainer;
   } else if (typeof(value) === 'string') {
+    var color = value;
+
     var $colorElement = makeNewElement();
     $colorElement.addClass("color block");
-    $colorElement.css('background-color', value);
+    $colorElement.css('background-color', color);
 
     $paletteElementContainer.append($colorElement);
-
-    this.paletteElements.push($paletteElementContainer);
-    return $paletteElementContainer;
   }
+
+  this.paletteElements.push($paletteElementContainer);
+  return $paletteElementContainer;
 };
 
-ColorPalette.prototype.render = function (mapNum) {
-  // this should be called something other than render and should probably be called as a subscription to adding a map value or something
-  var self = this;
-  if (typeof(mapNum) != 'undefined') {
-    self.$containerElement.append(self.generatePaletteElement(self.map[mapNum]));
+ColorPalette.prototype.addColumn = function () {
+  var $column = $('<div class="column"></div>');
+  this.columnElements.push($column);
+  this.$containerElement.append($column);
+  return $column;
+};
+
+ColorPalette.prototype.addPaletteElement = function ($element) {
+  var $column;
+
+  if (this.fillThisColumn === this.columnElements.length) {
+    $column = this.addColumn();
   } else {
-    _.each(self.map, function (value) {
-      self.$containerElement.append(self.generatePaletteElement(value));
-    });
+    $column = this.columnElements[this.fillThisColumn];
+  }
+
+  $column.append($element);
+
+  _.each(this.paletteElements, function ($element) {
+    $element.removeClass('selected');
+  });
+  $element.addClass('selected');
+
+  var color = $element.children('.color').eq(0).css('background-color');
+  var dataId = $element.children('.animated').eq(0).attr('data-id');
+  if (dataId) {
+    this.parent.drawableSurface.selectedStyle = customAnimatedBlocks[dataId];
+  } else {
+    this.parent.drawableSurface.selectedStyle = color;
+  }
+
+  this.addEventListeners($element);
+
+  if (this.paletteElements.length % 12 === 0) {
+    this.fillThisColumn = this.fillThisColumn + 1;
   }
 };
 
-ColorPalette.prototype.addEventListeners = function () {
+ColorPalette.prototype.addMapValue = function (value) {
+  this.map.push(value);
+};
+
+ColorPalette.prototype.addStyle = function (value) {
+  this.addMapValue(value);
+
+  var paletteElement = this.generatePaletteElement(value);
+  this.addPaletteElement(paletteElement);
+};
+
+ColorPalette.prototype.addEventListeners = function ($paletteElement) {
   // this should unbind the previous event listeners before attaching new ones
+  // or find time to bind this: do it when palette items are added instead of looping over all of them every time
   var self = this;
 
-  _.each(self.paletteElements, function ($element) {
-    $element.on('click', function (event) {
-      var $clickedElement = $(event.currentTarget);
+  $paletteElement.on('click', function (event) {
+    var $clickedElement = $(event.currentTarget);
 
-      $clickedElement.parent().parent().find('.palette-element-container.selected').removeClass('selected');
-      $clickedElement.addClass('selected');
+    $clickedElement.parent().parent().find('.palette-element-container.selected').removeClass('selected');
+    $clickedElement.addClass('selected');
 
-      var childrenThatAreColors = $clickedElement.children('.color');
-      if (childrenThatAreColors.length) {
-        self.parent.drawableSurface.selectedStyle = childrenThatAreColors.eq(0).css('background-color');
-      } else {
-        self.parent.drawableSurface.selectedStyle = customAnimatedBlocks[$clickedElement.children().eq(0).attr('data-id')];
-      }
-    });
+    var childrenThatAreColors = $clickedElement.children('.color');
+    if (childrenThatAreColors.length) {
+      self.parent.drawableSurface.selectedStyle = childrenThatAreColors.eq(0).css('background-color');
+    } else {
+      self.parent.drawableSurface.selectedStyle = customAnimatedBlocks[$clickedElement.children().eq(0).attr('data-id')];
+    }
   });
 };
 
+var colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
+var mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
+new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
 
-new ColorPalette(_.values(colorDictionary), $('#main-color-palette .column5'), mainArea);
-new ColorPalette(_.values(grayscaleDictionary), $('#main-color-palette .column4'), mainArea);
-new ColorPalette(_.values(colorDictionary), $('#constructor-color-palette .column2'), editorArea);
-new ColorPalette(_.values(grayscaleDictionary), $('#constructor-color-palette .column1'), editorArea);
-
-var customBlocksColorPalette = new ColorPalette([], $('#main-color-palette .column3'), mainArea);
 
 $('#save-block').on('mousedown', function (event) {
-  customBlocksColorPalette.addMapValue(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers)));
-  // add map should automatically call the following or something
-  customBlocksColorPalette.render(customBlocksColorPalette.map.length - 1);
-  customBlocksColorPalette.addEventListeners();
+  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers)));
 
   //this is for making their animations line up 
-  _.each(customBlocksColorPalette.map, function (block) {
-    block.pauseAnimation();
-    block.resetIndex();
-    block.startAnimation();
+  _.each(mainColorPalette.map, function (block) {
+    if (block.layers) {
+      block.pauseAnimation();
+      block.resetIndex();
+      block.startAnimation();
+    }
   });
 });
 
