@@ -6,12 +6,13 @@ var grayscaleDictionary = {"black1": "#fff", "black2": "#e8e8e8", "black3": "#d1
 
 // setup animated block
 
-function AnimatedBlock (layers) {
+function AnimatedBlock (layers, isBackgroundObject) {
   var self = this;
   self.layers = [];
   self.layerIndex = -1;
   self.animationInterval = null;
   self.$animatedElement = null;
+  self.isBackgroundObject = isBackgroundObject || false;
 
   _.each(layers, function (layer) {
     self.addLayer(layer);
@@ -187,6 +188,7 @@ function DrawableSurface ($element, $drawableElement, cellSize, defaultCellColor
   self.makeDrawable();
   self.animatedInterval = null;
 
+  self.render();
   self.startAnimating();
 }
 
@@ -240,7 +242,7 @@ DrawableSurface.prototype.makeDrawable = function () {
       self.drawHere(cellPosition.x, cellPosition.y);
     } else if (typeof(self.selectedStyle) === 'object' && self.selectedStyle.layers) {
       var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
-      self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+      self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers), self.selectedStyle.isBackgroundObject);
 
       _.each(self.animatedMap, function (block) {
         if (block) {
@@ -378,7 +380,7 @@ var editorArea = {
       }
     });
 
-    self.animatedBlock.addLayers(['red', 'blue', 'orange']);
+    self.animatedBlock.addLayers([colorDictionary['red'], colorDictionary['purple1'], colorDictionary['orange1']]);
     var $animatedElement = makeNewBlock();
     $('#preview-container').append($animatedElement);
     self.animatedBlock.$animatedElement = $animatedElement;
@@ -528,7 +530,7 @@ new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
 
 
 $('#save-block').on('mousedown', function (event) {
-  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers)));
+  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), editorArea.animatedBlock.isBackgroundObject));
 
   //this is for making their animations line up 
   _.each(mainColorPalette.map, function (block) {
@@ -547,7 +549,13 @@ $('#enable-shadow').on('click', function () {
 });
 
 
-
+$('#background-object').on('click', function (event) {
+  if (event.currentTarget.checked) {
+    editorArea.animatedBlock.isBackgroundObject = true;
+  } else {
+    editorArea.animatedBlock.isBackgroundObject = false;
+  }
+});
 
 
 

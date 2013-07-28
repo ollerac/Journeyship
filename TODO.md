@@ -1,7 +1,9 @@
 ### working on now:
-
+- adding checkbox option: indicate a layer is a background or foreground object (this should only be necessary if there's either transparency or if the blocks can move, neither of which can happen right now, so it's more like a stepping stone)
 
 ### what i *need* before launching:
+- new button should be on the top of the main color palette
+- different button style
 - layers
   - ✔ new layer button, new layer function 
   - ✔ mirror objects that watch a map-like list property and update their canvas when an update method is called
@@ -23,6 +25,7 @@
 - delete objects from main area
 - delete objects from main color palette
 - !!! data persistence
+- support multiple users (user accounts? url-based?)
 - ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
 ### before launch?
@@ -30,6 +33,8 @@
 - add journeyship logo (with sail moving)
 
 ### would be *really* nice to have:
+- give AnimatedBlocks a clone method
+- when you save a block it should update a block in the main color palette if there's a saved version of it there instead of creating a new one -- or saving should be different from exporting and should just save whatever you're working on (although this should be automatic probably, every 5 seconds if there's been changes)
 - double click on a color to reveal similar colors, add a back button to go back to main color palette
 - a transparent color
   - is this possible? would require redrawing transparent blocks the same as the underlying canvas. possible.
