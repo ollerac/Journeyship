@@ -174,9 +174,10 @@ function applyMapToContext (map, context, cellSize, columns, options) {
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface ($element, cellSize, defaultCellColor) {
+function DrawableSurface ($element, $drawableElement, cellSize, defaultCellColor) {
   var self = this;
   self.$element = $element;
+  self.$drawableElement = $drawableElement;
   self.cellSize = cellSize || defaultCellSize;
   self.columns = self.$element.width() / self.cellSize;
   self.rows = self.$element.height() / self.cellSize;
@@ -249,11 +250,11 @@ DrawableSurface.prototype.makeDrawable = function () {
     }
   }
 
-  self.$element.on('mousedown', function (event) {
+  self.$drawableElement.on('mousedown', function (event) {
     drawIt(event);
   });
 
-  self.$element.on('mousemove', function (event) {
+  self.$drawableElement.on('mousemove', function (event) {
     if (mouseIsDown) {
       drawIt(event);
     }
@@ -279,17 +280,30 @@ DrawableSurface.prototype.renderAnimatedMap = function () {
 
 var editorArea = {
   animatedBlock: new AnimatedBlock(),
-  drawableSurface: new DrawableSurface($('#constructor-area'), defaultCellSize),
+  drawableSurface: new DrawableSurface($('#constructor-area'), $('#constructor-area-draw-on-me'), defaultCellSize),
   selectedLayerNum: 0,
   $layersContainerElement: $('.layers'),
   renderSelectedLayer: function () {
     // renders the selected layer based on the selected layer in the attached animated block
     var selectedLayer = this.animatedBlock.layers[this.selectedLayerNum],
-    drawableContext = this.drawableSurface.$element[0].getContext('2d');
+      drawableContext = this.drawableSurface.$element[0].getContext('2d');
 
     if (selectedLayer) {
       // this might be a little redundant. need to decide whether to update the layer by drawing on it directly or by updating a map, not both
       applyMapToContext(selectedLayer, drawableContext, this.drawableSurface.cellSize, this.drawableSurface.columns);
+    }
+
+    // renders the selected layer based on the selected layer in the attached animated block
+    var shadowLayer;
+    var shadowDrawableContext;
+    if (this.selectedLayerNum > 0) {
+      shadowLayer = this.animatedBlock.layers[this.selectedLayerNum - 1];
+      shadowDrawableContext = $('#constructor-area-shadow')[0].getContext('2d');
+    }
+
+    if (shadowLayer) {
+      // this might be a little redundant. need to decide whether to update the layer by drawing on it directly or by updating a map, not both
+      applyMapToContext(shadowLayer, shadowDrawableContext, this.drawableSurface.cellSize, this.drawableSurface.columns);
     }
 
     // this renders the thumbnail of the selected layer
@@ -387,7 +401,7 @@ editorArea.setup();
 // set up main canvas
 
 var mainArea = {
-  drawableSurface: new DrawableSurface($('#main-area'), defaultCellSize)
+  drawableSurface: new DrawableSurface($('#main-area'), $('#main-area-draw-on-me'), defaultCellSize)
 };
 
 // there should be a better way than this
@@ -528,6 +542,9 @@ $('#save-block').on('mousedown', function (event) {
 
 
 
+$('#enable-shadow').on('click', function () {
+  $("#constructor-area-shadow").toggle();
+});
 
 
 

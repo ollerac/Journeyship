@@ -92,12 +92,13 @@ h1, h2, h3, h4, h5, h6 {
 #main-area-container {
   width: 900px;
   height: 300px;
+  position: relative;
 }
 
 /* Constructor */
 
 #constructor-container {
-  width: 540px;
+  width: 560px;
   margin: 0 auto;
 }
 
@@ -129,6 +130,28 @@ h1, h2, h3, h4, h5, h6 {
   float: left;
   height: 300px;
   width: 300px;
+  position: relative;
+}
+
+#constructor-area-shadow {
+  opacity: .5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+}
+
+#constructor-area-draw-on-me, #main-area-draw-on-me {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  top: 0;
+  left: 0;
+}
+
+#main-area-draw-on-me {
+  width: 900px;
+  height: 300px;
 }
 
 #constructor-color-palette {
@@ -149,6 +172,9 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 5px;
 }
 
+#enable-shadow-container {
+  clear: both;
+}
 
 .clear {
   clear: both;

@@ -9,9 +9,9 @@
   - ✔ remove
   - ✔ show which layer is selected with an icon or something
   - ✔ ability to select a layer 
-  - checkbox option: show previous layer on top of current layer with some transparency
   - ✔ link each layer to the preview animation
   - ✔ get the animate preview working
+  - ✔ checkbox option: show previous layer on top of current layer with some transparency
   - checkbox option: indicate a layer is a background or foreground object... necessary?
 - ✔ save block
   - ✔ unique id (from underscore)
@@ -25,16 +25,20 @@
 - !!! data persistence
 - ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
+### before launch?
+- simple howto video
+- add journeyship logo (with sail moving)
+
 ### would be *really* nice to have:
 - double click on a color to reveal similar colors, add a back button to go back to main color palette
 - a transparent color
   - is this possible? would require redrawing transparent blocks the same as the underlying canvas. possible.
-- add journeyship logo (with sail moving)
 - speech bubbles
-- select a block in the main area or the main color palette in order to edit it
+- ability to select a block in the main area or the main color palette in order to edit it
 - selected block follows cursor
 
 ### would be nice to have:
+- undo button with infinite undos
 - add arbitrary colors to the main color palette and the object color palette
 - paths for movable blocks to move on top of
 - rules for specifying how blocks interact
