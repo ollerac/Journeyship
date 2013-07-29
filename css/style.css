@@ -26,7 +26,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 30px;
   margin-bottom: 30px;
   font-size: 60px;
-  color: #fff;
   line-height: 1em;
 }
 
@@ -34,6 +33,12 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 16px;
   font-weight: normal;
   margin-bottom: 15px;
+}
+
+.area-heading {
+  font-size: 36px;
+  margin-bottom: 30px;
+  line-height: 1em;
 }
 
 .button {
@@ -87,10 +92,31 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #main-color-palette {
-  padding: 30px;
-  background: rgba(255,255,255,.5);
-
+  padding: 10px;
+  background-color: #fff;
+  background-color: rgba(255,255,255,.5);
+  clear: both;
 }
+
+/* top bar */
+
+#main-container-top-bar {
+    background: #fff;
+    background: rgba(255,255,255,.5);
+    padding: 10px 10px 0px 10px;
+    overflow: auto;
+    width:  882px;
+}
+
+#main-color-palette-top-bar {
+    background: #fff;
+    background: rgba(255,255,255,.5);
+    padding: 10px 10px 0px 10px;
+    overflow: auto;
+    width:  72px;
+    float: right;
+}
+
 
 /* Main Section */
 
@@ -104,6 +130,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 900px;
   height: 300px;
   position: relative;
+  float: left;
 }
 
 /* Constructor */
@@ -112,7 +139,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 560px;
   margin: 0 auto;
   background-color: rgba(255,255,255,.5);
-  padding: 30px 30px 20px 60px;
+  padding: 40px 40px 30px 60px;
 }
 
 #constructor-layers-container {
