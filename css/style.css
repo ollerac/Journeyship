@@ -162,6 +162,12 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
+.constructor-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 #constructor-layers-container .buttons-container {
   margin-bottom: 20px;
 }
@@ -173,25 +179,16 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
+#constructor-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 #constructor-area-shadow {
-  opacity: .5;
   position: absolute;
   top: 0;
   left: 0;
-  display: none;
-}
-
-#constructor-area-draw-on-me, #main-area-draw-on-me {
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  top: 0;
-  left: 0;
-}
-
-#main-area-draw-on-me {
-  width: 900px;
-  height: 300px;
 }
 
 #constructor-color-palette {

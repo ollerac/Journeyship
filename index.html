@@ -16,7 +16,7 @@
       </div>
 
       <div id='main-container-top-bar'>
-        <a href='#' class='button'>Editing foreground</a>
+        <a id='bg-fg-switch' class='button' href='#'>Editing Background</a>
       </div>
 
       <div id="main-color-palette" class="color-palette">
@@ -24,7 +24,6 @@
 
       <div id="main-area-container" class="area-container">
         <canvas id="main-area" width="900" height="300"></canvas>
-        <div id="main-area-draw-on-me"></div>
       </div>
     </div>
 
@@ -46,7 +45,7 @@
         <div class="layers">
         </div>
         <div class="buttons-container">
-          <a id="new-layer" class="button" href="#">New</a>
+          <a id="new-layer" class="button" href="#">New Layer</a>
           <a id="remove-layer" class="button warning" href="#">Remove</a>
           <div class='option-container'>
             <label><input type='checkbox' id='enable-shadow' class='checkbox' /> <div class='option'>Enable<br/>transparency</div></label>
@@ -55,9 +54,6 @@
       </div>
 
       <div id="constructor-area-container" class="area-container">
-        <canvas id="constructor-area" width="300" height="300"></canvas>
-        <canvas id="constructor-area-shadow" width="300" height="300"></canvas>
-        <div id="constructor-area-draw-on-me"></div>
       </div>
 
       <div class="clear"></div>

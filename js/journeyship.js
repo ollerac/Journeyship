@@ -2,7 +2,20 @@ var defaultCellSize = 30;
 var defaultTinyCellSize = 3;
 
 var colorDictionary = {"red": "#ff1100", "orange1": "#ff6e00", "orange2": "#ffa100", "yellow1": "#ffd400", "yellow2": "#f7ff00", "green1": "#95f200", "green2": "#00e32c", "blue1": "#00a0e6", "blue2": "#2b6af4", "purple1": "#3b00eb", "purple2": "#bd00eb", "pink": "#eb0068"};
-var grayscaleDictionary = {"black1": "#fff", "black2": "#e8e8e8", "black3": "#d1d1d1", "black4": "#bababa", "black5": "#a3a3a3", "black6": "#8c8c8c", "black7": "#737373", "black8": "#5c5c5c", "black9": "#454545", "black10": "#2e2e2e", "black11": "#171717", "black12": "#000"};
+var grayscaleDictionary = {
+  "black1": "transparent",
+  "black2": "#fff",
+  "black3": "#e5e5e5",
+  "black4": "#cccccc",
+  "black5": "#b2b2b2",
+  "black6": "#999999",
+  "black7": "#808080",
+  "black8": "#666666",
+  "black9": "#4d4d4d",
+  "black10": "#333333",
+  "black11": "#1a1a1a",
+  "black12": "#000"
+};
 
 // setup animated block
 
@@ -81,8 +94,9 @@ AnimatedBlock.prototype.nextLayer = function () {
 AnimatedBlock.prototype.animate = function () {
   var self = this;
   var context = self.$animatedElement[0].getContext('2d');
+  var layer =self.nextLayer();
   // this should show and hide elements instead of drawing over and over again
-  applyMapToContext(self.nextLayer(), context, defaultTinyCellSize, self.$animatedElement.width() / defaultTinyCellSize);
+  applyMapToContext(layer, context, defaultTinyCellSize, self.$animatedElement.width() / defaultTinyCellSize);
 };
 
 AnimatedBlock.prototype.startAnimation = function () {
@@ -104,6 +118,12 @@ function drawCell (context, x, y, size, color) {
 
   context.fillStyle = color;
   context.fillRect(x,y,size,size);
+}
+
+function clearCell (context, x, y, size) {
+  if (!size) size = defaultCellSize;
+
+  context.clearRect(x,y,size,size);
 }
 
 function getCellPositionInArrayFromPosition (x, y, cellSize, columns) {
@@ -174,20 +194,20 @@ function applyMapToContext (map, context, cellSize, columns, options) {
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface ($element, $drawableElement, cellSize, defaultCellColor) {
+function DrawableSurface ($element, cellSize, defaultCellColor) {
   var self = this;
   self.$element = $element;
-  self.$drawableElement = $drawableElement;
   self.cellSize = cellSize || defaultCellSize;
   self.columns = self.$element.width() / self.cellSize;
   self.rows = self.$element.height() / self.cellSize;
   self.selectedStyle = '#000';
-  self.map = self.makeMap(defaultCellColor || '#fff');
-  self.animatedMap = self.makeMap(null);
-  self.makeDrawable();
+  self.map = self.makeMap(defaultCellColor || '#fff'); //background, also potentially animated
+  self.animatedMap = self.makeMap(null); // foreground
   self.animatedInterval = null;
+  self.drawOnBackground = true;
 
-  self.render();
+  self.makeDrawable();
+  //self.renderFirstMap();
   self.startAnimating();
 }
 
@@ -195,7 +215,8 @@ DrawableSurface.prototype.startAnimating = function () {
   var self = this;
 
   self.animatedInterval = setInterval(function() {
-    self.renderAnimatedMap();
+    self.renderFirstMap();
+    self.renderSecondMap();
   }, 300);
 };
 
@@ -211,37 +232,45 @@ DrawableSurface.prototype.makeMap = function (cellColor) {
   return map;
 };
 
-DrawableSurface.prototype.render = function () {
-  applyMapToContext(this.map, this.$element[0].getContext('2d'), this.cellSize, this.columns);
-};
-
-DrawableSurface.prototype.updateMap = function (x, y) {
-  var cellRowAndColumn = getCellRowAndColumnFromPosition(x, y, this.cellSize);
-  var cellPositionInArray = getCellPositionInArray(cellRowAndColumn.row, cellRowAndColumn.column, this.columns);
-  this.map[cellPositionInArray] = this.selectedStyle;
-
-  $.publish("updated-map", {
-    surface: this,
-    index: cellPositionInArray,
-    value: this.selectedStyle
-  });
-};
-
-DrawableSurface.prototype.drawHere = function (x, y) {
-  drawCell(this.$element[0].getContext('2d'), x, y, this.cellSize, this.selectedStyle);
-  this.updateMap(x,y);
-};
-
 DrawableSurface.prototype.makeDrawable = function () {
   var self = this;
 
   function drawIt (event) {
     if (typeof(self.selectedStyle) === 'string') {
       var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
-      self.drawHere(cellPosition.x, cellPosition.y);
+      if (/rgba.*,.*,.*,.0\)/.test(self.selectedStyle)) {
+        clearCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize);
+      } else {
+        drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle);
+      }
+      var positionInArray = getCellPositionInArrayFromPosition(cellPosition.x, cellPosition.y, self.cellSize, self.columns);
+
+      if (self.drawOnBackground) {
+        self.map[positionInArray] = self.selectedStyle;
+      } else {
+        self.animatedMap[positionInArray] = self.selectedStyle;
+      }
+
+      $.publish("updated-map", {
+        surface: self,
+        index: positionInArray,
+        value: self.selectedStyle
+      });
+
     } else if (typeof(self.selectedStyle) === 'object' && self.selectedStyle.layers) {
       var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
-      self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+
+      if (self.drawOnBackground) {
+        self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+      } else {
+        self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+      }
+
+      $.publish("updated-map", {
+        surface: self,
+        index: positionInArray,
+        value: self.selectedStyle
+      });
 
       _.each(self.animatedMap, function (block) {
         if (block) {
@@ -251,60 +280,87 @@ DrawableSurface.prototype.makeDrawable = function () {
     }
   }
 
-  self.$drawableElement.on('mousedown', function (event) {
+  self.$element.on('mousedown', function (event) {
     drawIt(event);
   });
 
-  self.$drawableElement.on('mousemove', function (event) {
+  self.$element.on('mousemove', function (event) {
     if (mouseIsDown) {
       drawIt(event);
     }
   });
 };
 
-DrawableSurface.prototype.renderAnimatedMap = function () {
+DrawableSurface.prototype.renderMap = function (map) {
   var self = this;
   var context = self.$element[0].getContext('2d');
 
-  _.each(self.animatedMap, function (block, index) {
+  _.each(map, function (block, index) {
     if (block) {
       var position = getCellPositionFromIndex(index, self.columns);
-      applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, 10, {
-        x: position.x,
-        y: position.y
-      });
+
+      if (typeof(block) === 'object' && block.layers) {
+        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, 10, {
+          x: position.x,
+          y: position.y
+        });
+      } else {
+        drawCell(context, position.x, position.y, defaultCellSize, block);
+      }
     }
   });
 };
 
+DrawableSurface.prototype.renderFirstMap = function () {
+  this.renderMap(this.map);
+};
+
+DrawableSurface.prototype.renderSecondMap = function () {
+  this.renderMap(this.animatedMap);
+};
 
 
 var editorArea = {
   animatedBlock: new AnimatedBlock(),
-  drawableSurface: new DrawableSurface($('#constructor-area'), $('#constructor-area-draw-on-me'), defaultCellSize),
+  drawableSurfaces: [],
   selectedLayerNum: 0,
   $layersContainerElement: $('.layers'),
+  setSelectedLayer: function (num) {
+    if (num > this.drawableSurfaces.length - 1) {
+      throw 'Can\'t set selcted layer cuz it\'s not there';
+    } else {
+      this.selectedLayerNum = num;
+
+      var surfaceCount = this.drawableSurfaces.length;
+      _.each(this.drawableSurfaces, function (surface, index) {
+        if (index === num) {
+          surface.$element.css('z-index', 100 + surfaceCount + num);
+        } else if (index < num) {
+          surface.$element.css('z-index', 100 + surfaceCount + index);
+        } else if (index > num) {
+          surface.$element.css('z-index', 100 + surfaceCount - index - (surfaceCount - index));
+        }
+      });
+    }
+  },
+  setSelectedStyle: function (style) {
+    _.each(this.drawableSurfaces, function (surface) {
+      surface.selectedStyle = style;
+    });
+  },
+  selectedDrawableSurface: function () {
+    return this.drawableSurfaces[this.selectedLayerNum];
+  },
   renderSelectedLayer: function () {
     // renders the selected layer based on the selected layer in the attached animated block
-    var selectedLayer = this.animatedBlock.layers[this.selectedLayerNum],
-      drawableContext = this.drawableSurface.$element[0].getContext('2d');
+    var selectedLayer = this.animatedBlock.layers[this.selectedLayerNum];
 
-    if (selectedLayer) {
+    if (selectedLayer && this.selectedDrawableSurface()) {
+      var drawableSurface = this.selectedDrawableSurface(),
+        drawableContext = drawableSurface.$element[0].getContext('2d');
       // this might be a little redundant. need to decide whether to update the layer by drawing on it directly or by updating a map, not both
-      applyMapToContext(selectedLayer, drawableContext, this.drawableSurface.cellSize, this.drawableSurface.columns);
-    }
-
-    // renders the selected layer based on the selected layer in the attached animated block
-    var shadowLayer;
-    var shadowDrawableContext;
-    if (this.selectedLayerNum > 0) {
-      shadowLayer = this.animatedBlock.layers[this.selectedLayerNum - 1];
-      shadowDrawableContext = $('#constructor-area-shadow')[0].getContext('2d');
-    }
-
-    if (shadowLayer) {
-      // this might be a little redundant. need to decide whether to update the layer by drawing on it directly or by updating a map, not both
-      applyMapToContext(shadowLayer, shadowDrawableContext, this.drawableSurface.cellSize, this.drawableSurface.columns);
+      this.selectedDrawableSurface().map = selectedLayer;
+      applyMapToContext(selectedLayer, drawableContext, drawableSurface.cellSize, drawableSurface.columns);
     }
 
     // this renders the thumbnail of the selected layer
@@ -316,40 +372,55 @@ var editorArea = {
   },
   addLayer: function (layerPattern) {
     var self = this;
+
+    // layer menu setup
     var $layerElement = makeNewBlock();
     var $layerContainer = makeNewElement();
     var $arrowElement = $('<div class="arrow"><img src="img/arrow.png" /></div>');
-    $layerContainer.addClass('block area-container layer-container selected');    
+    $layerContainer.addClass('block area-container layer-container selected');
     $layerContainer.append($layerElement.add($arrowElement));
     this.$layersContainerElement.append($layerContainer);
     $layerContainer.siblings('.layer-container').removeClass('selected');
-    self.selectedLayerNum = $('.layers .layer-container').index($layerContainer);
-    self.renderSelectedLayer();
 
+    // adds event listener to layers in layer menu
     $layerContainer.on('mousedown', function (event) {
       $clickedElement = $(event.currentTarget);
 
       $clickedElement.addClass('selected');
       $clickedElement.siblings('.layer-container').removeClass('selected');
 
-      self.selectedLayerNum =  $('.layers .layer-container').index($clickedElement);
+      self.setSelectedLayer($('.layers .layer-container').index($clickedElement));
       self.renderSelectedLayer();
     });
 
+    // applies pattern to layer in layer menu
     var context = $layerElement[0].getContext('2d');
     var columns = $layerElement.width() / defaultTinyCellSize;
     applyMapToContext(layerPattern, context, defaultTinyCellSize, columns);
+
+    var constructorArea = $('<canvas></canvas>')
+                              .addClass('constructor-area')
+                              .attr('width', 300)
+                              .attr('height', 300)
+                              .appendTo('#constructor-area-container');
+
+    var surface = new DrawableSurface(constructorArea, defaultCellSize);
+    this.drawableSurfaces.push(surface);
+    self.setSelectedLayer(this.$layersContainerElement.children('.layer-container').length - 1);
+
+    // renders editor area canvas and layer in layers menu
+    self.renderSelectedLayer();
   },
   removeLayer: function (layerNum) {
     $('.layers .layer-container').eq(layerNum).remove();
 
     if (layerNum == self.selectedLayerNum) {
       if (self.selectedLayerNum === self.animatedBlock.layers.length) {
-        self.selectedLayerNum = self.selectedLayerNum - 1;
+        self.setSelectedLayer(self.selectedLayerNum - 1);
 
         if (self.selectedLayerNum === -1) {
           self.animatedBlock.addLayer('#fff');
-          self.selectedLayerNum = 0;
+          self.setSelectedLayer(0);
         }
       }
 
@@ -371,8 +442,9 @@ var editorArea = {
       self.animatedBlock.resetIndex();
     });
 
+    // this comes from drawing on an editor area
     $.subscribe('updated-map', function (event, update) {
-      if (update.surface === editorArea.drawableSurface) {
+      if (update.surface === editorArea.selectedDrawableSurface()) {
         editorArea.animatedBlock.changeLayerValue(editorArea.selectedLayerNum, update.index, update.value);
         // updates the thumbnail of the selected layer (and the selected layer itself) based on the selected layer of the attached animated block
         editorArea.renderSelectedLayer();
@@ -402,7 +474,10 @@ editorArea.setup();
 // set up main canvas
 
 var mainArea = {
-  drawableSurface: new DrawableSurface($('#main-area'), $('#main-area-draw-on-me'), defaultCellSize)
+  drawableSurfaces: [new DrawableSurface($('#main-area'), defaultCellSize)],
+  setSelectedStyle: function (style) {
+    this.drawableSurfaces[0].selectedStyle = style;
+  }
 };
 
 // there should be a better way than this
@@ -480,9 +555,9 @@ ColorPalette.prototype.addPaletteElement = function ($element) {
   var color = $element.children('.color').eq(0).css('background-color');
   var dataId = $element.children('.animated').eq(0).attr('data-id');
   if (dataId) {
-    this.parent.drawableSurface.selectedStyle = customAnimatedBlocks[dataId];
+    this.parent.setSelectedStyle(customAnimatedBlocks[dataId]);
   } else {
-    this.parent.drawableSurface.selectedStyle = color;
+    this.parent.setSelectedStyle(color);
   }
 
   this.addEventListeners($element);
@@ -516,16 +591,16 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
 
     var childrenThatAreColors = $clickedElement.children('.color');
     if (childrenThatAreColors.length) {
-      self.parent.drawableSurface.selectedStyle = childrenThatAreColors.eq(0).css('background-color');
+      self.parent.setSelectedStyle(childrenThatAreColors.eq(0).css('background-color'));
     } else {
-      self.parent.drawableSurface.selectedStyle = customAnimatedBlocks[$clickedElement.children().eq(0).attr('data-id')];
+      self.parent.setSelectedStyle(customAnimatedBlocks[$clickedElement.children().eq(0).attr('data-id')]);
     }
   });
 };
 
 var colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
 var mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
-new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
 
 
 $('#save-block').on('mousedown', function (event) {
@@ -544,11 +619,25 @@ $('#save-block').on('mousedown', function (event) {
 
 
 $('#enable-shadow').on('click', function () {
-  $("#constructor-area-shadow").toggle();
+  if (this.checked) {
+    $('.constructor-area').css('opacity', '1').eq(editorArea.selectedLayerNum).css('opacity', '.5');
+  } else {
+    $('.constructor-area').css('opacity', '1');
+  }
 });
 
 
+$('#bg-fg-switch').on('click', function (event) {
+  var button = $(event.currentTarget);
 
+  if (mainArea.drawableSurface.drawOnBackground) {
+    button.text('Editing Foreground');
+    mainArea.drawableSurface.drawOnBackground = false;
+  } else {
+    button.text('Editing Background');
+    mainArea.drawableSurface.drawOnBackground = true;
+  }
+});
 
 
 

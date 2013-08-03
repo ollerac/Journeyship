@@ -1,11 +1,12 @@
 ### working on now:
-- adding checkbox option: indicate a layer is a background or foreground object (this should only be necessary if there's either transparency or if the blocks can move, neither of which can happen right now, so it's more like a stepping stone)
+- transparent not totally working: needs to update the layers on the side without breaking the main animated block
 
 ### what i *need* before launching:
+- i'm continually redrawing the editor area's block every 300 milliseconds because it's a drawable surface and now that's what happens with all drawable surfaces. maybe have an option to turn this off? just don't call startAnimation on the editor block, but make sure you call render??
+- ✔ make and use transparent block
 - have to do something about saving more than 2 columns of custom blocks
-- 'new' button should be on the top of the main color palette
-- export button should be in the top right of the editing area
-- different button style
+- export/save button should be in the top right of the editing area
+- different button styling
 - layers
   - ✔ new layer button, new layer function 
   - ✔ mirror objects that watch a map-like list property and update their canvas when an update method is called
@@ -61,15 +62,25 @@
 
 
 ### recently finishished:
+- 'new' button should be on the top of the main color palette
+- removed draw on me layer
+- ENHANCEMENT: adding a transparent block
+  - only do adding it to a map and rendering -- no direct drawing...
+  - requires having multiple shadow layers, one for each layer
+    - one way: add all blocks, keep them all there, re-calculate z-index when you select a new block
+    - another way: remove all blocks and replace then with new ones
+    - i'm *really* tempted to rewrite this using angularjs
+
+
+### finished:
+- ENHANCEMENT: made foreground and background layers work
+- ENHANCEMENT: fix the transparency so that the selected layer has 50% transparency and the previous layer is behind it
 - ENHANCEMENT: saved layers should be selected by default
 - ENHANCEMENT: palettes should be responsible for multiple columns of colors and animated blocks and should be able to add new columns
 - ENHANCEMENT: new layers should be selected by default
 - removed font awesome
 - BUG: no color is shown as selected at startup
 - BUG: removing the selected layer doesn't update the editor's selected layer
-
-
-### finished:
 - BUG: can select more than one color in one color palette as long as it's in different row. time to use a query selector engine like sizzle? or rye.js? or jquery? jquery it is.
 - save block
   - unique id (from underscore)
