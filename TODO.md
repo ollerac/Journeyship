@@ -1,5 +1,4 @@
 ### working on now:
-- transparent not totally working: needs to update the layers on the side without breaking the main animated block
 
 ### what i *need* before launching:
 - i'm continually redrawing the editor area's block every 300 milliseconds because it's a drawable surface and now that's what happens with all drawable surfaces. maybe have an option to turn this off? just don't call startAnimation on the editor block, but make sure you call render??
@@ -62,6 +61,7 @@
 
 
 ### recently finishished:
+- fixed bug with transparency: needs to update the layers menu without breaking the main animated block
 - 'new' button should be on the top of the main color palette
 - removed draw on me layer
 - ENHANCEMENT: adding a transparent block

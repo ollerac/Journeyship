@@ -178,13 +178,26 @@ function getCellPositionFromIndex (index, columns) {
 }
 
 function applyMapToContext (map, context, cellSize, columns, options) {
-  if (!options) {
-    options = {x: 0, y: 0};
-  }
+  var defaults = {
+    x: 0,
+    y: 0,
+    withTransparency: false
+  };
+
+  _.extend(defaults, options);
 
   _.each(map, function (color, index) {
     var cellRowAndColumn = getCellRowAndColumnFromIndex(index, columns);
-    drawCell(context, options.x + cellRowAndColumn.column * cellSize, options.y + cellRowAndColumn.row * cellSize, cellSize, color);
+
+    if (!defaults.withTransparency) {
+      drawCell(context, defaults.x + cellRowAndColumn.column * cellSize, defaults.y + cellRowAndColumn.row * cellSize, cellSize, color);
+    } else {
+      if (/rgba.*,.*,.*,.0\)/.test(color)) {
+        clearCell(context, defaults.x + cellRowAndColumn.column * cellSize, defaults.y + cellRowAndColumn.row * cellSize, cellSize);
+      } else {
+        drawCell(context, defaults.x + cellRowAndColumn.column * cellSize, defaults.y + cellRowAndColumn.row * cellSize, cellSize, color);
+      }
+    }
   });
 }
 
@@ -367,7 +380,7 @@ var editorArea = {
     if (this.selectedLayerNum >= 0) {
       var smallLayer = $('.layers .layer-container .block')[this.selectedLayerNum];
       var columns = smallLayer.width / defaultTinyCellSize;
-      applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns);
+      applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns, {withTransparency: true});
     }
   },
   addLayer: function (layerPattern) {
