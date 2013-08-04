@@ -201,6 +201,14 @@ function applyMapToContext (map, context, cellSize, columns, options) {
   });
 }
 
+function makeMap (cellColor, cellCount) {
+  var map = [];
+  _.times(cellCount, function () {
+    map.push(cellColor);
+  });
+  return map;
+};
+
 
 
 
@@ -221,7 +229,7 @@ function DrawableSurface ($element, cellSize, defaultCellColor) {
 
   self.makeDrawable();
   //self.renderFirstMap();
-  self.startAnimating();
+  //self.startAnimating();
 }
 
 DrawableSurface.prototype.startAnimating = function () {
@@ -371,8 +379,9 @@ var editorArea = {
     if (selectedLayer && this.selectedDrawableSurface()) {
       var drawableSurface = this.selectedDrawableSurface(),
         drawableContext = drawableSurface.$element[0].getContext('2d');
+
       // this might be a little redundant. need to decide whether to update the layer by drawing on it directly or by updating a map, not both
-      this.selectedDrawableSurface().map = selectedLayer;
+      drawableSurface.map = selectedLayer;
       applyMapToContext(selectedLayer, drawableContext, drawableSurface.cellSize, drawableSurface.columns);
     }
 
@@ -394,6 +403,7 @@ var editorArea = {
     $layerContainer.append($layerElement.add($arrowElement));
     this.$layersContainerElement.append($layerContainer);
     $layerContainer.siblings('.layer-container').removeClass('selected');
+
 
     // adds event listener to layers in layer menu
     $layerContainer.on('mousedown', function (event) {
@@ -425,7 +435,9 @@ var editorArea = {
     self.renderSelectedLayer();
   },
   removeLayer: function (layerNum) {
+    $('#constructor-area-container .constructor-area').eq(layerNum).remove();
     $('.layers .layer-container').eq(layerNum).remove();
+    this.drawableSurfaces.splice(layerNum, 1);
 
     if (layerNum == self.selectedLayerNum) {
       if (self.selectedLayerNum === self.animatedBlock.layers.length) {
@@ -437,7 +449,7 @@ var editorArea = {
         }
       }
 
-      $('.layers .layer-container').eq(self.selectedLayerNum).addClass('selected');;
+      $('.layers .layer-container').eq(self.selectedLayerNum).addClass('selected');
       self.renderSelectedLayer();
     }
   },
@@ -470,11 +482,11 @@ var editorArea = {
     self.animatedBlock.$animatedElement = $animatedElement;
     self.animatedBlock.startAnimation();
 
-    $('#remove-layer').on('mousedown', function () {
+    $('#remove-layer').on('click', function () {
       editorArea.animatedBlock.removeLayer(editorArea.selectedLayerNum);
     });
 
-    $('#new-layer').on('mousedown', function () {
+    $('#new-layer').on('click', function () {
       editorArea.animatedBlock.addLayer("#fff");
     });
 
@@ -490,8 +502,16 @@ var mainArea = {
   drawableSurfaces: [new DrawableSurface($('#main-area'), defaultCellSize)],
   setSelectedStyle: function (style) {
     this.drawableSurfaces[0].selectedStyle = style;
+  },
+  selectedDrawableSurface: function () {
+    return this.drawableSurfaces[0];
+  },
+  setup: function () {
+    this.selectedDrawableSurface().startAnimating();
   }
 };
+
+mainArea.setup();
 
 // there should be a better way than this
 var customAnimatedBlocks = {};
@@ -643,12 +663,12 @@ $('#enable-shadow').on('click', function () {
 $('#bg-fg-switch').on('click', function (event) {
   var button = $(event.currentTarget);
 
-  if (mainArea.drawableSurface.drawOnBackground) {
+  if (mainArea.selectedDrawableSurface().drawOnBackground) {
     button.text('Editing Foreground');
-    mainArea.drawableSurface.drawOnBackground = false;
+    mainArea.selectedDrawableSurface().drawOnBackground = false;
   } else {
     button.text('Editing Background');
-    mainArea.drawableSurface.drawOnBackground = true;
+    mainArea.selectedDrawableSurface().drawOnBackground = true;
   }
 });
 

@@ -1,7 +1,7 @@
 ### working on now:
 
+
 ### what i *need* before launching:
-- i'm continually redrawing the editor area's block every 300 milliseconds because it's a drawable surface and now that's what happens with all drawable surfaces. maybe have an option to turn this off? just don't call startAnimation on the editor block, but make sure you call render??
 - ✔ make and use transparent block
 - have to do something about saving more than 2 columns of custom blocks
 - export/save button should be in the top right of the editing area
@@ -61,6 +61,8 @@
 
 
 ### recently finishished:
+- BUG: fixed bug when you remove all layers (required splicing the drawablesurfaces property of the editArea)
+- ENHANCEMENT: stopped animating the editor area's block
 - fixed bug with transparency: needs to update the layers menu without breaking the main animated block
 - 'new' button should be on the top of the main color palette
 - removed draw on me layer
