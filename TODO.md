@@ -2,11 +2,19 @@
 
 
 ### what i *need* before launching:
-- ✔ make and use transparent block
-- have to do something about saving more than 2 columns of custom blocks
+- new block button working
+- delete objects from main area
+- delete objects from main color palette
 - export/save button should be in the top right of the editing area
-- different button styling
-- layers
+- what to do when saving more than 2 columns of custom blocks. options:
+  - make it scrollable <-- yes
+  - make it paged
+  - expand the width of the main container
+- !!! data persistence
+- support multiple users (user accounts? url-based?)
+  - url based and then user accounts
+- ✔ different button styling
+- ✔ layers
   - ✔ new layer button, new layer function 
   - ✔ mirror objects that watch a map-like list property and update their canvas when an update method is called
   - ✔ add
@@ -16,33 +24,31 @@
   - ✔ link each layer to the preview animation
   - ✔ get the animate preview working
   - ✔ checkbox option: show previous layer on top of current layer with some transparency
-  - checkbox option: indicate a layer is a background or foreground object... necessary?
+  - ✔ checkbox option: indicate whether you're drawing on background or foreground
 - ✔ save block
   - ✔ unique id (from underscore)
   - ✔ add to main color palette
-- new block button working
 - ✔ color palette
 - ✔ be able to paint with custom boxes
 - ✔ show selected color
-- delete objects from main area
-- delete objects from main color palette
-- !!! data persistence
-- support multiple users (user accounts? url-based?)
 - ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
 ### before launch?
 - simple howto video
 - add journeyship logo (with sail moving)
 
+### after launch:
+- new design
+- organize code
+
 ### would be *really* nice to have:
+- ability to select a block in the main area or the main color palette in order to edit it
 - should populate the main color palette with some cool custom blocks to start out with
-- give AnimatedBlocks a clone method
+- give AnimatedBlocks a clone method and use that instead of replicating their layers and stuff
 - when you save a block it should update a block in the main color palette if there's a saved version of it there instead of creating a new one -- or saving should be different from exporting and should just save whatever you're working on (although this should be automatic probably, every 5 seconds if there's been changes)
 - double click on a color to reveal similar colors, add a back button to go back to main color palette
-- a transparent color
-  - is this possible? would require redrawing transparent blocks the same as the underlying canvas. possible.
+- ✔ a transparent color
 - speech bubbles
-- ability to select a block in the main area or the main color palette in order to edit it
 - selected block follows cursor
 
 ### would be nice to have:
@@ -53,14 +59,16 @@
 - global custom animation interval
 
 ### eventually:
-- clean up rendering
-  - there's currently two ways that blocks get rendered, by drawing and by updating a map and then rendering the layer. make sure these don't both get called on the same thing.
 - add EventEmitter2 library to make handling events easier. object could inherit from event emitters.
 - maybe: add javascript-state-machine library. what could i use it for?
 
 
 
 ### recently finishished:
+- ENHANCEMENT: added new button style
+
+
+### finished:
 - BUG: fixed bug when you remove all layers (required splicing the drawablesurfaces property of the editArea)
 - ENHANCEMENT: stopped animating the editor area's block
 - fixed bug with transparency: needs to update the layers menu without breaking the main animated block
@@ -72,9 +80,6 @@
     - one way: add all blocks, keep them all there, re-calculate z-index when you select a new block
     - another way: remove all blocks and replace then with new ones
     - i'm *really* tempted to rewrite this using angularjs
-
-
-### finished:
 - ENHANCEMENT: made foreground and background layers work
 - ENHANCEMENT: fix the transparency so that the selected layer has 50% transparency and the previous layer is behind it
 - ENHANCEMENT: saved layers should be selected by default

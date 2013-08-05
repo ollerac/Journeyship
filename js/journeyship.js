@@ -664,10 +664,10 @@ $('#bg-fg-switch').on('click', function (event) {
   var button = $(event.currentTarget);
 
   if (mainArea.selectedDrawableSurface().drawOnBackground) {
-    button.text('Editing Foreground');
+    button.children('.inner').text('Editing Foreground');
     mainArea.selectedDrawableSurface().drawOnBackground = false;
   } else {
-    button.text('Editing Background');
+    button.children('.inner').text('Editing Background');
     mainArea.selectedDrawableSurface().drawOnBackground = true;
   }
 });

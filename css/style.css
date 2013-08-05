@@ -41,21 +41,50 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1em;
 }
 
-.button {
-  color: #333;
-  font-size: 12px;
-  display:  block;
-  float: left;
-  text-decoration: none;
-  border: 1px solid #ccc;
-  background-color: #fafafa;
-  clear: both;
-  padding: 4px 7px 5px;
-  margin-bottom: 10px;
+.another-button {
+  position: relative;
+  display: inline-block;
+  background: rgb(129,157,211); /* Old browsers */
+  background: -moz-linear-gradient(left,  rgba(168,183,211,1) 0%, rgba(168,183,211,1) 5%, rgba(129,157,211,1) 50%, rgba(168,183,211,1) 95%, rgba(168,183,211,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(168,183,211,1)), color-stop(5%,rgba(168,183,211,1)), color-stop(50%,rgba(129,157,211,1)), color-stop(95%,rgba(168,183,211,1)), color-stop(100%,rgba(168,183,211,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(left,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* IE10+ */
+  background: linear-gradient(to right,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* W3C */
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
 }
 
-.button:hover {
-  border: 1px solid #999;
+.another-button .inner {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border: 1px solid #3b6fd3;
+  background-color: #fff;
+  color: #4676d3  ;
+  text-decoration: none;
+  margin-bottom: 1px;
+}
+
+.another-button:hover .inner {
+  color: #444;
+  border: 1px solid #666;
+}
+
+.another-button:hover {
+  background: #aaa; /* Old browsers */
+}
+
+.another-button:active {
+  background: transparent;
+  top: 1px;
+}
+
+#remove-layer, #new-layer {
+  margin-bottom: 1em;
 }
 
 .buttons-container {
@@ -103,7 +132,7 @@ h1, h2, h3, h4, h5, h6 {
 #main-container-top-bar {
     background: #fff;
     background: rgba(255,255,255,.5);
-    padding: 10px 10px 0px 10px;
+    padding: 10px 10px 10px 10px;
     overflow: auto;
     width:  882px;
 }
@@ -111,9 +140,9 @@ h1, h2, h3, h4, h5, h6 {
 #main-color-palette-top-bar {
     background: #fff;
     background: rgba(255,255,255,.5);
-    padding: 10px 10px 0px 10px;
+    padding: 10px 10px 10px 10px;
     overflow: auto;
-    width:  72px;
+    width:  158px;
     float: right;
 }
 
