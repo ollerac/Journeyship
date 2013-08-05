@@ -2,13 +2,6 @@
 
 
 ### what i *need* before launching:
-- copy button
-- new block button working
-  - flow should be this: 
-    - click 'new block' and a new block appears and the editor shows up below
-    - it's the same flow if you use the selector button on one of the empty blocks on the main canvas
-    - when you save a block in the editor it should update the block that's in the main color palette (or the main canvas block that's selected)
-    - but, for now it's just going to make a new block in the editor window... actually the new button is going to be in the editor window.
 - delete objects from main area
 - delete objects from main color palette
 - export/save button should be in the top right of the editing area
@@ -20,6 +13,8 @@
   - save after doing stuff or after a certain amount of time? time i think
 - support multiple users (user accounts? url-based?)
   - url based and then user accounts
+- ✔ copy button working
+- ✔ new block button working
 - ✔ different button styling
 - ✔ layers
   - ✔ new layer button, new layer function 
@@ -72,7 +67,9 @@
 
 
 ### recently finishished:
-- ENHANCEMENT: added save button that doesn't make a new block
+- copy button working
+- new block button working
+- ENHANCEMENT: added save button that doesn't make a new block when saving
 - ENHANCEMENT: added new button style
 
 

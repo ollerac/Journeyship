@@ -85,6 +85,13 @@ AnimatedBlock.prototype.removeLayer = function (layerNum) {
   $.publish('removed-layer', layerNum);
 };
 
+AnimatedBlock.prototype.removeAllLayers = function () {
+  var self = this;
+  _.each(self.layers, function (layer, index) {
+    self.removeLayer(0);
+  });
+};
+
 AnimatedBlock.prototype.nextLayer = function () {
   this.layerIndex++;
 
@@ -179,9 +186,9 @@ function getCellPositionFromRowAndColumn (row, column, cellSize) {
   };
 }
 
-function getCellPositionFromIndex (index, columns) {
+function getCellPositionFromIndex (index, columns, cellSize) {
   var rowAndColumn = getCellRowAndColumnFromIndex(index, columns);
-  return getCellPositionFromRowAndColumn(rowAndColumn.row, rowAndColumn.column);
+  return getCellPositionFromRowAndColumn(rowAndColumn.row, rowAndColumn.column, cellSize);
 }
 
 function applyMapToContext (map, context, cellSize, columns, options) {
@@ -194,16 +201,12 @@ function applyMapToContext (map, context, cellSize, columns, options) {
   _.extend(defaults, options);
 
   _.each(map, function (color, index) {
-    var cellRowAndColumn = getCellRowAndColumnFromIndex(index, columns);
+    var cellPosition = getCellPositionFromIndex(index, columns, cellSize);
 
-    if (!defaults.withTransparency) {
-      drawCell(context, defaults.x + cellRowAndColumn.column * cellSize, defaults.y + cellRowAndColumn.row * cellSize, cellSize, color);
+    if (defaults.withTransparency && /rgba.*,.*,.*,.0\)/.test(color)) {
+      clearCell(context, defaults.x + cellPosition.x, defaults.y + cellPosition.y, cellSize);
     } else {
-      if (/rgba.*,.*,.*,.0\)/.test(color)) {
-        clearCell(context, defaults.x + cellRowAndColumn.column * cellSize, defaults.y + cellRowAndColumn.row * cellSize, cellSize);
-      } else {
-        drawCell(context, defaults.x + cellRowAndColumn.column * cellSize, defaults.y + cellRowAndColumn.row * cellSize, cellSize, color);
-      }
+      drawCell(context, defaults.x + cellPosition.x, defaults.y + cellPosition.y, cellSize, color);
     }
   });
 }
@@ -262,6 +265,7 @@ DrawableSurface.prototype.makeMap = function (cellColor) {
 
 DrawableSurface.prototype.makeDrawable = function () {
   var self = this;
+  var positionInArray;
 
   function drawIt (event) {
     if (typeof(self.selectedStyle) === 'string') {
@@ -271,34 +275,15 @@ DrawableSurface.prototype.makeDrawable = function () {
       } else {
         drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle);
       }
-      var positionInArray = getCellPositionInArrayFromPosition(cellPosition.x, cellPosition.y, self.cellSize, self.columns);
-
-      if (self.drawOnBackground) {
-        self.map[positionInArray] = self.selectedStyle;
-      } else {
-        self.animatedMap[positionInArray] = self.selectedStyle;
-      }
-
-      $.publish("updated-map", {
-        surface: self,
-        index: positionInArray,
-        value: self.selectedStyle
-      });
-
+      positionInArray = getCellPositionInArrayFromPosition(cellPosition.x, cellPosition.y, self.cellSize, self.columns);
     } else if (typeof(self.selectedStyle) === 'object' && self.selectedStyle.layers) {
-      var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+      positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+    }
 
-      if (self.drawOnBackground) {
-        self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
-      } else {
-        self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
-      }
-
-      $.publish("updated-map", {
-        surface: self,
-        index: positionInArray,
-        value: self.selectedStyle
-      });
+    if (self.drawOnBackground) {
+      self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+    } else {
+      self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
 
       _.each(self.animatedMap, function (block) {
         if (block) {
@@ -306,6 +291,13 @@ DrawableSurface.prototype.makeDrawable = function () {
         }
       });
     }
+
+    $.publish("updated-map", {
+      surface: self,
+      index: positionInArray,
+      value: self.selectedStyle
+    });
+
   }
 
   self.$element.on('mousedown', function (event) {
@@ -353,6 +345,24 @@ var editorArea = {
   drawableSurfaces: [],
   selectedLayerNum: 0,
   $layersContainerElement: $('.layers'),
+  makeNewAnimatedBlock: function (layers) {
+    var self = this;
+
+    this.animatedBlock.pauseAnimation();
+    this.animatedBlock.removeAllLayers();
+    this.animatedBlock = new AnimatedBlock();
+
+    if (layers) {
+      _.each(layers, function (layer) {
+        self.animatedBlock.addLayer(layer);
+      });
+    } else {
+      this.animatedBlock.addLayer('#fff');
+    }
+
+    this.animatedBlock.$animatedElement = $('#preview-container').children('canvas.block');
+    this.animatedBlock.startAnimation();
+  },
   setSelectedLayer: function (num) {
     if (num > this.drawableSurfaces.length - 1) {
       throw 'Can\'t set selcted layer cuz it\'s not there';
@@ -369,6 +379,8 @@ var editorArea = {
           surface.$element.css('z-index', 100 + surfaceCount - index - (surfaceCount - index));
         }
       });
+
+      $('.layers .layer-container').eq(this.selectedLayerNum).addClass('selected');
     }
   },
   setSelectedStyle: function (style) {
@@ -442,23 +454,14 @@ var editorArea = {
     self.renderSelectedLayer();
   },
   removeLayer: function (layerNum) {
+    // don't use this directly, remove from the animatedBlock instead
     $('#constructor-area-container .constructor-area').eq(layerNum).remove();
     $('.layers .layer-container').eq(layerNum).remove();
     this.drawableSurfaces.splice(layerNum, 1);
 
-    if (layerNum == self.selectedLayerNum) {
-      if (self.selectedLayerNum === self.animatedBlock.layers.length) {
-        self.setSelectedLayer(self.selectedLayerNum - 1);
+    self.setSelectedLayer(self.selectedLayerNum - 1);
 
-        if (self.selectedLayerNum === -1) {
-          self.animatedBlock.addLayer('#fff');
-          self.setSelectedLayer(0);
-        }
-      }
-
-      $('.layers .layer-container').eq(self.selectedLayerNum).addClass('selected');
-      self.renderSelectedLayer();
-    }
+    self.renderSelectedLayer();
   },
   setup: function () {
     self = this;
@@ -477,9 +480,9 @@ var editorArea = {
     // this comes from drawing on an editor area
     $.subscribe('updated-map', function (event, update) {
       if (update.surface === editorArea.selectedDrawableSurface()) {
-        editorArea.animatedBlock.changeLayerValue(editorArea.selectedLayerNum, update.index, update.value);
+        self.animatedBlock.changeLayerValue(self.selectedLayerNum, update.index, update.value);
         // updates the thumbnail of the selected layer (and the selected layer itself) based on the selected layer of the attached animated block
-        editorArea.renderSelectedLayer();
+        self.renderSelectedLayer();
       }
     });
 
@@ -490,11 +493,35 @@ var editorArea = {
     self.animatedBlock.startAnimation();
 
     $('#remove-layer').on('click', function () {
-      editorArea.animatedBlock.removeLayer(editorArea.selectedLayerNum);
+      event.preventDefault();
+      self.animatedBlock.removeLayer(self.selectedLayerNum);
+      if (self.animatedBlock.layers.length === 0) {
+        self.animatedBlock.addLayer('#fff');
+        self.setSelectedLayer(0);
+      }
     });
 
     $('#new-layer').on('click', function () {
-      editorArea.animatedBlock.addLayer("#fff");
+      event.preventDefault();
+      self.animatedBlock.addLayer("#fff");
+    });
+
+    $('#new-block').on('click', function (event) {
+      event.preventDefault();
+      self.makeNewAnimatedBlock();
+    });
+
+    $('#copy-block').on('click', function (event) {
+      event.preventDefault();
+      self.makeNewAnimatedBlock(_.cloneDeep(self.animatedBlock.layers));
+
+      var buttonInner = $(event.currentTarget).children('.inner');
+      if (/Copy/.test(buttonInner.text())) {
+        setTimeout(function () {
+          buttonInner.text('Copy');
+        }, 2000);
+      }
+      buttonInner.text('Copied!');
     });
 
   }
@@ -623,7 +650,6 @@ ColorPalette.prototype.getBlockWithId = function (id) {
 
 ColorPalette.prototype.addStyle = function (value) {
   var matchingBlock = this.getBlockWithId(value.uniqueId);
-  console.log(matchingBlock);
   if (matchingBlock) {
     matchingBlock.layers = value.layers;
   } else {
