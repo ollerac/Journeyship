@@ -19,12 +19,19 @@ var grayscaleDictionary = {
 
 // setup animated block
 
-function AnimatedBlock (layers) {
+function AnimatedBlock (layers, options) {
+  var defaults = {
+    uniqueId: _.uniqueId('id-')
+  };
+
+  _.extend(defaults, options);
+
   var self = this;
   self.layers = [];
   self.layerIndex = -1;
   self.animationInterval = null;
   self.$animatedElement = null;
+  self.uniqueId = defaults.uniqueId;
 
   _.each(layers, function (layer) {
     self.addLayer(layer);
@@ -540,9 +547,8 @@ ColorPalette.prototype.generatePaletteElement = function (value) {
     var $animatedElement = makeNewBlock();
     $animatedElement.addClass('animated');
 
-    var unique = _.uniqueId('id-');
-    $animatedElement.attr('data-id', unique);
-    customAnimatedBlocks[unique] = animatedBlock;
+    $animatedElement.attr('data-id', animatedBlock.uniqueId);
+    customAnimatedBlocks[animatedBlock.uniqueId] = animatedBlock;
 
     animatedBlock.$animatedElement = $animatedElement;
     animatedBlock.startAnimation();
@@ -604,11 +610,27 @@ ColorPalette.prototype.addMapValue = function (value) {
   this.map.push(value);
 };
 
-ColorPalette.prototype.addStyle = function (value) {
-  this.addMapValue(value);
+ColorPalette.prototype.getBlockWithId = function (id) {
+  if (!id) return null;
 
-  var paletteElement = this.generatePaletteElement(value);
-  this.addPaletteElement(paletteElement);
+  var matchingBlock = null;
+  _.each(this.map, function (block) {
+    matchingBlock = block.uniqueId === id ? block : null;
+  });
+
+  return matchingBlock;
+};
+
+ColorPalette.prototype.addStyle = function (value) {
+  var matchingBlock = this.getBlockWithId(value.uniqueId);
+  console.log(matchingBlock);
+  if (matchingBlock) {
+    matchingBlock.layers = value.layers;
+  } else {
+    this.addMapValue(value);
+    var paletteElement = this.generatePaletteElement(value);
+    this.addPaletteElement(paletteElement);
+  }
 };
 
 ColorPalette.prototype.addEventListeners = function ($paletteElement) {
@@ -637,7 +659,7 @@ var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-pal
 
 
 $('#save-block').on('mousedown', function (event) {
-  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers)));
+  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {uniqueId: editorArea.animatedBlock.uniqueId}));
 
   //this is for making their animations line up 
   _.each(mainColorPalette.map, function (block) {

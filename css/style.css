@@ -39,9 +39,12 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 36px;
   margin-bottom: 30px;
   line-height: 1em;
+  position: relative;
 }
 
 .another-button {
+  font-size: 12px;
+  line-height: 1.3em;
   position: relative;
   display: inline-block;
   background: rgb(129,157,211); /* Old browsers */
@@ -81,6 +84,13 @@ h1, h2, h3, h4, h5, h6 {
 .another-button:active {
   background: transparent;
   top: 1px;
+}
+
+.constructor-heading-button-container {
+  display: inline-block;
+  position: relative;
+  top: -10px;
+  left: 10px;
 }
 
 #remove-layer, #new-layer {
