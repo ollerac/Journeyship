@@ -42,7 +42,7 @@ AnimatedBlock.prototype.resetIndex = function () {
   this.layerIndex = -1;
 };
 
-AnimatedBlock.prototype.addLayer = function (value, layerNum) {
+AnimatedBlock.prototype.addLayer = function (value, layerNumOption) {
   var layer = [];
   if (typeof value === 'string') {
     var color = value;
@@ -53,12 +53,13 @@ AnimatedBlock.prototype.addLayer = function (value, layerNum) {
     layer = value;
   }
 
-  layerNum = layerNum || this.layers.length;
+  var layerNum = typeof(layerNumOption) === 'number' ? layerNumOption : this.layers.length;
   this.layers.splice(layerNum, 0, layer);
 
   $.publish('added-layer', {
     layer: layer,
-    animatedBlock: this
+    animatedBlock: this,
+    layerNum: layerNum
   });
 };
 
@@ -413,7 +414,7 @@ var editorArea = {
       applyMapToContext(selectedLayer, smallLayer.getContext('2d'), defaultTinyCellSize, columns, {withTransparency: true});
     }
   },
-  addLayer: function (layerPattern) {
+  addLayer: function (layerPattern, layerNum) {
     var self = this;
 
     // layer menu setup
@@ -422,9 +423,15 @@ var editorArea = {
     var $arrowElement = $('<div class="arrow"><img src="img/arrow.png" /></div>');
     $layerContainer.addClass('block area-container layer-container selected');
     $layerContainer.append($layerElement.add($arrowElement));
-    this.$layersContainerElement.append($layerContainer);
-    $layerContainer.siblings('.layer-container').removeClass('selected');
 
+    var layers = this.$layersContainerElement.children('.layer-container');
+    if (layers.length && typeof(layerNum) === 'number') {
+      layers.eq(layerNum - 1).after($layerContainer);
+    } else {
+      this.$layersContainerElement.append($layerContainer);
+    }
+
+    $layerContainer.siblings('.layer-container').removeClass('selected');
 
     // adds event listener to layers in layer menu
     $layerContainer.on('click', function (event) {
@@ -449,10 +456,10 @@ var editorArea = {
                               .appendTo('#constructor-area-container');
 
     var surface = new DrawableSurface(constructorArea, defaultCellSize);
-    this.drawableSurfaces.push(surface);
-    self.setSelectedLayer(this.$layersContainerElement.children('.layer-container').length - 1);
+    this.drawableSurfaces.splice(layerNum, 0, surface);
+    self.setSelectedLayer(layerNum);
 
-    // renders editor area canvas and layer in layers menu
+    // renders editor area canvas and selected layer in layers menu
     self.renderSelectedLayer();
   },
   removeLayer: function (layerNum) {
@@ -470,7 +477,7 @@ var editorArea = {
 
     $.subscribe('added-layer', function (event, addedLayerUpdate) {
       if (self.animatedBlock == addedLayerUpdate.animatedBlock) {
-        self.addLayer(addedLayerUpdate.layer);
+        self.addLayer(addedLayerUpdate.layer, addedLayerUpdate.layerNum);
       }
     });
 
@@ -505,7 +512,12 @@ var editorArea = {
 
     $('#new-layer').on('click', function () {
       event.preventDefault();
-      self.animatedBlock.addLayer("#fff");
+      self.animatedBlock.addLayer("#fff", self.selectedLayerNum + 1);
+    });
+
+    $('#copy-layer').on('click', function () {
+      event.preventDefault();
+      self.animatedBlock.addLayer(_.cloneDeep(self.animatedBlock.layers[self.selectedLayerNum]), self.selectedLayerNum + 1);
     });
 
   }
@@ -520,6 +532,11 @@ var mainArea = {
   drawableSurfaces: [new DrawableSurface($('#main-area'), defaultCellSize)],
   setSelectedStyle: function (style) {
     this.drawableSurfaces[0].selectedStyle = style;
+
+    $.publish('selected-style', {
+      surface: this,
+      style: style
+    });
   },
   selectedDrawableSurface: function () {
     return this.drawableSurfaces[0];
@@ -604,11 +621,7 @@ ColorPalette.prototype.addPaletteElement = function ($element) {
 
   var color = $element.children('.color').eq(0).css('background-color');
   var dataId = $element.children('.animated').eq(0).attr('data-id');
-  if (dataId) {
-    this.parent.setSelectedStyle(customAnimatedBlocks[dataId]);
-  } else {
-    this.parent.setSelectedStyle(color);
-  }
+  this.parent.setSelectedStyle(customAnimatedBlocks[dataId] || color);
 
   this.addEventListeners($element);
 
@@ -639,11 +652,10 @@ ColorPalette.prototype.addStyle = function (value) {
   this.addPaletteElement(paletteElement);
 };
 
-ColorPalette.prototype.saveCustomBlock = function (customBlock) {
-  console.log("asd");
-  var matchingBlock = this.getBlockWithId(customBlock.uniqueId);
+ColorPalette.prototype.saveCustomBlock = function (layers, id) {
+  var matchingBlock = this.getBlockWithId(id);
   if (matchingBlock) {
-    matchingBlock.layers = customBlock.layers;
+    matchingBlock.layers = layers;
   }
 };
 
@@ -658,12 +670,10 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
     $clickedElement.parent().parent().find('.palette-element-container.selected').removeClass('selected');
     $clickedElement.addClass('selected');
 
-    var childrenThatAreColors = $clickedElement.children('.color');
-    if (childrenThatAreColors.length) {
-      self.parent.setSelectedStyle(childrenThatAreColors.eq(0).css('background-color'));
-    } else {
-      self.parent.setSelectedStyle(customAnimatedBlocks[$clickedElement.children().eq(0).attr('data-id')]);
-    }
+    var color = $clickedElement.children('.color').eq(0).css('background-color');
+    var dataId = $clickedElement.children('.animated').eq(0).attr('data-id');
+    self.parent.setSelectedStyle(customAnimatedBlocks[dataId] || color);
+
   });
 };
 
@@ -680,8 +690,7 @@ $('#new-block').on('click', function (event) {
 
 $('#save-block').on('click', function (event) {
   event.preventDefault();
-  // fix this: it should just pass layers and an id, not a whole new animated block
-  mainColorPalette.saveCustomBlock(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {uniqueId: editorArea.animatedBlock.uniqueId}));
+  mainColorPalette.saveCustomBlock(_.cloneDeep(editorArea.animatedBlock.layers), editorArea.animatedBlock.uniqueId);
 
   //this is for making their animations line up 
   _.each(mainColorPalette.map, function (block) {
@@ -697,7 +706,6 @@ $('#copy-block').on('click', function (event) {
   event.preventDefault();
 
   var newAnimatedBlock = editorArea.makeNewAnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.layers));
-  console.log(newAnimatedBlock);
   mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.layers), {uniqueId: newAnimatedBlock.uniqueId}));
 });
 
@@ -705,8 +713,6 @@ $('#delete-block').on('click', function (event) {
   event.preventDefault();
   // delete block
 });
-
-
 
 $('#enable-shadow').on('click', function () {
   if (this.checked) {
@@ -727,6 +733,16 @@ $('#bg-fg-switch').on('click', function (event) {
   } else {
     button.children('.inner').text('Editing Background');
     mainArea.selectedDrawableSurface().drawOnBackground = true;
+  }
+});
+
+$.subscribe('selected-style', function (event, update) {
+  var buttons = $('#copy-block, #delete-block');
+  if (typeof(update.style) === 'object' && update.style.layers) {
+    buttons.css('display', 'inline-block');
+    buttons.show();
+  } else {
+    buttons.hide();
   }
 });
 

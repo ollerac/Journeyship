@@ -2,11 +2,14 @@
 
 
 ### what i *need* before launching:
-- put new and copy buttons above the main color palette
-  - moved them
-  - new button should create a new palette element and show it in the editor
-  - copy button should duplicate the selected custom palette element
-    - don't show copy or delete button if a custom block isn't selected
+- ✔ making copy layer button
+  - ✔ inserting copied layer after the selected layer
+- ✔ new layer button should create layers after the selected layer
+- ✔ put new and copy buttons above the main color palette
+  - ✔ moved them
+  - ✔ new button should create a new palette element and show it in the editor
+  - ✔ copy button should duplicate the selected custom palette element
+    - ✔ don't show copy or delete button if a custom block isn't selected
   - delete button should delete the selcted custom palette element
 - use crosshair icon and cursor for selecting blocks
   - make a dashed, moving white and black border around canvas blocks that are selected
@@ -50,7 +53,8 @@
 - ✔ show selected color
 - ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
-### before launch?
+### before launch
+- test cross browser
 - simple howto video
 - add journeyship logo (with sail moving)
 
