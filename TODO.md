@@ -3,8 +3,13 @@
 
 ### what i *need* before launching:
 - put new and copy buttons above the main color palette
+  - moved them
+  - new button should create a new palette element and show it in the editor
+  - copy button should duplicate the selected custom palette element
+    - don't show copy or delete button if a custom block isn't selected
+  - delete button should delete the selcted custom palette element
 - use crosshair icon and cursor for selecting blocks
-  - make a dashed red and black border around canvas blocks that are selected
+  - make a dashed, moving white and black border around canvas blocks that are selected
     - only show edit and delete buttons if a selection is active
     - unselect canvas block when selecting a color palette block
     - show selected block in the editing area if user clicks 'edit'
@@ -54,6 +59,7 @@
 - organize code
 
 ### would be *really* nice to have:
+- make a button: generate example block
 - ability to select a block in the main area or the main color palette in order to edit it
 - should populate the main color palette with some cool custom blocks to start out with
 - give AnimatedBlocks a clone method and use that instead of replicating their layers and stuff

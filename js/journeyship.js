@@ -362,6 +362,8 @@ var editorArea = {
 
     this.animatedBlock.$animatedElement = $('#preview-container').children('canvas.block');
     this.animatedBlock.startAnimation();
+
+    return this.animatedBlock;
   },
   setSelectedLayer: function (num) {
     if (num > this.drawableSurfaces.length - 1) {
@@ -425,7 +427,7 @@ var editorArea = {
 
 
     // adds event listener to layers in layer menu
-    $layerContainer.on('mousedown', function (event) {
+    $layerContainer.on('click', function (event) {
       $clickedElement = $(event.currentTarget);
 
       $clickedElement.addClass('selected');
@@ -504,24 +506,6 @@ var editorArea = {
     $('#new-layer').on('click', function () {
       event.preventDefault();
       self.animatedBlock.addLayer("#fff");
-    });
-
-    $('#new-block').on('click', function (event) {
-      event.preventDefault();
-      self.makeNewAnimatedBlock();
-    });
-
-    $('#copy-block').on('click', function (event) {
-      event.preventDefault();
-      self.makeNewAnimatedBlock(_.cloneDeep(self.animatedBlock.layers));
-
-      var buttonInner = $(event.currentTarget).children('.inner');
-      if (/Copy/.test(buttonInner.text())) {
-        setTimeout(function () {
-          buttonInner.text('Copy');
-        }, 2000);
-      }
-      buttonInner.text('Copied!');
     });
 
   }
@@ -648,14 +632,18 @@ ColorPalette.prototype.getBlockWithId = function (id) {
   return matchingBlock;
 };
 
+// pass in a new AnimatedBlock or a color as a string
 ColorPalette.prototype.addStyle = function (value) {
-  var matchingBlock = this.getBlockWithId(value.uniqueId);
+  this.addMapValue(value);
+  var paletteElement = this.generatePaletteElement(value);
+  this.addPaletteElement(paletteElement);
+};
+
+ColorPalette.prototype.saveCustomBlock = function (customBlock) {
+  console.log("asd");
+  var matchingBlock = this.getBlockWithId(customBlock.uniqueId);
   if (matchingBlock) {
-    matchingBlock.layers = value.layers;
-  } else {
-    this.addMapValue(value);
-    var paletteElement = this.generatePaletteElement(value);
-    this.addPaletteElement(paletteElement);
+    matchingBlock.layers = customBlock.layers;
   }
 };
 
@@ -684,9 +672,16 @@ var mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainA
 var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
 
 
-$('#save-block').on('mousedown', function (event) {
+$('#new-block').on('click', function (event) {
   event.preventDefault();
+  editorArea.makeNewAnimatedBlock();
   mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {uniqueId: editorArea.animatedBlock.uniqueId}));
+});
+
+$('#save-block').on('click', function (event) {
+  event.preventDefault();
+  // fix this: it should just pass layers and an id, not a whole new animated block
+  mainColorPalette.saveCustomBlock(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {uniqueId: editorArea.animatedBlock.uniqueId}));
 
   //this is for making their animations line up 
   _.each(mainColorPalette.map, function (block) {
@@ -696,6 +691,19 @@ $('#save-block').on('mousedown', function (event) {
       block.startAnimation();
     }
   });
+});
+
+$('#copy-block').on('click', function (event) {
+  event.preventDefault();
+
+  var newAnimatedBlock = editorArea.makeNewAnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.layers));
+  console.log(newAnimatedBlock);
+  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.layers), {uniqueId: newAnimatedBlock.uniqueId}));
+});
+
+$('#delete-block').on('click', function (event) {
+  event.preventDefault();
+  // delete block
 });
 
 

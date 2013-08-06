@@ -161,10 +161,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1em;
 }
 
-.buttons-container {
-  overflow: auto;
-}
-
 .area-container {
   border: 1px solid #333;
 }
@@ -216,7 +212,7 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,.5);
     padding: 10px 10px 10px 10px;
     overflow: auto;
-    width:  158px;
+    width:  225px;
     float: right;
 }
 
@@ -224,7 +220,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Main Section */
 
 #main-container {
-  width: 1100px;
+  width: 1200px;
   height: 450px;
   margin: 0 auto;
 }
