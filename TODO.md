@@ -10,7 +10,9 @@
   - ✔ copy button should duplicate the selected custom palette element
     - ✔ don't show copy or delete button if a custom block isn't selected
   - delete button should delete the selected custom palette element
-- added a default 'tree' custom block to the main color palette
+    - remove palette element from dom, from customAnimatedBlocks, and from main color palette
+    - auto-select the previous palette element, whatever it is
+- ✔ added a default 'tree' custom block to the main color palette
 - use crosshair icon and cursor for selecting blocks
   - make a dashed, moving white and black border around canvas blocks that are selected
     - only show edit and delete buttons if a selection is active
@@ -61,8 +63,11 @@
 ### after launch:
 - new design
 - organize code
+- rewrite large parts of it using AngularJS
 
 ### would be *really* nice to have:
+- animations should line up so they happen at the same time
+- paths for movable blocks to move on top of
 - Fix: it'd be nice if the editor area didn't have a bunch of drawable surface, each with their own selected color
 - make default new layer transparent
 - make a button: generate example block
@@ -78,7 +83,6 @@
 ### would be nice to have:
 - undo button with infinite undos
 - add arbitrary colors to the main color palette and the object color palette
-- paths for movable blocks to move on top of
 - rules for specifying how blocks interact
 - global custom animation interval
 

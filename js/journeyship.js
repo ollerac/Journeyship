@@ -571,6 +571,8 @@ mainArea.setup();
 // stored according to a data-id so they're easy to look up when assigning a selectedStyle
 var customAnimatedBlocks = {};
 
+
+// parent is an area, either mainArea or editorArea
 function ColorPalette (map, $container, parent) {
   var self = this;
   self.map = [];
@@ -742,7 +744,8 @@ $('#copy-block').on('click', function (event) {
 
 $('#delete-block').on('click', function (event) {
   event.preventDefault();
-  
+  //console.log($(event.currentTarget).attr('data-id'));
+  console.log(mainColorPalette.parent.selectedStyle);
 });
 
 $('#enable-shadow').on('click', function () {
