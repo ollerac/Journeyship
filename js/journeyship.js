@@ -345,6 +345,7 @@ var editorArea = {
   animatedBlock: new AnimatedBlock(),
   drawableSurfaces: [],
   selectedLayerNum: 0,
+  selectedStyle: '#000',
   $layersContainerElement: $('.layers'),
   makeNewAnimatedBlock: function (layers) {
     var self = this;
@@ -354,9 +355,7 @@ var editorArea = {
     this.animatedBlock = new AnimatedBlock();
 
     if (layers) {
-      _.each(layers, function (layer) {
-        self.animatedBlock.addLayer(layer);
-      });
+      self.animatedBlock.addLayers(layers);
     } else {
       this.animatedBlock.addLayer('#fff');
     }
@@ -387,8 +386,17 @@ var editorArea = {
     }
   },
   setSelectedStyle: function (style) {
+    this.selectedStyle = style;
+
     _.each(this.drawableSurfaces, function (surface) {
       surface.selectedStyle = style;
+    });
+  },
+  refreshSelectedStyle: function () {
+    var self = this;
+
+    _.each(this.drawableSurfaces, function (surface) {
+      surface.selectedStyle = self.selectedStyle;
     });
   },
   selectedDrawableSurface: function () {
@@ -461,6 +469,8 @@ var editorArea = {
 
     // renders editor area canvas and selected layer in layers menu
     self.renderSelectedLayer();
+
+    self.refreshSelectedStyle();
   },
   removeLayer: function (layerNum) {
     // don't use this directly, remove from the animatedBlock instead
@@ -530,12 +540,21 @@ editorArea.setup();
 
 var mainArea = {
   drawableSurfaces: [new DrawableSurface($('#main-area'), defaultCellSize)],
+  selectedStyle: '#000',
   setSelectedStyle: function (style) {
+    this.selectedStyle = style;
     this.drawableSurfaces[0].selectedStyle = style;
 
     $.publish('selected-style', {
       surface: this,
       style: style
+    });
+  },
+  refreshSelectedStyle: function () {
+    var self = this;
+
+    _.each(this.drawableSurfaces, function (surface) {
+      surface.selectedStyle = self.selectedStyle;
     });
   },
   selectedDrawableSurface: function () {
@@ -549,6 +568,7 @@ var mainArea = {
 mainArea.setup();
 
 // there should be a better way than this
+// stored according to a data-id so they're easy to look up when assigning a selectedStyle
 var customAnimatedBlocks = {};
 
 function ColorPalette (map, $container, parent) {
@@ -677,9 +697,20 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
   });
 };
 
+$.subscribe('selected-style', function (event, update) {
+  var buttons = $('#copy-block, #delete-block');
+  if (typeof(update.style) === 'object' && update.style.layers) {
+    buttons.css('display', 'inline-block');
+    buttons.show();
+  } else {
+    buttons.hide();
+  }
+});
+
 var colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
 var mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
 var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+
 
 
 $('#new-block').on('click', function (event) {
@@ -711,7 +742,7 @@ $('#copy-block').on('click', function (event) {
 
 $('#delete-block').on('click', function (event) {
   event.preventDefault();
-  // delete block
+  
 });
 
 $('#enable-shadow').on('click', function () {
@@ -736,19 +767,12 @@ $('#bg-fg-switch').on('click', function (event) {
   }
 });
 
-$.subscribe('selected-style', function (event, update) {
-  var buttons = $('#copy-block, #delete-block');
-  if (typeof(update.style) === 'object' && update.style.layers) {
-    buttons.css('display', 'inline-block');
-    buttons.show();
-  } else {
-    buttons.hide();
-  }
-});
 
 
 
 
+
+mainColorPalette.addStyle(new AnimatedBlock(tree));
 
 
 

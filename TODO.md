@@ -1,6 +1,5 @@
 ### working on now:
 
-
 ### what i *need* before launching:
 - ✔ making copy layer button
   - ✔ inserting copied layer after the selected layer
@@ -10,12 +9,13 @@
   - ✔ new button should create a new palette element and show it in the editor
   - ✔ copy button should duplicate the selected custom palette element
     - ✔ don't show copy or delete button if a custom block isn't selected
-  - delete button should delete the selcted custom palette element
+  - delete button should delete the selected custom palette element
+- added a default 'tree' custom block to the main color palette
 - use crosshair icon and cursor for selecting blocks
   - make a dashed, moving white and black border around canvas blocks that are selected
     - only show edit and delete buttons if a selection is active
     - unselect canvas block when selecting a color palette block
-    - show selected block in the editing area if user clicks 'edit'
+    - show selected block in the editing area if user clicks 'edit' or if they select a block in the main color palette
       - ask if user wants to save changes to the current block if there are unsaved changes
 - delete objects from main area
   - add ability to select canvas block
@@ -63,6 +63,8 @@
 - organize code
 
 ### would be *really* nice to have:
+- Fix: it'd be nice if the editor area didn't have a bunch of drawable surface, each with their own selected color
+- make default new layer transparent
 - make a button: generate example block
 - ability to select a block in the main area or the main color palette in order to edit it
 - should populate the main color palette with some cool custom blocks to start out with
@@ -87,6 +89,7 @@
 
 
 ### recently finishished:
+- BUG: after creating a new layer the selected color gets reset
 - copy button working
 - new block button working
 - ENHANCEMENT: added save button that doesn't make a new block when saving
