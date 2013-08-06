@@ -16,6 +16,7 @@
 
 }(jQuery));
 
+
 function makeNewElement (type) {
   if (!type) {
     type = 'div';

@@ -74,16 +74,80 @@ h1, h2, h3, h4, h5, h6 {
 
 .another-button:hover .inner {
   color: #444;
-  border: 1px solid #666;
+  border: 1px solid #888;
 }
 
 .another-button:hover {
   background: #aaa; /* Old browsers */
 }
 
+.another-button.active .inner {
+  border: 1px solid #333;
+  background-color: #666;
+  color: #fff;
+}
+
+.another-button.active {
+  top: 1px;
+  background: transparent;
+}
+
 .another-button:active {
   background: transparent;
   top: 1px;
+}
+
+.another-button.has-icon .inner {
+  background-position: 12px 5px;
+  background-repeat: no-repeat;
+}
+
+.another-button.has-icon:hover .inner {
+  background-position: 12px -15px;
+  background-repeat: no-repeat;
+}
+
+.another-button.has-icon.active .inner {
+  background-position: 12px -35px;
+  background-repeat: no-repeat;
+}
+
+#main-container-top-bar .another-button {
+  margin-left: 5px;
+}
+
+.select-button .inner {
+  background-image: url(../img/hand-up-icon.png);
+  padding-left: 28px;
+}
+
+.edit-button .inner {
+  background-image: url(../img/edit-icon.png);
+  padding-left: 30px;
+}
+
+.delete-button .inner {
+  background-image: url(../img/trashcan-icon.png);
+  padding-left: 27px;
+}
+
+.save-button .inner {
+  background-image: url(../img/book-icon.png);
+  padding-left: 30px;
+}
+
+.new-button .inner {
+  background-image: url(../img/new-icon.png);
+  padding-left: 28px;
+}
+
+.copy-button .inner {
+  background-image: url(../img/copy-icon.png);
+  padding-left: 30px;
+}
+
+#bg-fg-switch {
+  float: right;
 }
 
 .constructor-heading-button-container {

@@ -685,6 +685,7 @@ var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-pal
 
 
 $('#save-block').on('mousedown', function (event) {
+  event.preventDefault();
   mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {uniqueId: editorArea.animatedBlock.uniqueId}));
 
   //this is for making their animations line up 
@@ -709,6 +710,7 @@ $('#enable-shadow').on('click', function () {
 
 
 $('#bg-fg-switch').on('click', function (event) {
+  event.preventDefault();
   var button = $(event.currentTarget);
 
   if (mainArea.selectedDrawableSurface().drawOnBackground) {

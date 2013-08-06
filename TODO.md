@@ -2,17 +2,27 @@
 
 
 ### what i *need* before launching:
+- put new and copy buttons above the main color palette
+- use crosshair icon and cursor for selecting blocks
+  - make a dashed red and black border around canvas blocks that are selected
+    - only show edit and delete buttons if a selection is active
+    - unselect canvas block when selecting a color palette block
+    - show selected block in the editing area if user clicks 'edit'
+      - ask if user wants to save changes to the current block if there are unsaved changes
 - delete objects from main area
+  - add ability to select canvas block
+  - add trash can icon to button
 - delete objects from main color palette
-- export/save button should be in the top right of the editing area
-- what to do when saving more than 2 columns of custom blocks. options:
-  - make it scrollable <-- yes
-  - make it paged
-  - expand the width of the main container
+  - add trash can icon
+  - prevent deleting main colors palette blocks
+- when saving more than 2 columns of custom blocks:
+  - make main color palette scrollable
 - !!! data persistence
   - save after doing stuff or after a certain amount of time? time i think
+  - meteor? nodejs and mongodb?
 - support multiple users (user accounts? url-based?)
   - url based and then user accounts
+- ✔ export/save button should be in the top right of the editing area
 - ✔ copy button working
 - ✔ new block button working
 - ✔ different button styling
