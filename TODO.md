@@ -18,11 +18,11 @@
 - ✔ added a default 'tree' custom block to the main color palette
 - ✔ when selecting a block in the main color palette show it in the editor area unless it's a color -- then show nothing
 - ✔ set select button to active when selecting blocks
-  - when you click the select button when it's active make it not active and re-select the color palette style that was selected before
-  - when you select a block, unselect the block in the main color palette and hide the editor area
-    - only show edit and delete buttons if a selection is active
-  - when selecting a color palette block, unselect the currently selected canvas block
-    - hide th edit and delete buttons too
+  - ✔ when you click the select button when it's active make it not active and re-select the color palette style that was selected before
+  - ✔ when you select a block, unselect the block in the main color palette and hide the editor area
+    - ✔ only show edit and delete buttons if a selection is active
+  - ✔ when selecting a color palette block, unselect the currently selected canvas block
+    - ✔ hide th edit and delete buttons too
   - when you click edit, if the block is a color, convert it into an animated block, if it's already an animated block load it into the editor area
     - make the edit button have an active state
     - don't do this yet: ask if user wants to save changes to the current block if there are unsaved changes

@@ -1,8 +1,10 @@
 var defaultCellSize = 30;
 var defaultTinyCellSize = 3;
 
-var deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
-var editInMainCanvasButton = $('#edit-block-from-main-canvas');
+var $deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
+var $editInMainCanvasButton = $('#edit-block-from-main-canvas');
+
+var $editorAreaContainer = $('#constructor-container');
 
 var colorDictionary = {"red": "#ff1100", "orange1": "#ff6e00", "orange2": "#ffa100", "yellow1": "#ffd400", "yellow2": "#f7ff00", "green1": "#95f200", "green2": "#00e32c", "blue1": "#00a0e6", "blue2": "#2b6af4", "purple1": "#3b00eb", "purple2": "#bd00eb", "pink": "#eb0068"};
 var grayscaleDictionary = {
@@ -836,8 +838,8 @@ function disableMainCanvasSelect () {
   $('#select-block-from-main-canvas').removeClass('active');
   mainArea.selectedDrawableSurface().selectedBlocksMap = [];
 
-  deleteFromMainCanvasButton.hide();
-  editInMainCanvasButton.hide();
+  $deleteFromMainCanvasButton.hide();
+  $editInMainCanvasButton.hide();
 }
 
 $('#select-block-from-main-canvas').on('click', function (event) {
@@ -848,14 +850,16 @@ $('#select-block-from-main-canvas').on('click', function (event) {
     disableMainCanvasSelect();
 
     paletteElementThatWasSelected.addClass('selected');
+    $editorAreaContainer.show();
   } else {
     selectActive = true;
     $button.addClass('active');
 
-    deleteFromMainCanvasButton.css('display', 'inline-block').show();
-    editInMainCanvasButton.css('display', 'inline-block').show();
+    $deleteFromMainCanvasButton.css('display', 'inline-block').show();
+    $editInMainCanvasButton.css('display', 'inline-block').show();
 
     paletteElementThatWasSelected = $('#main-color-palette .palette-element-container.selected').removeClass('selected');
+    $editorAreaContainer.hide();
   }
 });
 
