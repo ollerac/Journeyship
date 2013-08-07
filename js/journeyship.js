@@ -135,6 +135,20 @@ function drawCell (context, x, y, size, color) {
   context.fillRect(x,y,size,size);
 }
 
+function drawOutline (context, x, y, size, color) {
+  if (!color) color = defaultCellColor;
+  if (!size) size = defaultCellSize;
+
+  context.strokeStyle = color;
+  context.beginPath();
+  context.moveTo(x-.5,y - .5);
+  context.lineTo(x+30.5, y - .5);
+  context.lineTo(x+30.5, y +30.5);
+  context.lineTo(x-.5, y+30.5);
+  context.lineTo(x-.5, y-.5);
+  context.stroke();
+}
+
 function clearCell (context, x, y, size) {
   if (!size) size = defaultCellSize;
 
@@ -212,10 +226,18 @@ function applyMapToContext (map, context, cellSize, columns, options) {
   });
 }
 
-function makeMap (cellColor, cellCount) {
+function makeMap (cellColor, cellCount, options) {
+  defaults = {};
+
+  _.extend(defaults, options);
+
   var map = [];
-  _.times(cellCount, function () {
-    map.push(cellColor);
+  _.times(cellCount, function (index) {
+    if (defaults.positions && defaults.positions.indexOf(index) > -1) {
+      map.push(defaults.color);
+    } else {
+      map.push(cellColor);
+    }
   });
   return map;
 };
@@ -235,6 +257,7 @@ function DrawableSurface ($element, cellSize, defaultCellColor) {
   self.selectedStyle = '#000';
   self.map = self.makeMap(defaultCellColor || '#fff'); //background, also potentially animated
   self.animatedMap = self.makeMap(null); // foreground
+  self.selectedBlocksMap = [];
   self.animatedInterval = null;
   self.drawOnBackground = true;
 
@@ -249,6 +272,7 @@ DrawableSurface.prototype.startAnimating = function () {
   self.animatedInterval = setInterval(function() {
     self.renderFirstMap();
     self.renderSecondMap();
+    self.renderSelectedBlocksMap(self.selectedBlocksMap);
   }, 300);
 };
 
@@ -266,9 +290,15 @@ DrawableSurface.prototype.makeMap = function (cellColor) {
 
 DrawableSurface.prototype.makeDrawable = function () {
   var self = this;
-  var positionInArray;
+
+  function selectIt (event) {
+    var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+    self.selectedBlocksMap = makeMap(null, self.columns * self.rows, {color: colorDictionary['red'], positions: [positionInArray]});
+  }
 
   function drawIt (event) {
+    var positionInArray;
+
     if (typeof(self.selectedStyle) === 'string') {
       var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
       if (self.selectedStyle === 'transparent') {
@@ -302,11 +332,15 @@ DrawableSurface.prototype.makeDrawable = function () {
   }
 
   self.$element.on('mousedown', function (event) {
-    drawIt(event);
+    if (!selectActive || self === editorArea.selectedDrawableSurface()) {
+      drawIt(event);
+    } else {
+      selectIt(event);
+    }
   });
 
   self.$element.on('mousemove', function (event) {
-    if (mouseIsDown) {
+    if ((mouseIsDown && !selectActive) || mouseIsDown && self === editorArea.selectedDrawableSurface()) {
       drawIt(event);
     }
   });
@@ -328,6 +362,19 @@ DrawableSurface.prototype.renderMap = function (map) {
       } else {
         drawCell(context, position.x, position.y, defaultCellSize, block);
       }
+    }
+  });
+};
+
+DrawableSurface.prototype.renderSelectedBlocksMap = function (map) {
+  var self = this;
+  var context = self.$element[0].getContext('2d');
+
+  _.each(map, function (block, index) {
+    if (block) {
+      var position = getCellPositionFromIndex(index, self.columns);
+
+      drawOutline(context, position.x, position.y, defaultCellSize, block);
     }
   });
 };
@@ -674,7 +721,7 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
 
 $.subscribe('selected-style', function (event, update) {
   var buttons = $('#copy-block, #delete-block');
-  var $editorAreaElement = $('#constructor-container')
+  var $editorAreaElement = $('#constructor-container');
   if (typeof(update.style) === 'object' && update.style.layers) {
     buttons.css('display', 'inline-block');
     buttons.show();
@@ -776,7 +823,29 @@ $('#bg-fg-switch').on('click', function (event) {
   }
 });
 
+var deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
+var editInMainCanvasButton = $('#edit-block-from-main-canvas');
 
+var selectActive = false;
+$('#select-block-from-main-canvas').on('click', function (event) {
+  event.preventDefault();
+  $button = $('#select-block-from-main-canvas');
+
+  if ($button.hasClass('active')) {
+    selectActive = false;
+    $button.removeClass('active');
+    mainArea.selectedDrawableSurface().selectedBlocksMap = [];
+
+    deleteFromMainCanvasButton.hide();
+    editInMainCanvasButton.hide();
+  } else {
+    selectActive = true;
+    $button.addClass('active');
+
+    deleteFromMainCanvasButton.css('display', 'inline-block').show();
+    editInMainCanvasButton.css('display', 'inline-block').show();
+  }
+});
 
 
 

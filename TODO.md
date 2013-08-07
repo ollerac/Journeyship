@@ -17,15 +17,19 @@
     - ✔ auto-select the previous palette element, whatever it is
 - ✔ added a default 'tree' custom block to the main color palette
 - ✔ when selecting a block in the main color palette show it in the editor area unless it's a color -- then show nothing
-- set select button to active when selecting blocks
-  - make a dashed white and black border around canvas blocks that are selected
+- ✔ set select button to active when selecting blocks
+  - when you click the select button when it's active make it not active and re-select the color palette style that was selected before
+  - when you select a block, unselect the block in the main color palette and hide the editor area
     - only show edit and delete buttons if a selection is active
-    - unselect canvas block when selecting a color palette block
-    - show selected block in the editing area if user clicks 'edit' or if they select a block in the main color palette
-      - ask if user wants to save changes to the current block if there are unsaved changes
+  - when selecting a color palette block, unselect the currently selected canvas block
+    - hide th edit and delete buttons too
+  - when you click edit, if the block is a color, convert it into an animated block, if it's already an animated block load it into the editor area
+    - make the edit button have an active state
+    - don't do this yet: ask if user wants to save changes to the current block if there are unsaved changes
 - delete objects from main area
   - add ability to select canvas block
   - add trash can icon to button
+  - when you delete a block, it's replaced by a regular color block that's still selected but not currently being edited
 - !!! data persistence
   - save after doing stuff or after a certain amount of time? time i think
   - meteor? nodejs and mongodb?
@@ -83,6 +87,7 @@
 - selected block follows cursor
 
 ### would be nice to have:
+- if a block is made entirely of the same color, convert it back to just a color when it's saved...?
 - make the selected block dashed border move
 - undo button with infinite undos
 - add arbitrary colors to the main color palette and the object color palette
