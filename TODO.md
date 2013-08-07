@@ -1,9 +1,8 @@
 ### working on now:
-- BUG: switching layers and creating new layers when 'make top layer transparent' is selected
-- BUG: deleting layers in different columns causes chaos. needs to cause a reflow of the columns and data. 
-  - strongly consider not using columns. just use a bunch of divs floated to the left in a big box. colors and then white to black.
-- BUG: clicking on buttons sometimes doesn't work. something to do with clicking on the very bottom of the button.
-  - finish fixing the styling for this
+- BUG: switching layers and creating new layers when 'make top layer transparent' is checked
+  - either uncheck it or make sure it's re-implemented after a new layer is selected
+
+
 
 ### what i *need* before launching:
 - ✔ making copy layer button
@@ -98,6 +97,11 @@
 
 
 ### recently finishished:
+- BUG: deleting layers in different columns causes chaos. needs to cause a reflow of the columns and data. 
+  - strongly consider not using columns. just use a bunch of divs floated to the left in a big box. colors and then white to black.
+  - working on making color palette items not organized by columns
+- BUG: clicking on buttons sometimes doesn't work. something to do with clicking on the very bottom of the button.
+  - finish fixing the styling for this
 - BUG: after creating a new layer the selected color gets reset
 - copy button working
 - new block button working

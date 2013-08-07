@@ -173,6 +173,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1px;
   border: 2px solid transparent;
   overflow: auto;
+  float: left;
 }
 
 .color-palette .palette-element-container.selected {
@@ -184,6 +185,7 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #fff;
   background-color: rgba(255,255,255,.5);
   clear: both;
+  width: 225px;
 }
 
 /* top bar */
@@ -224,7 +226,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Constructor */
 
 #constructor-container {
-  width: 560px;
+  width: 585px;
   margin: 0 auto;
   background-color: rgba(255,255,255,.5);
   padding: 40px 40px 30px 60px;
@@ -280,7 +282,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #constructor-color-palette {
-  width: 90px;
+  width: 108px;
 }
 
 .preview-container {

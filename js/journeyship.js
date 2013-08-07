@@ -567,10 +567,6 @@ var mainArea = {
 
 mainArea.setup();
 
-// there should be a better way than this
-// stored according to a data-id so they're easy to look up when assigning a selectedStyle
-var customAnimatedBlocks = {};
-
 
 // parent is an area, either mainArea or editorArea
 function ColorPalette (map, $container, parent) {
@@ -579,8 +575,6 @@ function ColorPalette (map, $container, parent) {
   self.$containerElement = $container;
   self.paletteElements = [];
   self.parent = parent;
-  self.columnElements = [];
-  self.fillThisColumn = 0;
 
   _.each(map, function (value) {
     self.addStyle(value);
@@ -597,13 +591,11 @@ ColorPalette.prototype.generatePaletteElement = function (value) {
     var $animatedElement = makeNewBlock();
     $animatedElement.addClass('animated');
 
-    $animatedElement.attr('data-id', animatedBlock.uniqueId);
-    customAnimatedBlocks[animatedBlock.uniqueId] = animatedBlock;
-
     animatedBlock.$animatedElement = $animatedElement;
     animatedBlock.startAnimation();
 
     $paletteElementContainer.append($animatedElement);
+    $paletteElementContainer.data('paletteValue', {type: 'animated', value: animatedBlock});
   } else if (typeof(value) === 'string') {
     var color = value;
 
@@ -612,44 +604,25 @@ ColorPalette.prototype.generatePaletteElement = function (value) {
     $colorElement.css('background-color', color);
 
     $paletteElementContainer.append($colorElement);
+    $paletteElementContainer.data('paletteValue', {type: 'color', value: color});
   }
 
   this.paletteElements.push($paletteElementContainer);
   return $paletteElementContainer;
 };
 
-ColorPalette.prototype.addColumn = function () {
-  var $column = $('<div class="column"></div>');
-  this.columnElements.push($column);
-  this.$containerElement.append($column);
-  return $column;
-};
-
 ColorPalette.prototype.addPaletteElement = function ($element) {
-  var $column;
-
-  if (this.fillThisColumn === this.columnElements.length) {
-    $column = this.addColumn();
-  } else {
-    $column = this.columnElements[this.fillThisColumn];
-  }
-
-  $column.append($element);
+  this.$containerElement.append($element);
 
   _.each(this.paletteElements, function ($element) {
     $element.removeClass('selected');
   });
   $element.addClass('selected');
 
-  var color = $element.children('.color').eq(0).css('background-color');
-  var dataId = $element.children('.animated').eq(0).attr('data-id');
-  this.parent.setSelectedStyle(customAnimatedBlocks[dataId] || color);
+  this.parent.setSelectedStyle($element.data('paletteValue').value);
 
   this.addEventListeners($element);
 
-  if (this.paletteElements.length % 12 === 0) {
-    this.fillThisColumn = this.fillThisColumn + 1;
-  }
 };
 
 ColorPalette.prototype.addMapValue = function (value) {
@@ -692,10 +665,7 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
     $clickedElement.parent().parent().find('.palette-element-container.selected').removeClass('selected');
     $clickedElement.addClass('selected');
 
-    var color = $clickedElement.children('.color').eq(0).css('background-color');
-    var dataId = $clickedElement.children('.animated').eq(0).attr('data-id');
-    self.parent.setSelectedStyle(customAnimatedBlocks[dataId] || color);
-
+    self.parent.setSelectedStyle($clickedElement.data('paletteValue').value);
   });
 };
 
@@ -749,21 +719,9 @@ $('#delete-block').on('click', function (event) {
   var index = mainColorPalette.map.indexOf(selectedAnimatedBlock);
 
   mainColorPalette.map.splice(index);
-  mainColorPalette.parent.selectedStyle = mainColorPalette.map[index - 1];
+  mainColorPalette.parent.setSelectedStyle(mainColorPalette.map[index - 1]);
 
-  delete customAnimatedBlocks[selectedAnimatedBlock.uniqueId];
-
-  var $animatedBlockContainer = selectedAnimatedBlock.$animatedElement.parent();
-  if ($animatedBlockContainer.siblings('.palette-element-container').length) {
-    $animatedBlockContainer.remove();
-  } else {
-    var columnIndex = $animatedBlockContainer.parent().parent().children('.column').index($animatedBlockContainer.parent());
-    mainColorPalette.columnElements.splice(columnIndex);
-    $animatedBlockContainer.parent().remove();
-    if (mainColorPalette.fillThisColumn > mainColorPalette.columnElements.length - 1) {
-      mainColorPalette.fillThisColumn -= 1;
-    }
-  }
+  selectedAnimatedBlock.$animatedElement.parent().remove();
 
   mainColorPalette.paletteElements.splice(index);
   mainColorPalette.paletteElements[index - 1].addClass('selected');
