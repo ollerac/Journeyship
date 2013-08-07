@@ -744,8 +744,29 @@ $('#copy-block').on('click', function (event) {
 
 $('#delete-block').on('click', function (event) {
   event.preventDefault();
-  //console.log($(event.currentTarget).attr('data-id'));
-  console.log(mainColorPalette.parent.selectedStyle);
+  var selectedAnimatedBlock = mainColorPalette.parent.selectedStyle;
+  // weird
+  var index = mainColorPalette.map.indexOf(selectedAnimatedBlock);
+
+  mainColorPalette.map.splice(index);
+  mainColorPalette.parent.selectedStyle = mainColorPalette.map[index - 1];
+
+  delete customAnimatedBlocks[selectedAnimatedBlock.uniqueId];
+
+  var $animatedBlockContainer = selectedAnimatedBlock.$animatedElement.parent();
+  if ($animatedBlockContainer.siblings('.palette-element-container').length) {
+    $animatedBlockContainer.remove();
+  } else {
+    var columnIndex = $animatedBlockContainer.parent().parent().children('.column').index($animatedBlockContainer.parent());
+    mainColorPalette.columnElements.splice(columnIndex);
+    $animatedBlockContainer.parent().remove();
+    if (mainColorPalette.fillThisColumn > mainColorPalette.columnElements.length - 1) {
+      mainColorPalette.fillThisColumn -= 1;
+    }
+  }
+
+  mainColorPalette.paletteElements.splice(index);
+  mainColorPalette.paletteElements[index - 1].addClass('selected');
 });
 
 $('#enable-shadow').on('click', function () {

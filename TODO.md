@@ -1,4 +1,9 @@
 ### working on now:
+- BUG: switching layers and creating new layers when 'make top layer transparent' is selected
+- BUG: deleting layers in different columns causes chaos. needs to cause a reflow of the columns and data. 
+  - strongly consider not using columns. just use a bunch of divs floated to the left in a big box. colors and then white to black.
+- BUG: clicking on buttons sometimes doesn't work. something to do with clicking on the very bottom of the button.
+  - finish fixing the styling for this
 
 ### what i *need* before launching:
 - ✔ making copy layer button
@@ -10,7 +15,7 @@
   - ✔ copy button should duplicate the selected custom palette element
     - ✔ don't show copy or delete button if a custom block isn't selected
   - delete button should delete the selected custom palette element
-    - remove palette element from dom, from customAnimatedBlocks, and from main color palette
+    - remove palette element from dom, from customAnimatedBlocks, and from main color palette map
     - auto-select the previous palette element, whatever it is
 - ✔ added a default 'tree' custom block to the main color palette
 - use crosshair icon and cursor for selecting blocks

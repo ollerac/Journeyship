@@ -47,101 +47,86 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3em;
   position: relative;
   display: inline-block;
-  background: rgb(129,157,211); /* Old browsers */
-  background: -moz-linear-gradient(left,  rgba(168,183,211,1) 0%, rgba(168,183,211,1) 5%, rgba(129,157,211,1) 50%, rgba(168,183,211,1) 95%, rgba(168,183,211,1) 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(168,183,211,1)), color-stop(5%,rgba(168,183,211,1)), color-stop(50%,rgba(129,157,211,1)), color-stop(95%,rgba(168,183,211,1)), color-stop(100%,rgba(168,183,211,1))); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(left,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(left,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(left,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* IE10+ */
-  background: linear-gradient(to right,  rgba(168,183,211,1) 0%,rgba(168,183,211,1) 5%,rgba(129,157,211,1) 50%,rgba(168,183,211,1) 95%,rgba(168,183,211,1) 100%); /* W3C */
   border-radius: 3px;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
-}
-
-.another-button .inner {
-  display: inline-block;
+  box-shadow: 0 1px 0px #bacbeb;
+  -moz-box-shadow: 0 1px 0px #bacbeb;
+  -webkit-box-shadow: 0 1px 0px #bacbeb;
   padding: 5px 12px;
-  border-radius: 3px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
   border: 1px solid #3b6fd3;
   background-color: #fff;
   color: #4676d3  ;
   text-decoration: none;
-  margin-bottom: 1px;
-}
 
-.another-button:hover .inner {
-  color: #444;
-  border: 1px solid #888;
 }
 
 .another-button:hover {
-  background: #aaa; /* Old browsers */
-}
-
-.another-button.active .inner {
-  border: 1px solid #333;
-  background-color: #666;
-  color: #fff;
-}
-
-.another-button.active {
-  top: 1px;
-  background: transparent;
+  color: #444;
+  border: 1px solid #888;
+  box-shadow: 0 1px 0px #aaa;
+  -moz-box-shadow: 0 1px 0px #aaa;
+  -webkit-box-shadow: 0 1px 0px #aaa;
 }
 
 .another-button:active {
-  background: transparent;
   top: 1px;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
-.another-button.has-icon .inner {
+.another-button.active {
+  border: 1px solid #333;
+  background-color: #666;
+  color: #fff;
+  top: 1px;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}
+
+.another-button.has-icon {
   background-position: 12px 5px;
   background-repeat: no-repeat;
 }
 
-.another-button.has-icon:hover .inner {
+.another-button.has-icon:hover {
   background-position: 12px -15px;
   background-repeat: no-repeat;
 }
 
-.another-button.has-icon.active .inner {
+.another-button.has-icon.active {
   background-position: 12px -35px;
   background-repeat: no-repeat;
 }
 
-#main-container-top-bar .another-button {
-  margin-left: 5px;
-}
-
-.select-button .inner {
+.select-button {
   background-image: url(../img/hand-up-icon.png);
   padding-left: 28px;
 }
 
-.edit-button .inner {
+.edit-button {
   background-image: url(../img/edit-icon.png);
   padding-left: 30px;
 }
 
-.delete-button .inner {
+.delete-button {
   background-image: url(../img/trashcan-icon.png);
   padding-left: 27px;
 }
 
-.save-button .inner {
+.save-button {
   background-image: url(../img/book-icon.png);
   padding-left: 30px;
 }
 
-.new-button .inner {
+.new-button {
   background-image: url(../img/new-icon.png);
   padding-left: 28px;
 }
 
-.copy-button .inner {
+.copy-button {
   background-image: url(../img/copy-icon.png);
   padding-left: 30px;
 }
@@ -162,7 +147,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #remove-layer, #new-layer, #copy-layer {
-  margin-bottom: 1em;
+  margin-bottom: .5em;
 }
 
 .area-container {
@@ -314,6 +299,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .option-container {
   clear: both;
+  margin-top: 10px;
 }
 
 .option {
