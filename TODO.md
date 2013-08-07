@@ -1,6 +1,5 @@
 ### working on now:
-- BUG: switching layers and creating new layers when 'make top layer transparent' is checked
-  - either uncheck it or make sure it's re-implemented after a new layer is selected
+
 
 
 
@@ -13,12 +12,15 @@
   - ✔ new button should create a new palette element and show it in the editor
   - ✔ copy button should duplicate the selected custom palette element
     - ✔ don't show copy or delete button if a custom block isn't selected
-  - delete button should delete the selected custom palette element
-    - remove palette element from dom, from customAnimatedBlocks, and from main color palette map
-    - auto-select the previous palette element, whatever it is
+  - ✔ delete button should delete the selected custom palette element
+    - ✔ remove palette element from dom, from customAnimatedBlocks, and from main color palette map
+    - ✔ auto-select the previous palette element, whatever it is
 - ✔ added a default 'tree' custom block to the main color palette
-- use crosshair icon and cursor for selecting blocks
-  - make a dashed, moving white and black border around canvas blocks that are selected
+- when selecting a block in the main color palette show it in the editor area unless it's a color -- then show nothing
+- BUG: switching layers and creating new layers when 'make top layer transparent' is checked
+  - either uncheck it or make sure it's re-implemented after a new layer is selected
+- set select button to active when selecting blocks
+  - make a dashed white and black border around canvas blocks that are selected
     - only show edit and delete buttons if a selection is active
     - unselect canvas block when selecting a color palette block
     - show selected block in the editing area if user clicks 'edit' or if they select a block in the main color palette
@@ -26,11 +28,6 @@
 - delete objects from main area
   - add ability to select canvas block
   - add trash can icon to button
-- delete objects from main color palette
-  - add trash can icon
-  - prevent deleting main colors palette blocks
-- when saving more than 2 columns of custom blocks:
-  - make main color palette scrollable
 - !!! data persistence
   - save after doing stuff or after a certain amount of time? time i think
   - meteor? nodejs and mongodb?
@@ -70,8 +67,11 @@
 - rewrite large parts of it using AngularJS
 
 ### would be *really* nice to have:
+- don't animate blocks with only one layer. this also requires starting the animation when layers are added. and stopping it when all but one is removed.
 - animations should line up so they happen at the same time
 - paths for movable blocks to move on top of
+- Enhancement: remove 'save' button, make it an automatic update, make it use the same animated block so they all update at the same time. requires an animated block having more than one animated element.
+- Fix: it'd be nice if each block in the color palette was stored and loaded somewhere so there's a new animated block didn't have to be created
 - Fix: it'd be nice if the editor area didn't have a bunch of drawable surface, each with their own selected color
 - make default new layer transparent
 - make a button: generate example block
@@ -85,6 +85,7 @@
 - selected block follows cursor
 
 ### would be nice to have:
+- make the selected block dashed border move
 - undo button with infinite undos
 - add arbitrary colors to the main color palette and the object color palette
 - rules for specifying how blocks interact

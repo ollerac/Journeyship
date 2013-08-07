@@ -347,12 +347,17 @@ var editorArea = {
   selectedLayerNum: 0,
   selectedStyle: '#000',
   $layersContainerElement: $('.layers'),
-  makeNewAnimatedBlock: function (layers) {
+  makeNewAnimatedBlock: function (layers, uniqueId) {
     var self = this;
+
+    var options = {};
+    if (uniqueId) {
+      options.uniqueId = uniqueId;
+    }
 
     this.animatedBlock.pauseAnimation();
     this.animatedBlock.removeAllLayers();
-    this.animatedBlock = new AnimatedBlock();
+    this.animatedBlock = new AnimatedBlock([], options);
 
     if (layers) {
       self.animatedBlock.addLayers(layers);
@@ -505,12 +510,6 @@ var editorArea = {
       }
     });
 
-    self.animatedBlock.addLayers([colorDictionary['red'], colorDictionary['purple1'], colorDictionary['orange1']]);
-    var $animatedElement = makeNewBlock();
-    $('#preview-container').append($animatedElement);
-    self.animatedBlock.$animatedElement = $animatedElement;
-    self.animatedBlock.startAnimation();
-
     $('#remove-layer').on('click', function () {
       event.preventDefault();
       self.animatedBlock.removeLayer(self.selectedLayerNum);
@@ -634,7 +633,10 @@ ColorPalette.prototype.getBlockWithId = function (id) {
 
   var matchingBlock = null;
   _.each(this.map, function (block) {
-    matchingBlock = block.uniqueId === id ? block : null;
+    if (block.uniqueId === id) {
+      matchingBlock = block;
+      return false;
+    }
   });
 
   return matchingBlock;
@@ -662,7 +664,7 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
   $paletteElement.on('click', function (event) {
     var $clickedElement = $(event.currentTarget);
 
-    $clickedElement.parent().parent().find('.palette-element-container.selected').removeClass('selected');
+    $clickedElement.siblings('.palette-element-container.selected').removeClass('selected');
     $clickedElement.addClass('selected');
 
     self.parent.setSelectedStyle($clickedElement.data('paletteValue').value);
@@ -671,22 +673,28 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
 
 $.subscribe('selected-style', function (event, update) {
   var buttons = $('#copy-block, #delete-block');
+  var $editorAreaElement = $('#constructor-container')
   if (typeof(update.style) === 'object' && update.style.layers) {
     buttons.css('display', 'inline-block');
     buttons.show();
+
+    $editorAreaElement.show();
+    editorArea.makeNewAnimatedBlock(_.cloneDeep(update.style.layers), update.style.uniqueId);
   } else {
     buttons.hide();
+    $editorAreaElement.hide();
   }
 });
 
 var colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
 var mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
 var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
-
+mainColorPalette.addStyle(new AnimatedBlock(tree));
 
 
 $('#new-block').on('click', function (event) {
   event.preventDefault();
+  $('#constructor-container').show();
   editorArea.makeNewAnimatedBlock();
   mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {uniqueId: editorArea.animatedBlock.uniqueId}));
 });
@@ -718,12 +726,12 @@ $('#delete-block').on('click', function (event) {
   // weird
   var index = mainColorPalette.map.indexOf(selectedAnimatedBlock);
 
-  mainColorPalette.map.splice(index);
+  mainColorPalette.map.splice(index, 1);
   mainColorPalette.parent.setSelectedStyle(mainColorPalette.map[index - 1]);
 
   selectedAnimatedBlock.$animatedElement.parent().remove();
 
-  mainColorPalette.paletteElements.splice(index);
+  mainColorPalette.paletteElements.splice(index, 1);
   mainColorPalette.paletteElements[index - 1].addClass('selected');
 });
 
@@ -751,10 +759,6 @@ $('#bg-fg-switch').on('click', function (event) {
 
 
 
-
-
-
-mainColorPalette.addStyle(new AnimatedBlock(tree));
 
 
 
