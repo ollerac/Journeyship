@@ -23,8 +23,13 @@
     - ✔ only show edit and delete buttons if a selection is active
   - ✔ when selecting a color palette block, unselect the currently selected canvas block
     - ✔ hide th edit and delete buttons too
-  - when you click edit, if the block is a color, convert it into an animated block, if it's already an animated block load it into the editor area
+  - when you click edit:
+    - if the block is a color, convert it into an animated block, place it in the map, copy it, show the editor area, load it in
+    - if it's already an animated block, get it from the map, copy it, show the editor area, load it in
     - make the edit button have an active state
+    - when you select another block, disable active state of edit button
+    - when you click 'save' save the block to the canvas
+    - add an 'save to palette' button to the editor area, which copies the editor area's animated block into the main color palette
     - don't do this yet: ask if user wants to save changes to the current block if there are unsaved changes
 - delete objects from main area
   - add ability to select canvas block
