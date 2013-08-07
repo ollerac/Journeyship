@@ -387,7 +387,12 @@ var editorArea = {
         }
       });
 
-      $('.layers .layer-container').eq(this.selectedLayerNum).addClass('selected');
+      var selectedLayer = $('.layers .layer-container').removeClass('selected').eq(this.selectedLayerNum).addClass('selected');
+
+      $.publish('selected-layer', {
+        layerNum: num,
+        layer: selectedLayer
+      });
     }
   },
   setSelectedStyle: function (style) {
@@ -444,16 +449,12 @@ var editorArea = {
       this.$layersContainerElement.append($layerContainer);
     }
 
-    $layerContainer.siblings('.layer-container').removeClass('selected');
-
     // adds event listener to layers in layer menu
     $layerContainer.on('click', function (event) {
       $clickedElement = $(event.currentTarget);
 
-      $clickedElement.addClass('selected');
-      $clickedElement.siblings('.layer-container').removeClass('selected');
-
-      self.setSelectedLayer($('.layers .layer-container').index($clickedElement));
+      var layerNum = $('.layers .layer-container').index($clickedElement);
+      self.setSelectedLayer(layerNum);
       self.renderSelectedLayer();
     });
 
@@ -735,11 +736,29 @@ $('#delete-block').on('click', function (event) {
   mainColorPalette.paletteElements[index - 1].addClass('selected');
 });
 
+
+var applyShadow = function () {
+  $('.constructor-area').css('opacity', '1').eq(editorArea.selectedLayerNum).css('opacity', '.5');
+};
+
+var removeShadow = function () {
+  $('.constructor-area').css('opacity', '1');
+};
+
+var shadowEnabled = false;
 $('#enable-shadow').on('click', function () {
   if (this.checked) {
-    $('.constructor-area').css('opacity', '1').eq(editorArea.selectedLayerNum).css('opacity', '.5');
+    shadowEnabled = true;
+    applyShadow();
   } else {
-    $('.constructor-area').css('opacity', '1');
+    shadowEnabled = false;
+    removeShadow();
+  }
+});
+
+$.subscribe('selected-layer', function(event, update) {
+  if (shadowEnabled) {
+    applyShadow();
   }
 });
 

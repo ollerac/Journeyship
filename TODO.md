@@ -16,9 +16,8 @@
     - ✔ remove palette element from dom, from customAnimatedBlocks, and from main color palette map
     - ✔ auto-select the previous palette element, whatever it is
 - ✔ added a default 'tree' custom block to the main color palette
-- when selecting a block in the main color palette show it in the editor area unless it's a color -- then show nothing
-- BUG: switching layers and creating new layers when 'make top layer transparent' is checked
-  - either uncheck it or make sure it's re-implemented after a new layer is selected
+- ✔ when selecting a block in the main color palette show it in the editor area unless it's a color -- then show nothing
+- BUG: transparent color stopped working
 - set select button to active when selecting blocks
   - make a dashed white and black border around canvas blocks that are selected
     - only show edit and delete buttons if a selection is active
@@ -98,6 +97,8 @@
 
 
 ### recently finishished:
+- BUG: switching layers and creating new layers when 'make top layer transparent' is checked
+  - either uncheck it or make sure it's re-implemented after a new layer is selected
 - BUG: deleting layers in different columns causes chaos. needs to cause a reflow of the columns and data. 
   - strongly consider not using columns. just use a bunch of divs floated to the left in a big box. colors and then white to black.
   - working on making color palette items not organized by columns
