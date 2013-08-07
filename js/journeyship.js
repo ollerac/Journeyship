@@ -204,7 +204,7 @@ function applyMapToContext (map, context, cellSize, columns, options) {
   _.each(map, function (color, index) {
     var cellPosition = getCellPositionFromIndex(index, columns, cellSize);
 
-    if (defaults.withTransparency && /rgba.*,.*,.*,.0\)/.test(color)) {
+    if (defaults.withTransparency && color === 'transparent') {
       clearCell(context, defaults.x + cellPosition.x, defaults.y + cellPosition.y, cellSize);
     } else {
       drawCell(context, defaults.x + cellPosition.x, defaults.y + cellPosition.y, cellSize, color);
@@ -271,7 +271,7 @@ DrawableSurface.prototype.makeDrawable = function () {
   function drawIt (event) {
     if (typeof(self.selectedStyle) === 'string') {
       var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
-      if (/rgba.*,.*,.*,.0\)/.test(self.selectedStyle)) {
+      if (self.selectedStyle === 'transparent') {
         clearCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize);
       } else {
         drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle);
