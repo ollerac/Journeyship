@@ -66,7 +66,6 @@
 
 ### bugs
 - sometimes buttons don't click. big problem.
-- transparent blocks don't save or load correctly or place correctly (they just overlap things, they should replace)
 
 ### before launch
 - test cross browser
@@ -111,6 +110,14 @@
 
 
 ### recently finishished:
+- BUGS: with transparent blocks 
+  - don't load correctly 
+    - they overwrite whatever was in the preview block but you can still see it peaking through
+  - don't save correctly
+    - they appear as the color that was erased and not as transparent
+  - don't place correctly
+    - they overlap things on the same layer as them instead of replacing them
+  - the 1st and 3rd issue can probably be fixed by clearing the whole cell before loading it or placing it
 - BUG: editing background/foreground not working
 - BUG: transparent color stopped working
 - BUG: switching layers and creating new layers when 'make top layer transparent' is checked

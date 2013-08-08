@@ -114,13 +114,16 @@ AnimatedBlock.prototype.nextLayer = function () {
 AnimatedBlock.prototype.animate = function () {
   var self = this;
   var context = self.$animatedElement[0].getContext('2d');
-  var layer =self.nextLayer();
+  var layer = self.nextLayer();
   // this should show and hide elements instead of drawing over and over again
   applyMapToContext(layer, context, defaultTinyCellSize, self.$animatedElement.width() / defaultTinyCellSize);
 };
 
 AnimatedBlock.prototype.startAnimation = function () {
   var self = this;
+
+  self.$animatedElement[0].getContext('2d').clearRect(0,0,self.$animatedElement[0].width,self.$animatedElement[0].height);
+
   self.animationInterval = setInterval(function () {
     self.animate();
   }, 300);
@@ -167,6 +170,10 @@ function getCellPositionInArrayFromPosition (x, y, cellSize, columns) {
 
 // input x, y and outputs x and y rounded down to the nearest multiple of cellSize
 function getCellPosition (x, y, cellSize) {
+  if (!cellSize) {
+    cellSize = defaultCellSize;
+  }
+
   return {
     x: Math.floor(x/cellSize) * cellSize,
     y: Math.floor(y/cellSize) * cellSize
@@ -180,14 +187,14 @@ function getCellRowAndColumnFromIndex (index, containerColumns) {
   };
 }
 
-function getCellRowAndColumnFromPosition (roundedX, roundedY, cellSize) {
+function getCellRowAndColumnFromPosition (x, y, cellSize) {
   if (!cellSize) {
     cellSize = defaultCellSize;
   }
 
   return {
-    row: Math.floor(roundedY / cellSize),
-    column: Math.floor(roundedX / cellSize)
+    row: Math.floor(y / cellSize),
+    column: Math.floor(x / cellSize)
   };
 }
 
@@ -207,6 +214,10 @@ function getCellPositionFromRowAndColumn (row, column, cellSize) {
 }
 
 function getCellPositionFromIndex (index, columns, cellSize) {
+  if (!cellSize) {
+    cellSize = defaultCellSize;
+  }
+
   var rowAndColumn = getCellRowAndColumnFromIndex(index, columns);
   return getCellPositionFromRowAndColumn(rowAndColumn.row, rowAndColumn.column, cellSize);
 }
@@ -302,27 +313,37 @@ DrawableSurface.prototype.makeDrawable = function () {
   }
 
   function drawIt (event) {
-    var positionInArray;
+    var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
+    var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+
+    var drawingContext = self.$element[0].getContext('2d');
+    clearCell(drawingContext, cellPosition.x, cellPosition.y, self.cellSize);
 
     if (typeof(self.selectedStyle) === 'string') {
-      var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
-      if (self.selectedStyle === 'transparent') {
-        clearCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize);
-      } else {
+      if (self.selectedStyle !== 'transparent') {
         drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle);
       }
-      positionInArray = getCellPositionInArrayFromPosition(cellPosition.x, cellPosition.y, self.cellSize, self.columns);
-    } else if (typeof(self.selectedStyle) === 'object' && self.selectedStyle.layers) {
-      positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
-    }
 
-    if (self.drawOnBackground) {
-      self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
-    } else {
-      self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+      if (self.drawOnBackground) {
+        self.map[positionInArray] = self.selectedStyle;
+      } else {
+        self.animatedMap[positionInArray] = self.selectedStyle;
+      }
+    } else if (typeof(self.selectedStyle === 'object') && self.selectedStyle.layers) {
+      if (self.drawOnBackground) {
+        self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+      } else {
+        self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+      }
+
+      _.each(self.map, function (block) {
+        if (block && typeof(block) === 'object' && block.layers) {
+          block.resetIndex();
+        }
+      });
 
       _.each(self.animatedMap, function (block) {
-        if (block) {
+        if (block && typeof(block) === 'object' && block.layers) {
           block.resetIndex();
         }
       });
