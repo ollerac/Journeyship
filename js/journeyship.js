@@ -822,10 +822,10 @@ $('#bg-fg-switch').on('click', function (event) {
   var button = $(event.currentTarget);
 
   if (mainArea.selectedDrawableSurface().drawOnBackground) {
-    button.children('.inner').text('Editing Foreground');
+    button.text('Editing Foreground');
     mainArea.selectedDrawableSurface().drawOnBackground = false;
   } else {
-    button.children('.inner').text('Editing Background');
+    button.text('Editing Background');
     mainArea.selectedDrawableSurface().drawOnBackground = true;
   }
 });

@@ -23,6 +23,7 @@
     - ✔ only show edit and delete buttons if a selection is active
   - ✔ when selecting a color palette block, unselect the currently selected canvas block
     - ✔ hide th edit and delete buttons too
+  - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead
   - when you click edit:
     - if the block is a color, convert it into an animated block, place it in the map, copy it, show the editor area, load it in
     - if it's already an animated block, get it from the map, copy it, show the editor area, load it in
@@ -63,6 +64,10 @@
 - ✔ show selected color
 - ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
+### bugs
+- sometimes buttons don't click. big problem.
+- transparent blocks don't save or load correctly or place correctly (they just overlap things, they should replace)
+
 ### before launch
 - test cross browser
 - simple howto video
@@ -74,13 +79,13 @@
 - rewrite large parts of it using AngularJS
 
 ### would be *really* nice to have:
+- make default new layer transparent
+- paths for movable blocks to move on top of
 - don't animate blocks with only one layer. this also requires starting the animation when layers are added. and stopping it when all but one is removed.
 - animations should line up so they happen at the same time
-- paths for movable blocks to move on top of
 - Enhancement: remove 'save' button, make it an automatic update, make it use the same animated block so they all update at the same time. requires an animated block having more than one animated element.
 - Fix: it'd be nice if each block in the color palette was stored and loaded somewhere so there's a new animated block didn't have to be created
 - Fix: it'd be nice if the editor area didn't have a bunch of drawable surface, each with their own selected color
-- make default new layer transparent
 - make a button: generate example block
 - ability to select a block in the main area or the main color palette in order to edit it
 - should populate the main color palette with some cool custom blocks to start out with
@@ -106,6 +111,7 @@
 
 
 ### recently finishished:
+- BUG: editing background/foreground not working
 - BUG: transparent color stopped working
 - BUG: switching layers and creating new layers when 'make top layer transparent' is checked
   - either uncheck it or make sure it's re-implemented after a new layer is selected
