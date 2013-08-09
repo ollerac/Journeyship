@@ -23,15 +23,14 @@
     - ✔ only show edit and delete buttons if a selection is active
   - ✔ when selecting a color palette block, unselect the currently selected canvas block
     - ✔ hide th edit and delete buttons too
-  - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead
-  - when you click edit:
-    - if the block is a color, convert it into an animated block, place it in the map, copy it, show the editor area, load it in
-    - if it's already an animated block, get it from the map, copy it, show the editor area, load it in
-    - make the edit button have an active state
-    - when you select another block, disable active state of edit button
-    - when you click 'save' save the block to the canvas
+  - ✔only show edit and delete button after selecting a block
+  - ✔ when you click edit:
+    - ✔ if the block is a color, convert it into an animated block, place it in the map, copy it, show the editor area, load it in
+    - ✔ if it's already an animated block, get it from the map, copy it, show the editor area, load it in
+    - ✔ when you select another block, disable active state of edit button
+    - ✔ when you click 'save' save the block to the canvas
     - add an 'save to palette' button to the editor area, which copies the editor area's animated block into the main color palette
-    - don't do this yet: ask if user wants to save changes to the current block if there are unsaved changes
+    - BUG: when you edit a block, save it, and then click edit again it erases the block!!!
 - delete objects from main area
   - add ability to select canvas block
   - add trash can icon to button
@@ -65,7 +64,9 @@
 - ✔ if there are too many custom blocks in the main color palette add new ones to a new column
 
 ### bugs
-- sometimes buttons don't click. big problem.
+- BUG: when you delete the first layer is selects the last layer... what's up with that?
+- BUG: sometimes buttons don't click. big problem. What the heck is going on with this?
+- BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
 
 ### before launch
 - test cross browser

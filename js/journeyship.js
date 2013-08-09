@@ -26,7 +26,8 @@ var grayscaleDictionary = {
 
 function AnimatedBlock (layers, options) {
   var defaults = {
-    uniqueId: _.uniqueId('id-')
+    uniqueId: _.uniqueId('id-'),
+    fromMainCanvas: false
   };
 
   _.extend(defaults, options);
@@ -37,6 +38,9 @@ function AnimatedBlock (layers, options) {
   self.animationInterval = null;
   self.$animatedElement = null;
   self.uniqueId = defaults.uniqueId;
+  self.fromMainCanvas = defaults.fromMainCanvas;
+  self.mainCanvasPosition = defaults.mainCanvasPosition;
+  self.mainCanvasOnBackground = defaults.mainCanvasOnBackground;
 
   _.each(layers, function (layer) {
     self.addLayer(layer);
@@ -308,8 +312,19 @@ DrawableSurface.prototype.makeDrawable = function () {
   var self = this;
 
   function selectIt (event) {
+    $deleteFromMainCanvasButton.css('display', 'inline-block').show();
+    $editInMainCanvasButton.css('display', 'inline-block').show();
+    $editorAreaContainer.hide();
+
     var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
     self.selectedBlocksMap = makeMap(null, self.columns * self.rows, {color: colorDictionary['red'], positions: [positionInArray]});
+
+    self.selectedBlock = {
+      position: positionInArray,
+      value: self.drawOnBackground ? self.map[positionInArray] : self.animatedMap[positionInArray],
+      map: self.drawOnBackground ? self.map : self.animatedMap,
+      onBackground: self.drawOnBackground
+    };
   }
 
   function drawIt (event) {
@@ -420,13 +435,8 @@ var editorArea = {
   selectedLayerNum: 0,
   selectedStyle: '#000',
   $layersContainerElement: $('.layers'),
-  makeNewAnimatedBlock: function (layers, uniqueId) {
+  makeNewAnimatedBlock: function (layers, options) {
     var self = this;
-
-    var options = {};
-    if (uniqueId) {
-      options.uniqueId = uniqueId;
-    }
 
     this.animatedBlock.pauseAnimation();
     this.animatedBlock.removeAllLayers();
@@ -753,7 +763,7 @@ $.subscribe('selected-style', function (event, update) {
     buttons.show();
 
     $editorAreaElement.show();
-    editorArea.makeNewAnimatedBlock(_.cloneDeep(update.style.layers), update.style.uniqueId);
+    editorArea.makeNewAnimatedBlock(_.cloneDeep(update.style.layers), {uniqueId: update.style.uniqueId});
   } else {
     buttons.hide();
     $editorAreaElement.hide();
@@ -777,16 +787,30 @@ $('#new-block').on('click', function (event) {
 
 $('#save-block').on('click', function (event) {
   event.preventDefault();
-  mainColorPalette.saveCustomBlock(_.cloneDeep(editorArea.animatedBlock.layers), editorArea.animatedBlock.uniqueId);
 
-  //this is for making their animations line up 
-  _.each(mainColorPalette.map, function (block) {
-    if (block.layers) {
-      block.pauseAnimation();
-      block.resetIndex();
-      block.startAnimation();
+  var animBlock = editorArea.animatedBlock;
+
+  console.log(animBlock);
+
+  if (animBlock.fromMainCanvas) {
+    console.log('ere');
+    if (animBlock.mainCanvasOnBackground) {
+      mainArea.selectedDrawableSurface().map[animBlock.mainCanvasPosition].layers = _.cloneDeep(animBlock.layers);
+    } else {
+      mainArea.selectedDrawableSurface().animatedMap[animBlock.mainCanvasPosition].layers = _.cloneDeep(animBlock.layers);
     }
-  });
+  } else {
+    mainColorPalette.saveCustomBlock(_.cloneDeep(editorArea.animatedBlock.layers), editorArea.animatedBlock.uniqueId);
+
+    //this is for making their animations line up 
+    _.each(mainColorPalette.map, function (block) {
+      if (block.layers) {
+        block.pauseAnimation();
+        block.resetIndex();
+        block.startAnimation();
+      }
+    });
+  }
 });
 
 $('#copy-block').on('click', function (event) {
@@ -876,13 +900,43 @@ $('#select-block-from-main-canvas').on('click', function (event) {
     selectActive = true;
     $button.addClass('active');
 
-    $deleteFromMainCanvasButton.css('display', 'inline-block').show();
-    $editInMainCanvasButton.css('display', 'inline-block').show();
-
     paletteElementThatWasSelected = $('#main-color-palette .palette-element-container.selected').removeClass('selected');
     $editorAreaContainer.hide();
   }
 });
+
+$editInMainCanvasButton.on('click', function (event) {
+  event.preventDefault();
+
+  $editorAreaContainer.show();
+
+  var selectedBlock = mainArea.selectedDrawableSurface().selectedBlock;
+  var animatedBlock;
+
+  if (typeof(selectedBlock.value) === 'string') {
+    animatedBlock = editorArea.makeNewAnimatedBlock([selectedBlock.value], {
+      fromMainCanvas: true,
+      mainCanvasPosition: selectedBlock.position,
+      mainCanvasOnBackground: selectedBlock.onBackground
+    });
+
+    selectedBlock.map[selectedBlock.position] = new AnimatedBlock([selectedBlock.value], {
+      uniqueId: animatedBlock.uniqueId
+    });
+
+  } else if (typeof(selectedBlock.value) === 'object' && selectedBlock.value.layers) {
+    editorArea.makeNewAnimatedBlock(_.cloneDeep(selectedBlock.value.layers), {
+      uniqueId: selectedBlock.value.uniqueId,
+      fromMainCanvas: true,
+      mainCanvasPosition: selectedBlock.position,
+      mainCanvasOnBackground: selectedBlock.onBackground
+    });
+  }
+});
+
+
+
+
 
 
 
