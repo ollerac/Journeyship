@@ -124,13 +124,12 @@ AnimatedBlock.prototype.animate = function () {
   var context = self.$animatedElement[0].getContext('2d');
   var layer = self.nextLayer();
   // this should show and hide elements instead of drawing over and over again
+  self.clearAnimation();
   applyMapToContext(layer, context, defaultTinyCellSize, self.$animatedElement.width() / defaultTinyCellSize);
 };
 
 AnimatedBlock.prototype.startAnimation = function () {
   var self = this;
-
-  self.clearAnimation();
 
   self.animationInterval = setInterval(function () {
     self.animate();
@@ -264,7 +263,7 @@ function makeMap (cellColor, cellCount, options) {
     }
   });
   return map;
-};
+}
 
 
 
@@ -290,10 +289,15 @@ function DrawableSurface ($element, cellSize, defaultCellColor) {
   //self.startAnimating();
 }
 
+DrawableSurface.prototype.clear = function () {
+  this.$element[0].getContext('2d').clearRect(0,0,this.$element.width(),this.$element.height());
+};
+
 DrawableSurface.prototype.startAnimating = function () {
   var self = this;
 
   self.animatedInterval = setInterval(function() {
+    self.clear();
     self.renderFirstMap();
     self.renderSecondMap();
     self.renderSelectedBlocksMap(self.selectedBlocksMap);

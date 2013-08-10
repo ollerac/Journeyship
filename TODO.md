@@ -79,6 +79,7 @@
 - rewrite large parts of it using AngularJS
 
 ### would be *really* nice to have:
+- give areas and animated blocks direct access to their context, so you don't have to keep grabbing that.
 - add a paint bucket tool
 - make a global interval for animating all the blocks -- all of them. have it emit an event: 'tick'. have all the things listening to this go to the next frame of their animation when this fires. this might be more overhead than setting a setInterval. and it might not work, but it's worth a try. it fixes the problem of animations not lining up. do they need to???
 - make default new layer transparent
@@ -113,6 +114,7 @@
 
 
 ### recently finishished:
+- BUG: animations with lots of transparent blocks don't really show. maybe they should clear their squares before drawing, so it's clear, draw, pause, clear, draw, pause
 - BUG: delete first layer and it jumps to selecting the last layer and then things get messed up if you keep deleting
 - when you delete a layer redraw the animation block
 
