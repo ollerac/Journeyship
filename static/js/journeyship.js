@@ -544,7 +544,7 @@ var editorArea = {
     // layer menu setup
     var $layerElement = makeNewBlock();
     var $layerContainer = makeNewElement();
-    var $arrowElement = $('<div class="arrow"><img src="img/arrow.png" /></div>');
+    var $arrowElement = $('<div class="arrow"><img src="../img/arrow.png" /></div>');
     $layerContainer.addClass('block area-container layer-container selected');
     $layerContainer.append($layerElement.add($arrowElement));
 
