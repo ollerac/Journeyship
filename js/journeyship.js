@@ -48,6 +48,10 @@ function AnimatedBlock (layers, options) {
   });
 }
 
+AnimatedBlock.prototype.clearAnimation = function () {
+  this.$animatedElement[0].getContext('2d').clearRect(0,0,this.$animatedElement[0].width,this.$animatedElement[0].height);
+};
+
 AnimatedBlock.prototype.resetIndex = function () {
   this.layerIndex = -1;
 };
@@ -88,7 +92,6 @@ AnimatedBlock.prototype.changeLayerValue = function (layerNum, indexNum, newValu
   }
 
   this.layers[layerNum][indexNum] = newValue;
-  //$.publish('changed-layer-value'); // nothing subscribed
 };
 
 AnimatedBlock.prototype.removeLayer = function (layerNum) {
@@ -127,7 +130,7 @@ AnimatedBlock.prototype.animate = function () {
 AnimatedBlock.prototype.startAnimation = function () {
   var self = this;
 
-  self.$animatedElement[0].getContext('2d').clearRect(0,0,self.$animatedElement[0].width,self.$animatedElement[0].height);
+  self.clearAnimation();
 
   self.animationInterval = setInterval(function () {
     self.animate();
@@ -452,7 +455,7 @@ var editorArea = {
     if (layers) {
       self.animatedBlock.addLayers(layers);
     } else {
-      this.animatedBlock.addLayer('#fff');
+      this.animatedBlock.addLayer('transparent');
     }
 
     this.animatedBlock.$animatedElement = $('#preview-container').children('canvas.block');
@@ -483,11 +486,14 @@ var editorArea = {
         }
       });
 
-      var selectedLayer = $('.layers .layer-container').removeClass('selected').eq(this.selectedLayerNum).addClass('selected');
+      var $drawableLayers = $('#constructor-area-container .constructor-area').css('opacity', .5);
+      var $selectedDrawableLayer = $('#constructor-area-container .constructor-area').eq(this.selectedLayerNum).css('opacity', 1);
+
+      var $selectedLayer = $('.layers .layer-container').removeClass('selected').eq(this.selectedLayerNum).addClass('selected');
 
       $.publish('selected-layer', {
         layerNum: num,
-        layer: selectedLayer
+        layer: $selectedLayer
       });
     }
   },
@@ -607,18 +613,19 @@ var editorArea = {
       }
     });
 
-    $('#remove-layer').on('click', function () {
+    $('#delete-layer').on('click', function () {
       event.preventDefault();
       self.animatedBlock.removeLayer(self.selectedLayerNum);
       if (self.animatedBlock.layers.length === 0) {
-        self.animatedBlock.addLayer('#fff');
+        self.animatedBlock.addLayer('transparent');
         self.setSelectedLayer(0);
       }
+      self.animatedBlock.clearAnimation();
     });
 
     $('#new-layer').on('click', function () {
       event.preventDefault();
-      self.animatedBlock.addLayer("#fff", self.selectedLayerNum + 1);
+      self.animatedBlock.addLayer("transparent", self.selectedLayerNum + 1);
     });
 
     $('#copy-layer').on('click', function () {
@@ -857,11 +864,11 @@ $('#delete-block').on('click', function (event) {
 
 
 var applyShadow = function () {
-  $('.constructor-area').css('opacity', '1').eq(editorArea.selectedLayerNum).css('opacity', '.5');
+  $('.constructor-area').css('opacity', '.25').eq(editorArea.selectedLayerNum).css('opacity', '.5');
 };
 
 var removeShadow = function () {
-  $('.constructor-area').css('opacity', '1');
+  $('.constructor-area').css('opacity', '.5').eq(editorArea.selectedLayerNum).css('opacity', '1');
 };
 
 var shadowEnabled = false;
