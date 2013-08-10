@@ -30,7 +30,6 @@
     - ✔ when you select another block, disable active state of edit button
     - ✔ when you click 'save' save the block to the canvas
     - ✔ add a 'save to palette' button to the editor area, which copies the editor area's animated block into the main color palette
-- BUG: delete first layer and it jumps to selecting the last layer and then things get messed up if you keep deleting
 - animations with lots of transparent blocks don't really show. maybe they should clear their squares before drawing, so it's clear, draw, pause, clear, draw, pause.
 - delete objects from main area
   - add ability to select canvas block
@@ -114,6 +113,7 @@
 
 
 ### recently finishished:
+- BUG: delete first layer and it jumps to selecting the last layer and then things get messed up if you keep deleting
 - when you delete a layer redraw the animation block
 
 

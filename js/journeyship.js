@@ -586,9 +586,15 @@ var editorArea = {
     $('.layers .layer-container').eq(layerNum).remove();
     this.drawableSurfaces.splice(layerNum, 1);
 
-    self.setSelectedLayer(self.selectedLayerNum - 1);
+    if (this.drawableSurfaces.length) {
+      if (self.selectedLayerNum === 0) {
+        self.setSelectedLayer(self.selectedLayerNum);
+      } else {
+        self.setSelectedLayer(self.selectedLayerNum - 1);
+      }
 
-    self.renderSelectedLayer();
+      self.renderSelectedLayer();
+    }
   },
   setup: function () {
     self = this;
