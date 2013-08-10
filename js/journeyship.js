@@ -308,6 +308,17 @@ DrawableSurface.prototype.makeMap = function (cellColor) {
   return map;
 };
 
+DrawableSurface.prototype.setupSelectedBlock = function (position) {
+  var self = this;
+
+  self.selectedBlock = {
+    position: position,
+    value: self.drawOnBackground ? self.map[position] : self.animatedMap[position],
+    map: self.drawOnBackground ? self.map : self.animatedMap,
+    onBackground: self.drawOnBackground
+  };
+};
+
 DrawableSurface.prototype.makeDrawable = function () {
   var self = this;
 
@@ -319,12 +330,7 @@ DrawableSurface.prototype.makeDrawable = function () {
     var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
     self.selectedBlocksMap = makeMap(null, self.columns * self.rows, {color: colorDictionary['red'], positions: [positionInArray]});
 
-    self.selectedBlock = {
-      position: positionInArray,
-      value: self.drawOnBackground ? self.map[positionInArray] : self.animatedMap[positionInArray],
-      map: self.drawOnBackground ? self.map : self.animatedMap,
-      onBackground: self.drawOnBackground
-    };
+    self.setupSelectedBlock(positionInArray);
   }
 
   function drawIt (event) {
@@ -923,6 +929,9 @@ $editInMainCanvasButton.on('click', function (event) {
     selectedBlock.map[selectedBlock.position] = new AnimatedBlock([selectedBlock.value], {
       uniqueId: animatedBlock.uniqueId
     });
+
+    // reset selected block
+    mainArea.selectedDrawableSurface().setupSelectedBlock(selectedBlock.position);
 
   } else if (typeof(selectedBlock.value) === 'object' && selectedBlock.value.layers) {
     editorArea.makeNewAnimatedBlock(_.cloneDeep(selectedBlock.value.layers), {
