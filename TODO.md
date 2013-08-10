@@ -30,11 +30,13 @@
     - ✔ when you select another block, disable active state of edit button
     - ✔ when you click 'save' save the block to the canvas
     - ✔ add a 'save to palette' button to the editor area, which copies the editor area's animated block into the main color palette
-- animations with lots of transparent blocks don't really show. maybe they should clear their squares before drawing, so it's clear, draw, pause, clear, draw, pause.
+- ✔ animations with lots of transparent blocks don't really show. maybe they should clear their squares before drawing, so it's clear, draw, pause, clear, draw, pause.
 - delete objects from main area
-  - add ability to select canvas block
-  - add trash can icon to button
-  - when you delete a block, it's replaced by a regular color block that's still selected but not currently being edited
+  - ✔ add ability to select canvas block
+  - ✔ add trash can icon to button
+  - ✔ when you delete a block, it's replaced by a regular color block that's still selected but not currently being edited
+    - ✔ on background: white
+    - ✔ on foreground: null
 - !!! data persistence
   - save after doing stuff or after a certain amount of time? time i think
   - meteor? nodejs and mongodb?

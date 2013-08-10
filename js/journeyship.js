@@ -906,9 +906,23 @@ $('#bg-fg-switch').on('click', function (event) {
   if (mainArea.selectedDrawableSurface().drawOnBackground) {
     button.text('Editing Foreground');
     mainArea.selectedDrawableSurface().drawOnBackground = false;
+
+    $editorAreaContainer.hide();
+
+    // reset selected block
+    if (mainArea.selectedDrawableSurface().selectedBlock) {
+      mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
+    }
   } else {
     button.text('Editing Background');
     mainArea.selectedDrawableSurface().drawOnBackground = true;
+
+    $editorAreaContainer.hide();
+
+    // reset selected block
+    if (mainArea.selectedDrawableSurface().selectedBlock) {
+      mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
+    }
   }
 });
 
@@ -950,14 +964,14 @@ $editInMainCanvasButton.on('click', function (event) {
   var selectedBlock = mainArea.selectedDrawableSurface().selectedBlock;
   var animatedBlock;
 
-  if (typeof(selectedBlock.value) === 'string') {
-    animatedBlock = editorArea.makeNewAnimatedBlock([selectedBlock.value], {
+  if (typeof(selectedBlock.value) === 'string' || selectedBlock.value === null) {
+    animatedBlock = editorArea.makeNewAnimatedBlock([selectedBlock.value === null ? 'transparent' : selectedBlock.value], {
       fromMainCanvas: true,
       mainCanvasPosition: selectedBlock.position,
       mainCanvasOnBackground: selectedBlock.onBackground
     });
 
-    selectedBlock.map[selectedBlock.position] = new AnimatedBlock([selectedBlock.value], {
+    selectedBlock.map[selectedBlock.position] = new AnimatedBlock([selectedBlock.value === null ? 'transparent' : selectedBlock.value], {
       uniqueId: animatedBlock.uniqueId
     });
 
@@ -994,7 +1008,17 @@ $exportBlockButton.on('click', function (event) {
   });
 });
 
+$deleteFromMainCanvasButton.on('click', function (event) {
+  event.preventDefault();
 
+  $editorAreaContainer.hide();
+
+  var selectedBlock = mainArea.selectedDrawableSurface().selectedBlock;
+  selectedBlock.map[selectedBlock.position] = selectedBlock.onBackground ? '#fff' : null;
+
+  // reset selected block
+  mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
+});
 
 
 
