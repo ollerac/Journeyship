@@ -146,7 +146,7 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
-#copy-block, #delete-block {
+#copy-block, #delete-block, #export-block {
   display: none;
 }
 

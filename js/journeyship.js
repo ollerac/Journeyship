@@ -3,6 +3,7 @@ var defaultTinyCellSize = 3;
 
 var $deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
 var $editInMainCanvasButton = $('#edit-block-from-main-canvas');
+var $exportBlockButton = $('#export-block');
 
 var $editorAreaContainer = $('#constructor-container');
 
@@ -457,6 +458,12 @@ var editorArea = {
     this.animatedBlock.$animatedElement = $('#preview-container').children('canvas.block');
     this.animatedBlock.startAnimation();
 
+    if (this.animatedBlock.fromMainCanvas) {
+      $exportBlockButton.show();
+    } else {
+      $exportBlockButton.hide();
+    }
+
     return this.animatedBlock;
   },
   setSelectedLayer: function (num) {
@@ -796,24 +803,31 @@ $('#save-block').on('click', function (event) {
 
   var animBlock = editorArea.animatedBlock;
 
-  console.log(animBlock);
-
   if (animBlock.fromMainCanvas) {
-    console.log('ere');
     if (animBlock.mainCanvasOnBackground) {
       mainArea.selectedDrawableSurface().map[animBlock.mainCanvasPosition].layers = _.cloneDeep(animBlock.layers);
     } else {
       mainArea.selectedDrawableSurface().animatedMap[animBlock.mainCanvasPosition].layers = _.cloneDeep(animBlock.layers);
     }
+
+    _.each(mainArea.selectedDrawableSurface().map, function (block) {
+      if (block && typeof(block) === 'object' && block.layers) {
+        block.resetIndex();
+      }
+    });
+
+    _.each(mainArea.selectedDrawableSurface().animatedMap, function (block) {
+      if (block && typeof(block) === 'object' && block.layers) {
+        block.resetIndex();
+      }
+    });
   } else {
-    mainColorPalette.saveCustomBlock(_.cloneDeep(editorArea.animatedBlock.layers), editorArea.animatedBlock.uniqueId);
+    mainColorPalette.saveCustomBlock(_.cloneDeep(animBlock.layers), animBlock.uniqueId);
 
     //this is for making their animations line up 
     _.each(mainColorPalette.map, function (block) {
       if (block.layers) {
-        block.pauseAnimation();
         block.resetIndex();
-        block.startAnimation();
       }
     });
   }
@@ -944,7 +958,24 @@ $editInMainCanvasButton.on('click', function (event) {
 });
 
 
+$exportBlockButton.on('click', function (event) {
+  event.preventDefault();
 
+  if (mainColorPalette.getBlockWithId(editorArea.animatedBlock.uniqueId)) {
+    mainColorPalette.saveCustomBlock(_.cloneDeep(editorArea.animatedBlock.layers), editorArea.animatedBlock.uniqueId);
+  } else {
+    mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(editorArea.animatedBlock.layers), {
+      uniqueId: editorArea.animatedBlock.uniqueId
+    }));
+  }
+
+  //this is for making their animations line up 
+  _.each(mainColorPalette.map, function (block) {
+    if (block.layers) {
+      block.resetIndex();
+    }
+  });
+});
 
 
 

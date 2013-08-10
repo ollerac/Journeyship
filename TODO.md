@@ -29,8 +29,7 @@
     - ✔ if it's already an animated block, get it from the map, copy it, show the editor area, load it in
     - ✔ when you select another block, disable active state of edit button
     - ✔ when you click 'save' save the block to the canvas
-    - add an 'save to palette' button to the editor area, which copies the editor area's animated block into the main color palette
-    - BUG: when you edit a block, save it, and then click edit again it erases the block!!!
+    - ✔ add a 'save to palette' button to the editor area, which copies the editor area's animated block into the main color palette
 - delete objects from main area
   - add ability to select canvas block
   - add trash can icon to button
@@ -69,7 +68,7 @@
 - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
 
 ### before launch
-- test cross browser
+- test cross browser... ugh.
 - simple howto video
 - add journeyship logo (with sail moving)
 
@@ -79,6 +78,8 @@
 - rewrite large parts of it using AngularJS
 
 ### would be *really* nice to have:
+- add a paint bucket tool
+- make a global interval for animating all the blocks -- all of them. have it emit an event: 'tick'. have all the things listening to this go to the next frame of their animation when this fires. this might be more overhead than setting a setInterval. and it might not work, but it's worth a try. it fixes the problem of animations not lining up. do they need to???
 - make default new layer transparent
 - paths for movable blocks to move on top of
 - don't animate blocks with only one layer. this also requires starting the animation when layers are added. and stopping it when all but one is removed.
@@ -111,6 +112,11 @@
 
 
 ### recently finishished:
+
+
+
+### finished:
+- BUG: when you edit a block, save it, and then click edit again it erases the block!!!
 - BUGS: with transparent blocks 
   - don't load correctly 
     - they overwrite whatever was in the preview block but you can still see it peaking through
@@ -133,9 +139,6 @@
 - new block button working
 - ENHANCEMENT: added save button that doesn't make a new block when saving
 - ENHANCEMENT: added new button style
-
-
-### finished:
 - BUG: fixed bug when you remove all layers (required splicing the drawablesurfaces property of the editArea)
 - ENHANCEMENT: stopped animating the editor area's block
 - fixed bug with transparency: needs to update the layers menu without breaking the main animated block
