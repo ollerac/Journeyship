@@ -3,22 +3,67 @@
 
 function replaceLayersWithAnimatedBlocks (map) {
   _.each(map, function (value, index, list) {
-    console.log(value);
+    if (typeof(value) === 'object') {
+      list[index] = new AnimatedBlock(value);
+    }
   });
+
+  return map;
 }
 
 
-$.ajax({
-  url: '/getstory/',
-  data: {id: window.location.pathname.replace(/^\//, '')},
-  success: function (result) {
-    console.log('get r', result);
-    replaceLayersWithAnimatedBlocks(result);
-  },
-  error: function (error) {
-    console.log('get e', error);
+var colors;
+var mainColorPalette;
+var editorAreaColorPalette;
+
+var load = function () {
+
+  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+  var loadThisData = {
+    id: parseInt(paths[1], 10)
+  };
+
+  if (paths[2]) {
+    loadThisData.secondId = parseInt(paths[2], 10);
   }
-});
+
+
+  $.ajax({
+    url: '/getstory/',
+    data: loadThisData,
+    success: function (result) {
+
+      if (result) {
+        replaceLayersWithAnimatedBlocks(result.main.palette);
+        replaceLayersWithAnimatedBlocks(result.main.firstLayer);
+        replaceLayersWithAnimatedBlocks(result.main.secondLayer);
+
+
+        editorArea.setup(result.editor.animatedBlock.layers);
+        mainArea.setup(result.main.firstLayer, result.main.secondLayer);
+
+        colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
+        mainColorPalette = new ColorPalette (result.main.palette, $('#main-color-palette'), mainArea);
+        editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+  //      mainColorPalette.addStyle(new AnimatedBlock(tree));
+      } else {
+        editorArea.setup();
+        mainArea.setup();
+
+        colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
+        mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
+        editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+        mainColorPalette.addStyle(new AnimatedBlock(tree));
+      }
+
+    },
+    error: function (error) {
+      // do something here
+    }
+  });
+};
+
+load();
 
 function replaceAnimatedBlocksWithTheirLayers (map) {
   _.each(map, function (value, index, list) {
@@ -30,7 +75,7 @@ function replaceAnimatedBlocksWithTheirLayers (map) {
   return map;
 }
 
-var saveData = function () {
+var saveData = function (callback) {
   var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
   var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
   var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
@@ -50,18 +95,26 @@ var saveData = function () {
 
   storyData = JSON.stringify(storyData);
 
+  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+
+  var dataToSave = {
+    id: parseInt(paths[1], 10),
+    story: storyData
+  };
+
   $.ajax({
     type: 'post',
     url: '/savestory/',
-    data: {
-      id: window.location.pathname.replace(/^\//, ''),
-      story: storyData
-    },
+    data: dataToSave,
     success: function (result) {
-      console.log('set r',result);
+      History.pushState(null, null, '/' + dataToSave.id + '/' + result.version);
+
+      if (callback) {
+        callback();
+      }
     },
     error: function (error) {
-      console.log('set e',error);
+      // do something here
     }
   });
 };
@@ -340,15 +393,16 @@ function makeMap (cellColor, cellCount, options) {
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface ($element, cellSize, defaultCellColor) {
+function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, secondLayer) {
   var self = this;
   self.$element = $element;
   self.cellSize = cellSize || defaultCellSize;
   self.columns = self.$element.width() / self.cellSize;
   self.rows = self.$element.height() / self.cellSize;
   self.selectedStyle = '#000';
-  self.map = self.makeMap(defaultCellColor || '#fff'); //background, also potentially animated
-  self.animatedMap = self.makeMap(null); // foreground
+  self.defaultCellColor = defaultCellColor || '#fff';
+  self.map = firstLayer || self.makeMap(self.defaultCellColor); //background, also potentially animated
+  self.animatedMap = secondLayer || self.makeMap(null); // foreground
   self.selectedBlocksMap = [];
   self.animatedInterval = null;
   self.drawOnBackground = true;
@@ -513,7 +567,7 @@ DrawableSurface.prototype.renderSecondMap = function () {
 
 
 var editorArea = {
-  animatedBlock: new AnimatedBlock(),
+  animatedBlock: null,
   drawableSurfaces: [],
   selectedLayerNum: 0,
   selectedStyle: '#000',
@@ -669,8 +723,10 @@ var editorArea = {
       self.renderSelectedLayer();
     }
   },
-  setup: function () {
+  setup: function (layers) {
     self = this;
+
+    self.animatedBlock = new AnimatedBlock(layers || []);
 
     $.subscribe('added-layer', function (event, addedLayerUpdate) {
       if (self.animatedBlock == addedLayerUpdate.animatedBlock) {
@@ -715,13 +771,10 @@ var editorArea = {
   }
 };
 
-editorArea.setup();
-
-
 // set up main canvas
 
 var mainArea = {
-  drawableSurfaces: [new DrawableSurface($('#main-area'), defaultCellSize)],
+  drawableSurfaces: [],
   selectedStyle: '#000',
   setSelectedStyle: function (style) {
     this.selectedStyle = style;
@@ -742,13 +795,11 @@ var mainArea = {
   selectedDrawableSurface: function () {
     return this.drawableSurfaces[0];
   },
-  setup: function () {
+  setup: function (firstLayer, secondLayer) {
+    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, null, firstLayer, secondLayer))
     this.selectedDrawableSurface().startAnimating();
   }
 };
-
-mainArea.setup();
-
 
 // parent is an area, either mainArea or editorArea
 function ColorPalette (map, $container, parent) {
@@ -870,11 +921,6 @@ $.subscribe('selected-style', function (event, update) {
 
   disableMainCanvasSelect();
 });
-
-var colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
-var mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
-var editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
-mainColorPalette.addStyle(new AnimatedBlock(tree));
 
 
 $('#new-block').on('click', function (event) {
@@ -1089,10 +1135,21 @@ $deleteFromMainCanvasButton.on('click', function (event) {
   mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
 });
 
+$('#save').on('click', function (event) {
+  event.preventDefault();
+  var $clickedButton = $(event.currentTarget);
+
+  saveData(function () {
+    if ($clickedButton.text() === 'Save') {
+      $clickedButton.text('Saved!').css('color', '#adf2b1');
+      setTimeout(function() {
+        $clickedButton.text('Save').css('color', '#fff');
+      }, 3000);
+    }
+  });
+});
 
 
-
-saveData();
 
 
 

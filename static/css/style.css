@@ -8,6 +8,23 @@ body {
   line-height: 1.3em;
 }
 
+a {
+  color: #296edd;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #3f7de0;
+}
+
+.container {
+  width: 700px;
+  background-color: white;
+  border: 1px solid #333;
+  margin: 20px auto;
+  padding: 20px;
+}
+
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
@@ -23,10 +40,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .page-heading {
   text-align: center;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  font-size: 60px;
+  padding-top: 10px;
+  margin-bottom: 50px;
+  font-size: 72px;
   line-height: 1em;
+  clear: both;
 }
 
 .section-heading {
@@ -214,10 +232,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Main Section */
 
-#main-container {
+#main-container, .top-button-container {
   width: 1200px;
   height: 450px;
   margin: 0 auto;
+}
+
+.top-button-container {
+  height: auto;
 }
 
 #main-area-container {
@@ -321,9 +343,19 @@ h1, h2, h3, h4, h5, h6 {
   clear: both;
 }
 
+.hanging-button {
+  float: left;
+  margin-right: 10px;
+  background: #666;
+  background: rgba(0,0,0,.2);
+  padding: 8px 18px;
+  color: #fff;
+  font-size: 14px;
+}
 
-
-
+.hanging-button:hover {
+  color: #ddd;
+}
 
 
 

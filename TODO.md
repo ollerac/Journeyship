@@ -1,13 +1,39 @@
 ### working on now:
-- set up a static file server using express
-- got ids working in url
-- working on ajax endpoints
-- refreshing database data
-- making ajax endpoints consume json and output it
-- saving data
-  - save layers of editor area's animated block
-  - save custom blocks in main color palette
-  - save bg and fg layer of main canvas
+- ✔ set up a static file server using express
+- ✔ got ids working in url
+- ✔ working on ajax endpoints
+- ✔ refreshing database data
+- ✔ making ajax endpoints consume json and output it
+- ✔ saving data
+  - ✔ layers to save
+    - ✔ save layers of editor area's animated block
+    - ✔ save custom blocks in main color palette
+    - ✔ save bg and fg layer of main canvas
+  - ✔ convert animated blocks into their layers
+- ✔ add loading functions to each area that needs to save things and set it up so that they don't get started until they check to see what the loaded object has. that means giving each of them an init() function and calling it inside the response to the ajax call. so it will be
+  - ✔ editorArea.setup(data.animatedBlock.layers)
+  - ✔ mainArea.setup({firstLayer: data.main.firstLayer, secondLayer: data.main.secondLayer})
+  - ✔ mainColorPalette.setup(data.main.palette)
+- make a loading indicator overlay that displays until all of the data is loaded in
+- ✔ make 404 page
+- urls
+  - ✔ load journeyship.com
+    - ✔ get next story id
+      - save a story with this id
+        - redirect to this id
+  - load id (url/id[/secondId])
+    get('story-' + id) or get('story-' + id + '-' secondId)
+    - exists
+      load page
+      - get the ids from the url with History.getState
+      - ajax load ('story-' + id) or ('story-' + id + '-' secondId)
+    - else
+      load 404
+  - on page
+    - click 'save'
+      - set('story-' + id + '-' window.location.pathname(after first slashes), if none start at 1)
+      - History.pushState(null, null, "id/secondId");
+
 
 
 
