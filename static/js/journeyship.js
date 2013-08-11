@@ -1,125 +1,3 @@
-
-
-
-function replaceLayersWithAnimatedBlocks (map) {
-  _.each(map, function (value, index, list) {
-    if (typeof(value) === 'object') {
-      list[index] = new AnimatedBlock(value);
-    }
-  });
-
-  return map;
-}
-
-
-var colors;
-var mainColorPalette;
-var editorAreaColorPalette;
-
-var load = function () {
-
-  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
-  var loadThisData = {
-    id: parseInt(paths[1], 10)
-  };
-
-  if (paths[2]) {
-    loadThisData.secondId = parseInt(paths[2], 10);
-  }
-
-
-  $.ajax({
-    url: '/getstory/',
-    data: loadThisData,
-    success: function (result) {
-
-      if (result) {
-        replaceLayersWithAnimatedBlocks(result.main.palette);
-        replaceLayersWithAnimatedBlocks(result.main.firstLayer);
-        replaceLayersWithAnimatedBlocks(result.main.secondLayer);
-
-
-        editorArea.setup(result.editor.animatedBlock.layers);
-        mainArea.setup(result.main.firstLayer, result.main.secondLayer);
-
-        colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
-        mainColorPalette = new ColorPalette (result.main.palette, $('#main-color-palette'), mainArea);
-        editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
-  //      mainColorPalette.addStyle(new AnimatedBlock(tree));
-      } else {
-        editorArea.setup();
-        mainArea.setup();
-
-        colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
-        mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
-        editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
-        mainColorPalette.addStyle(new AnimatedBlock(tree));
-      }
-
-    },
-    error: function (error) {
-      // do something here
-    }
-  });
-};
-
-load();
-
-function replaceAnimatedBlocksWithTheirLayers (map) {
-  _.each(map, function (value, index, list) {
-    if (value && typeof(value) === 'object' && value.layers) {
-      list[index] = value.layers;
-    }
-  });
-
-  return map;
-}
-
-var saveData = function (callback) {
-  var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
-  var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
-  var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
-
-  var storyData = {
-    editor: {
-      animatedBlock: {
-        layers: editorArea.animatedBlock.layers
-      }
-    },
-    main: {
-      palette: mainPaletteMap,
-      firstLayer: firstLayerMap,
-      secondLayer: secondLayerMap
-    }
-  };
-
-  storyData = JSON.stringify(storyData);
-
-  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
-
-  var dataToSave = {
-    id: parseInt(paths[1], 10),
-    story: storyData
-  };
-
-  $.ajax({
-    type: 'post',
-    url: '/savestory/',
-    data: dataToSave,
-    success: function (result) {
-      History.pushState(null, null, '/' + dataToSave.id + '/' + result.version);
-
-      if (callback) {
-        callback();
-      }
-    },
-    error: function (error) {
-      // do something here
-    }
-  });
-};
-
-
 var defaultCellSize = 30;
 var defaultTinyCellSize = 3;
 
@@ -1152,6 +1030,110 @@ $('#save').on('click', function (event) {
 
 
 
+var version;
+var colors;
+var mainColorPalette;
+var editorAreaColorPalette;
+
+var load = function () {
+
+  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+
+  if (paths) {
+    var loadThisData = {
+      id: parseInt(paths[1], 10)
+    };
+
+    if (paths[2]) {
+      loadThisData.version = parseInt(paths[2], 10);
+    }
+
+    $.ajax({
+      url: '/getstory/',
+      data: loadThisData,
+      success: function (result) {
+        version = result.version;
+
+        replaceLayersWithAnimatedBlocks(result.main.palette);
+        replaceLayersWithAnimatedBlocks(result.main.firstLayer);
+        replaceLayersWithAnimatedBlocks(result.main.secondLayer);
+
+        editorArea.setup(result.editor.animatedBlock.layers);
+        mainArea.setup(result.main.firstLayer, result.main.secondLayer);
+
+        colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
+        mainColorPalette = new ColorPalette (result.main.palette, $('#main-color-palette'), mainArea);
+        editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+      },
+      error: function (error) {
+        // do something here
+      }
+    });
+  } else {
+    editorArea.setup();
+    mainArea.setup();
+
+    colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
+    mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
+    editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+    mainColorPalette.addStyle(new AnimatedBlock(tree));
+  }
+
+};
+
+load();
+
+var saveData = function (callback) {
+  var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
+  var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
+  var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
+
+  var storyData = {
+    editor: {
+      animatedBlock: {
+        layers: editorArea.animatedBlock.layers
+      }
+    },
+    main: {
+      palette: mainPaletteMap,
+      firstLayer: firstLayerMap,
+      secondLayer: secondLayerMap
+    }
+  };
+
+  storyData = JSON.stringify(storyData);
+
+  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+
+  var dataToSave = {
+    story: storyData
+  };
+
+  if (paths && paths[1]) {
+    dataToSave.id = parseInt(paths[1], 10);
+  }
+
+  if (version) {
+    dataToSave.version = version;
+  }
+
+  $.ajax({
+    type: 'post',
+    url: '/savestory/',
+    data: dataToSave,
+    success: function (result) {
+      History.pushState(null, null, '/' + result.id + (result.version ? '/' + result.version : ''));
+      version = result.version;
+
+      if (callback) {
+        callback();
+      }
+    },
+    error: function (error) {
+      // do something here
+    }
+  });
+};
 
 
 

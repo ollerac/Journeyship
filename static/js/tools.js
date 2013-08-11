@@ -41,7 +41,25 @@ function makeNewBlock () {
 
 
 
+function replaceLayersWithAnimatedBlocks (map) {
+  _.each(map, function (value, index, list) {
+    if (typeof(value) === 'object') {
+      list[index] = new AnimatedBlock(value);
+    }
+  });
 
+  return map;
+}
+
+function replaceAnimatedBlocksWithTheirLayers (map) {
+  _.each(map, function (value, index, list) {
+    if (value && typeof(value) === 'object' && value.layers) {
+      list[index] = value.layers;
+    }
+  });
+
+  return map;
+}
 
 
 

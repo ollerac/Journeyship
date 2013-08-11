@@ -19,8 +19,8 @@
 - urls
   - ✔ load journeyship.com
     - ✔ get next story id
-      - save a story with this id
-        - redirect to this id
+      - ✔ save a story with this id
+        - ✔ redirect to this id
   - load id (url/id[/secondId])
     get('story-' + id) or get('story-' + id + '-' secondId)
     - exists
@@ -44,6 +44,7 @@
   - meteor? nodejs and mongodb?
 - support multiple users (user accounts? url-based?)
   - url based and then user accounts
+- get the urls working with earlier versions of IE
 
 
 ### bugs

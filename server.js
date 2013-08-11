@@ -9,66 +9,81 @@ app.use(express.static(__dirname + '/static'));
 app.use(express.bodyParser());
 
 app.get('/', function(req, res){
-  db.incr("global:nextUrlId", function(error, reply) {
-    db.set('story:story-' + reply, '', function () {
-      res.redirect('/' + reply);
-    });
-  });
-});
-
-app.get('/getstory', function(req, res) {
-  var storyName = 'story:story-' + req.query.id + (req.query.secondId || '');
-
-  db.get(storyName, function (error, storyData) {
-    if (error) {
-      res.send('error');
-    } else {
-      db.get('story:story-version-' + req.query.id, function (error, version) {
-        if (error) {
-          res.send('error');
-        } else {
-          if (storyData) {
-            storyData = JSON.parse(storyData);
-            storyData.version = version;
-            res.send(storyData);
-          } else {
-            res.send(storyData);
-          }
-        }
-      });
-    }
-  });
+  res.sendfile('./static/views/index.html');
 });
 
 app.post('/savestory', function(req, res) {
-  db.incr('story:story-version-' + req.body.id, function (error, version) {
-    if (error) {
-      res.send('error');
-    } else {
-      var storyName = 'story:story-' + req.body.id + version;
+  if (!req.body.id) {
+    db.incr("global:nextStoryId", function(error, storyId) {
+      var storyName = 'story:story-' + storyId;
 
       db.set(storyName, req.body.story, function (error, reply) {
-        if (error) {
-          res.send('error');
+        if (!error) {
+          res.send({
+            version: 0,
+            id: storyId
+          });
         } else {
-          res.send({version: version});
+          res.send('error');
         }
       });
-    }
-  });
+    });
+  } else {
+    db.incr('story:story-version-' + req.body.id, function (error, version) {
+      if (!error) {
+        var storyName = 'story:story-' + req.body.id + '-' + version;
 
-
-
+        db.set(storyName, req.body.story, function (error, reply) {
+          if (!error) {
+            res.send({
+              version: version,
+              id: req.body.id
+            });
+          } else {
+            res.send('error');
+          }
+        });
+      } else {
+        res.send('error');
+      }
+    });
+  }
 });
 
+app.get('/getstory', function(req, res) {
+  var storyName = 'story:story-' + req.query.id + (req.query.version ? '-' + req.query.version : '');
+
+  db.get(storyName, function (error, storyData) {
+    if (!error) {
+      db.get('story:story-version-' + req.query.id, function (error, version) {
+        if (!error) {
+          //if (storyData) {
+            storyData = JSON.parse(storyData);
+            storyData.version = version;
+            res.send(storyData);
+          //} else {
+          //  res.send(storyData);
+          //}
+        } else {
+          res.send('error');
+        }
+      });
+    } else {
+      res.send('error');
+    }
+  });
+});
+
+
+
 app.get('/:id/:secondId?', function(req, res) {
-  var storyName = 'story:story-' + req.params.id + (req.params.secondId || '');
+  var storyName = 'story:story-' + req.params.id + (req.params.version ? '-' + req.params.version : '');
 
   db.get(storyName, function (error, reply) {
-    if (error || (!reply && reply !== '')) {
-      res.sendfile('./static/views/404.html');
-    } else {
+    if (!error && (reply || reply === '')) {
       res.sendfile('./static/views/index.html');
+    } else {
+      res.sendfile('./static/views/404.html');
     }
   });
   
