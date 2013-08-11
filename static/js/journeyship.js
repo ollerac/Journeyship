@@ -1,3 +1,72 @@
+
+
+
+function replaceLayersWithAnimatedBlocks (map) {
+  _.each(map, function (value, index, list) {
+    console.log(value);
+  });
+}
+
+
+$.ajax({
+  url: '/getstory/',
+  data: {id: window.location.pathname.replace(/^\//, '')},
+  success: function (result) {
+    console.log('get r', result);
+    replaceLayersWithAnimatedBlocks(result);
+  },
+  error: function (error) {
+    console.log('get e', error);
+  }
+});
+
+function replaceAnimatedBlocksWithTheirLayers (map) {
+  _.each(map, function (value, index, list) {
+    if (value && typeof(value) === 'object' && value.layers) {
+      list[index] = value.layers;
+    }
+  });
+
+  return map;
+}
+
+var saveData = function () {
+  var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
+  var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
+  var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
+
+  var storyData = {
+    editor: {
+      animatedBlock: {
+        layers: editorArea.animatedBlock.layers
+      }
+    },
+    main: {
+      palette: mainPaletteMap,
+      firstLayer: firstLayerMap,
+      secondLayer: secondLayerMap
+    }
+  };
+
+  storyData = JSON.stringify(storyData);
+
+  $.ajax({
+    type: 'post',
+    url: '/savestory/',
+    data: {
+      id: window.location.pathname.replace(/^\//, ''),
+      story: storyData
+    },
+    success: function (result) {
+      console.log('set r',result);
+    },
+    error: function (error) {
+      console.log('set e',error);
+    }
+  });
+};
+
+
 var defaultCellSize = 30;
 var defaultTinyCellSize = 3;
 
@@ -1023,7 +1092,7 @@ $deleteFromMainCanvasButton.on('click', function (event) {
 
 
 
-
+saveData();
 
 
 

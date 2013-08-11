@@ -1,5 +1,13 @@
 ### working on now:
 - set up a static file server using express
+- got ids working in url
+- working on ajax endpoints
+- refreshing database data
+- making ajax endpoints consume json and output it
+- saving data
+  - save layers of editor area's animated block
+  - save custom blocks in main color palette
+  - save bg and fg layer of main canvas
 
 
 
