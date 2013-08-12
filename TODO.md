@@ -18,38 +18,29 @@
 - ✔ make 404 page
 - urls
   - ✔ load journeyship.com
-    - ✔ get next story id
-      - ✔ save a story with this id
-        - ✔ redirect to this id
-  - load id (url/id[/secondId])
-    get('story-' + id) or get('story-' + id + '-' secondId)
-    - exists
-      load page
-      - get the ids from the url with History.getState
-      - ajax load ('story-' + id) or ('story-' + id + '-' secondId)
-    - else
-      load 404
-  - on page
-    - click 'save'
-      - set('story-' + id + '-' window.location.pathname(after first slashes), if none start at 1)
-      - History.pushState(null, null, "id/secondId");
+    - ✔serve page
+  - ✔on page
+    - ✔click 'save'
+      - ✔set('story-' + id + '-' window.location.pathname(after first slashes), if none start at 1)
+      - ✔History.pushState(null, null, "id/secondId");
+  - ✔load id (url/id[/secondId])
+    ✔get('story-' + id) or get('story-' + id + '-' secondId)
+    - ✔exists
+      ✔load page
+      - ✔get the ids from the url with History.getState
+      - ✔ajax load ('story-' + id) or ('story-' + id + '-' secondId)
+    - ✔else
+      ✔load 404
+
 
 
 
 
 ### what i *need* before launching:
-- HERE WE GO... Adding node.js first
-- !!! data persistence
-  - save after doing stuff or after a certain amount of time? time i think
-  - meteor? nodejs and mongodb?
-- support multiple users (user accounts? url-based?)
-  - url based and then user accounts
-- get the urls working with earlier versions of IE
+- ????
 
 
 ### bugs
-- BUG: when you delete the first layer is selects the last layer... what's up with that?
-- BUG: sometimes buttons don't click. big problem. What the heck is going on with this?
 - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
 
 ### before launch
@@ -63,6 +54,7 @@
 - rewrite large parts of it using AngularJS
 
 ### would be *really* nice to have:
+- support for user accounts
 - give areas and animated blocks direct access to their context, so you don't have to keep grabbing that.
 - add a paint bucket tool
 - make a global interval for animating all the blocks -- all of them. have it emit an event: 'tick'. have all the things listening to this go to the next frame of their animation when this fires. this might be more overhead than setting a setInterval. and it might not work, but it's worth a try. it fixes the problem of animations not lining up. do they need to???

@@ -1,7 +1,11 @@
 var express = require('express');
-var redis = require('redis');
 
-var db = redis.createClient();
+var redis = require('iris-redis');
+var client = redis.createClient(6379, "nodejitsudb7729947618.redis.irstack.com");
+client.auth("f327cfe980c971946e80b8e975fbebb4");
+
+client.on("ready", function() {
+
 
 app = express();
 
@@ -14,10 +18,10 @@ app.get('/', function(req, res){
 
 app.post('/savestory', function(req, res) {
   if (!req.body.id) {
-    db.incr("global:nextStoryId", function(error, storyId) {
+    client.incr("global:nextStoryId", function(error, storyId) {
       var storyName = 'story:story-' + storyId;
 
-      db.set(storyName, req.body.story, function (error, reply) {
+      client.set(storyName, req.body.story, function (error, reply) {
         if (!error) {
           res.send({
             version: 0,
@@ -29,11 +33,11 @@ app.post('/savestory', function(req, res) {
       });
     });
   } else {
-    db.incr('story:story-version-' + req.body.id, function (error, version) {
+    client.incr('story:story-version-' + req.body.id, function (error, version) {
       if (!error) {
         var storyName = 'story:story-' + req.body.id + '-' + version;
 
-        db.set(storyName, req.body.story, function (error, reply) {
+        client.set(storyName, req.body.story, function (error, reply) {
           if (!error) {
             res.send({
               version: version,
@@ -53,9 +57,9 @@ app.post('/savestory', function(req, res) {
 app.get('/getstory', function(req, res) {
   var storyName = 'story:story-' + req.query.id + (req.query.version ? '-' + req.query.version : '');
 
-  db.get(storyName, function (error, storyData) {
+  client.get(storyName, function (error, storyData) {
     if (!error) {
-      db.get('story:story-version-' + req.query.id, function (error, version) {
+      client.get('story:story-version-' + req.query.id, function (error, version) {
         if (!error) {
           //if (storyData) {
             storyData = JSON.parse(storyData);
@@ -79,7 +83,7 @@ app.get('/getstory', function(req, res) {
 app.get('/:id/:secondId?', function(req, res) {
   var storyName = 'story:story-' + req.params.id + (req.params.version ? '-' + req.params.version : '');
 
-  db.get(storyName, function (error, reply) {
+  client.get(storyName, function (error, reply) {
     if (!error && (reply || reply === '')) {
       res.sendfile('./static/views/index.html');
     } else {
@@ -89,6 +93,6 @@ app.get('/:id/:secondId?', function(req, res) {
   
 });
 
+  app.listen(3000);
+});
 
-
-app.listen(3000);

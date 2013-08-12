@@ -1,5 +1,10 @@
 # Journey Ship
 
-I'm building an app for making interactive comic strips. Something like Amazon's new Storyteller, but with blocky graphics. Like a 2-dimensional Minecraft.
+**Currently in development.**
 
-I'm using Knockout.js for the front-end code and I'm hoping to wire it up to a Firebase back-end.
+A webapp for making animated stories.
+
+
+## Technology
+
+Node.js, Underscore, jQuery, Javascript, History.js, HTML & CSS
