@@ -2,6 +2,7 @@
 
 
 ### what i *need* before launching:
+- BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
 - BUG: transparent blocks don't work in IE
 - BUG: get next version number before saving because multiple users could be using the app at the same time
 
@@ -20,6 +21,13 @@
 - invite people
 
 ### would be *really* nice to have:
+- ! export to movie file
+- movie view (without the editor or palettes)
+- export to data (native canvas option?)
+- import data (native canvas option?)
+- use getNextAnimationFrame instead of setInterval
+- enhancement: selecting a block should open the editor
+- add 'mirror vertical' and 'mirror horizontal' buttons to animated block editor
 - support for user accounts
 - give areas and animated blocks direct access to their context, so you don't have to keep grabbing that.
 - add a paint bucket tool
