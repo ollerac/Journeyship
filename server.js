@@ -2,7 +2,8 @@ var express = require('express');
 
 var redis = require('iris-redis');
 var client = redis.createClient(6379, "nodejitsudb7729947618.redis.irstack.com");
-client.auth("f327cfe980c971946e80b8e975fbebb4");
+var dbPass = require('./db-info.js');
+client.auth(dbPass);
 
 client.on("ready", function() {
 

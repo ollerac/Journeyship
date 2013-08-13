@@ -134,9 +134,16 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 27px;
 }
 
-.save-button {
+.save-button.has-icon {
   background-image: url(../img/book-icon.png);
   padding-left: 30px;
+  background-position: 12px 6px;
+}
+
+.save-button.has-icon:hover {
+  background-image: url(../img/book-icon.png);
+  padding-left: 30px;
+  background-position: 12px -14px;
 }
 
 .new-button {

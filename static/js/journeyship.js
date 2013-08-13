@@ -336,15 +336,21 @@ DrawableSurface.prototype.makeDrawable = function () {
     $editInMainCanvasButton.css('display', 'inline-block').show();
     $editorAreaContainer.hide();
 
-    var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+    var offX  = (event.offsetX || event.clientX - $(event.target).offset().left + window.pageXOffset);
+    var offY  = (event.offsetY || event.clientY - $(event.target).offset().top + window.pageYOffset);
+
+    var positionInArray = getCellPositionInArrayFromPosition(offX, offY, self.cellSize, self.columns);
     self.selectedBlocksMap = makeMap(null, self.columns * self.rows, {color: colorDictionary['red'], positions: [positionInArray]});
 
     self.setupSelectedBlock(positionInArray);
   }
 
   function drawIt (event) {
-    var cellPosition = getCellPosition(event.offsetX, event.offsetY, self.cellSize);
-    var positionInArray = getCellPositionInArrayFromPosition(event.offsetX, event.offsetY, self.cellSize, self.columns);
+    var offX  = (event.offsetX || event.clientX - $(event.target).offset().left + window.pageXOffset);
+    var offY  = (event.offsetY || event.clientY - $(event.target).offset().top + window.pageYOffset);
+
+    var cellPosition = getCellPosition(offX, offY, self.cellSize);
+    var positionInArray = getCellPositionInArrayFromPosition(offX, offY, self.cellSize, self.columns);
 
     var drawingContext = self.$element[0].getContext('2d');
     clearCell(drawingContext, cellPosition.x, cellPosition.y, self.cellSize);
@@ -626,7 +632,7 @@ var editorArea = {
       }
     });
 
-    $('#delete-layer').on('click', function () {
+    $('#delete-layer').on('click', function (event) {
       event.preventDefault();
       self.animatedBlock.removeLayer(self.selectedLayerNum);
       if (self.animatedBlock.layers.length === 0) {
@@ -636,12 +642,12 @@ var editorArea = {
       self.animatedBlock.clearAnimation();
     });
 
-    $('#new-layer').on('click', function () {
+    $('#new-layer').on('click', function (event) {
       event.preventDefault();
       self.animatedBlock.addLayer("transparent", self.selectedLayerNum + 1);
     });
 
-    $('#copy-layer').on('click', function () {
+    $('#copy-layer').on('click', function (event) {
       event.preventDefault();
       self.animatedBlock.addLayer(_.cloneDeep(self.animatedBlock.layers[self.selectedLayerNum]), self.selectedLayerNum + 1);
     });
@@ -1035,6 +1041,21 @@ var colors;
 var mainColorPalette;
 var editorAreaColorPalette;
 
+var loadData = function (data) {
+  replaceLayersWithAnimatedBlocks(data.main.palette);
+  replaceLayersWithAnimatedBlocks(data.main.firstLayer);
+  replaceLayersWithAnimatedBlocks(data.main.secondLayer);
+
+  editorArea.setup(data.editor.animatedBlock.layers);
+  mainArea.setup(data.main.firstLayer, data.main.secondLayer);
+
+  colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
+  mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
+  editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+
+  return data;
+};
+
 var load = function () {
 
   var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
@@ -1054,16 +1075,7 @@ var load = function () {
       success: function (result) {
         version = result.version;
 
-        replaceLayersWithAnimatedBlocks(result.main.palette);
-        replaceLayersWithAnimatedBlocks(result.main.firstLayer);
-        replaceLayersWithAnimatedBlocks(result.main.secondLayer);
-
-        editorArea.setup(result.editor.animatedBlock.layers);
-        mainArea.setup(result.main.firstLayer, result.main.secondLayer);
-
-        colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
-        mainColorPalette = new ColorPalette (result.main.palette, $('#main-color-palette'), mainArea);
-        editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+        loadData(result);
       },
       error: function (error) {
         // do something here
@@ -1083,7 +1095,7 @@ var load = function () {
 
 load();
 
-var saveData = function (callback) {
+var exportData = function () {
   var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
   var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
   var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
@@ -1101,7 +1113,11 @@ var saveData = function (callback) {
     }
   };
 
-  storyData = JSON.stringify(storyData);
+  return JSON.stringify(storyData);
+};
+
+var saveData = function (callback) {
+  storyData = exportData();
 
   var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
 
