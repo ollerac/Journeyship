@@ -43,8 +43,11 @@ function makeNewBlock () {
 
 function replaceLayersWithAnimatedBlocks (map) {
   _.each(map, function (value, index, list) {
-    if (typeof(value) === 'object') {
+    if (_.isArray(value) && value.length > 0) {
       list[index] = new AnimatedBlock(value);
+    } else if (typeof(value) === 'object' && value && value.length === 0) {
+      // temporary fix for null layers that were saved with no layers
+      list[index] = null;
     }
   });
 
@@ -53,7 +56,7 @@ function replaceLayersWithAnimatedBlocks (map) {
 
 function replaceAnimatedBlocksWithTheirLayers (map) {
   _.each(map, function (value, index, list) {
-    if (value && typeof(value) === 'object' && value.layers) {
+    if (value && _.isObject(value) && value.layers) {
       list[index] = value.layers;
     }
   });

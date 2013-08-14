@@ -2,25 +2,31 @@
 
 
 ### what i *need* before launching:
+- replace database with mongo
+- get loading and saving working
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
-- BUG: transparent blocks don't work in IE
 - BUG: get next version number before saving because multiple users could be using the app at the same time
 
 ### bugs
 - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
 
 ### before launch
-- test cross browser... ugh.
-- simple howto video
+- simple howto video or guided javascript walkthrough
 - add journeyship logo (with sail moving)
 
 ### after launch:
-- new design
-- organize code
-- rewrite large parts of it using AngularJS
 - invite people
 
+### next cycle
+- look through priorities and organize them
+- rewrite large parts of it using AngularJS
+- organize code
+- new design
+
 ### would be *really* nice to have:
+- edit more space
+  - make all blocks bigger?
+  - the ability to select and edit multiple adjacent layers?
 - ! export to movie file
 - movie view (without the editor or palettes)
 - export to data (native canvas option?)
