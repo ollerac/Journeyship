@@ -1073,9 +1073,11 @@ var load = function () {
       url: '/getstory/',
       data: loadThisData,
       success: function (result) {
+        console.log('result', result);
+
         version = result.version;
 
-        loadData(result);
+        loadData(JSON.parse(result.data));
       },
       error: function (error) {
         // do something here
@@ -1129,16 +1131,19 @@ var saveData = function (callback) {
     dataToSave.id = parseInt(paths[1], 10);
   }
 
-  if (version) {
+  if (version || version === 0) {
     dataToSave.version = version;
   }
+
+  console.log('dataToSave', dataToSave);
 
   $.ajax({
     type: 'post',
     url: '/savestory/',
     data: dataToSave,
     success: function (result) {
-      History.pushState(null, null, '/' + result.id + (result.version ? '/' + result.version : ''));
+      console.log(result);
+      History.pushState(null, null, '/' + result._id + (result.version || result.version === 0 ? '/' + result.version : ''));
       version = result.version;
 
       if (callback) {
