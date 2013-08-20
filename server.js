@@ -42,25 +42,8 @@ MongoClient.connect(mongodbUrl, function(err, db) {
     res.sendfile('./static/views/index.html');
   });
 
-  app.get('/:id/:version?', function(req, res) {
-    var query = {_id: parseInt(req.params.id, 10)};
-    if (req.params.version) {
-      query.version = req.params.version;
-    } else {
-      query.version = 0;
-    }
-
-    storiesCollection.findOne(query, function (err, story) {
-      if (!err && story) {
-        res.sendfile('./static/views/index.html');
-      } else {
-        res.sendfile('./static/views/404.html');
-      }
-    });
-  });
-
   app.post('/savestory', function(req, res) {
-    if (!req.body.id) {
+    if (!req.body._id) {
       getNextStoryId(function (err, nextStoryId) {
         if (!err) {
           countersCollection.insert({_id: 'story-version-' + nextStoryId.seq, seq: 0}, {safe: true}, function (err, storyVersions) {
@@ -83,11 +66,11 @@ MongoClient.connect(mongodbUrl, function(err, db) {
         }
       });
     } else {
-      var storyId = parseInt(req.body.id, 10);
+      var storyId = parseInt(req.body._id, 10);
 
       getNextStoryVersion(storyId, function (err, storyVersion) {
         if (!err) {
-          storiesCollection.insert({_id: storyId + '-' + storyVersion.seq, version: storyVersion.seq, data: story.data}, {safe: true}, function (err, stories) {
+          storiesCollection.insert({_id: storyId + '-' + storyVersion.seq, version: storyVersion.seq, data: req.body.story}, {safe: true}, function (err, stories) {
             if (!err) {
               res.send(stories[0]);
             } else {
@@ -102,15 +85,25 @@ MongoClient.connect(mongodbUrl, function(err, db) {
   });
 
   app.get('/getstory', function(req, res) {
-    var storyVersion = parseInt(req.query.version, 10) || 0;
-    var storyId = parseInt(req.query.id, 10);
-    var query = {_id: storyId + '-' + storyVersion, version: storyVersion};
-
-    storiesCollection.findOne(query, function (err, story) {
+    storiesCollection.findOne({_id: req.query._id}, function (err, story) {
       if (!err) {
         res.json(story);
       } else {
         res.send('error');
+      }
+    });
+  });
+
+  // needs to be last because it's the most general pattern
+  app.get('/:id/:version?', function(req, res) {
+    var version = req.params.version || 0;
+    var query = {_id: req.params.id + '-' + version};
+
+    storiesCollection.findOne(query, function (err, story) {
+      if (!err && story) {
+        res.sendfile('./static/views/index.html');
+      } else {
+        res.sendfile('./static/views/404.html');
       }
     });
   });

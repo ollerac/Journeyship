@@ -2,12 +2,9 @@
 
 
 ### what i *need* before launching:
-- get loading and saving working
-  - export stories that are up there already
-  - ! actually, just sync databases
-- replace database with mongo
+- done: get loading and saving working, replace database with mongo
+  - ! sync databases
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
-- BUG: get next version number before saving because multiple users could be using the app at the same time
 
 ### bugs
 - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.

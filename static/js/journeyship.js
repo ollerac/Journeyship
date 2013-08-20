@@ -1061,20 +1061,15 @@ var load = function () {
   var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
 
   if (paths) {
-    var loadThisData = {
-      id: parseInt(paths[1], 10)
-    };
 
-    if (paths[2]) {
-      loadThisData.version = parseInt(paths[2], 10);
-    }
+    var version = paths[2] || 0;
 
     $.ajax({
       url: '/getstory/',
-      data: loadThisData,
+      data: {
+        _id: paths[1] + '-' + version
+      },
       success: function (result) {
-        console.log('result', result);
-
         version = result.version;
 
         loadData(JSON.parse(result.data));
@@ -1127,23 +1122,20 @@ var saveData = function (callback) {
     story: storyData
   };
 
+  // saving a new version just requires an id, don't need to know the current version
   if (paths && paths[1]) {
-    dataToSave.id = parseInt(paths[1], 10);
+    dataToSave._id = paths[1];
   }
-
-  if (version || version === 0) {
-    dataToSave.version = version;
-  }
-
-  console.log('dataToSave', dataToSave);
 
   $.ajax({
     type: 'post',
     url: '/savestory/',
     data: dataToSave,
     success: function (result) {
-      console.log(result);
-      History.pushState(null, null, '/' + result._id + (result.version || result.version === 0 ? '/' + result.version : ''));
+      var ids = result._id.split("-");
+      var id = ids[0];
+      var version = parseInt(ids[1], 10); // so there's no second slash for the first save
+      History.pushState(null, null, '/' + id + (version ? '/' + version : ''));
       version = result.version;
 
       if (callback) {
