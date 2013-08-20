@@ -20,10 +20,18 @@ var MongoClient = require('mongodb').MongoClient;
 MongoClient.connect(mongodbUrl, function(err, db) {
   if (err) throw err;
 
-  db.collection('counters').insert({_id: 'storyId', seq: 0}, function (err, docs) {});
+  var countersCollection = db.collection('counters');
+
+  countersCollection.insert({_id: 'storyId', seq: 0}, function (err, docs) {});
 
   function getNextStoryId (callback) {
-    db.collection('counters').findAndModify({_id: 'storyId'}, [['_id','asc']], {$inc: {seq: 1}}, {new: true}, function(err, object) {
+    countersCollection.findAndModify({_id: 'storyId'}, [['_id','asc']], {$inc: {seq: 1}}, {new: true}, function(err, object) {
+      callback(err, object);
+    });
+  }
+
+  function getNextStoryVersion (storyId, callback) {
+    countersCollection.findAndModify({_id: 'story-version-' + storyId}, [['_id','asc']], {$inc: {seq: 1}}, {new: true}, function(err, object) {
       callback(err, object);
     });
   }
@@ -38,6 +46,8 @@ MongoClient.connect(mongodbUrl, function(err, db) {
     var query = {_id: parseInt(req.params.id, 10)};
     if (req.params.version) {
       query.version = req.params.version;
+    } else {
+      query.version = 0;
     }
 
     storiesCollection.findOne(query, function (err, story) {
@@ -51,24 +61,41 @@ MongoClient.connect(mongodbUrl, function(err, db) {
 
   app.post('/savestory', function(req, res) {
     if (!req.body.id) {
-      var storyVersion = 0;
-
       getNextStoryId(function (err, nextStoryId) {
-        storiesCollection.insert({_id: nextStoryId.seq, version: storyVersion, data: req.body.story}, {safe: true}, function (err, stories) {
-          if (!err) {
-            res.send(stories[0]);
-          } else {
-            res.send('error');
-          }
-        });
+        if (!err) {
+          countersCollection.insert({_id: 'story-version-' + nextStoryId.seq, seq: 0}, {safe: true}, function (err, storyVersions) {
+            if (!err) {
+              var storyVersion = storyVersions[0].seq;
+
+              storiesCollection.insert({_id: nextStoryId.seq + '-' + storyVersion, version: storyVersion, data: req.body.story}, {safe: true}, function (err, stories) {
+                if (!err) {
+                  res.send(stories[0]);
+                } else {
+                  res.send('error');
+                }
+              });
+            } else {
+              res.send('error initializing story version');
+            }
+          });
+        } else {
+          res.send('error getting next storyId');
+        }
       });
     } else {
-      storiesCollection.findAndModify({_id: parseInt(req.body.id, 10)}, [['_id','asc']], {$inc: {version: 1}, $set: {data: req.body.story}}, {safe: true}, function (err, story) {
-        console.log('stories', story);
+      var storyId = parseInt(req.body.id, 10);
+
+      getNextStoryVersion(storyId, function (err, storyVersion) {
         if (!err) {
-          res.send(story);
+          storiesCollection.insert({_id: storyId + '-' + storyVersion.seq, version: storyVersion.seq, data: story.data}, {safe: true}, function (err, stories) {
+            if (!err) {
+              res.send(stories[0]);
+            } else {
+              res.send('error inserting version + 1 story');
+            }
+          });
         } else {
-          res.send('error');
+          res.send('error getting next story version');
         }
       });
     }
@@ -76,7 +103,8 @@ MongoClient.connect(mongodbUrl, function(err, db) {
 
   app.get('/getstory', function(req, res) {
     var storyVersion = parseInt(req.query.version, 10) || 0;
-    var query = {_id: parseInt(req.query.id, 10), version: storyVersion};
+    var storyId = parseInt(req.query.id, 10);
+    var query = {_id: storyId + '-' + storyVersion, version: storyVersion};
 
     storiesCollection.findOne(query, function (err, story) {
       if (!err) {
