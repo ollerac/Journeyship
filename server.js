@@ -4,14 +4,14 @@ var app = express();
 var mongodbUrl;
 
 app.use(express.static(__dirname + '/static'));
-app.use(express.bodyParser());
+app.use(express.bodyParser()); // for getting the request body
 
 app.configure('development', function () {
   mongodbUrl = 'mongodb://127.0.0.1:27017/test';
 });
 
 app.configure('production', function () {
-  var dbPass = require('./db-info.js');
+  var dbPass = require('./mongo-db-info.js');
   mongodbUrl = 'mongodb://david:' + dbPass + '@paulo.mongohq.com:10073/journeyship';
 });
 

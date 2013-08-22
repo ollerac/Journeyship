@@ -18,6 +18,11 @@
 - invite people
 
 ### next cycle
+- make animated blocks simple arrays, use angularjs
+- make blocks twice as big
+  - what about backwards compatibility?
+- get rid of colors in the main palette?
+- make scenes: each new scene clears the main canvas and resets all of its animated blocks
 - look through priorities and organize them
 - rewrite large parts of it using AngularJS
 - organize code
