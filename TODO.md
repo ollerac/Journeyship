@@ -2,8 +2,6 @@
 
 
 ### what i *need* before launching:
-- done: get loading and saving working, replace database with mongo
-  - ! sync databases
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
 
 ### bugs
@@ -18,6 +16,9 @@
 - invite people
 
 ### next cycle
+- make blocks follow mouse and snap to block position
+- background themes
+- cache breaker
 - make animated blocks simple arrays, use angularjs
 - make blocks twice as big
   - what about backwards compatibility?

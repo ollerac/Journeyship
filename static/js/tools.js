@@ -31,11 +31,11 @@ function makeNewElement (type) {
 }
 
 
-function makeNewBlock () {
+function makeNewBlock (size) {
   var block = makeNewElement('canvas');
   block.addClass('block');
-  block.attr('width', defaultCellSize);
-  block.attr('height', defaultCellSize);
+  block.attr('width', size || defaultCellSize);
+  block.attr('height', size || defaultCellSize);
   return block;
 }
 

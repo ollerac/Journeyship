@@ -1,5 +1,7 @@
-var defaultCellSize = 30;
+var defaultCellSize = 60;
+var defaultEditCellSize = 30;
 var defaultTinyCellSize = 3;
+var defaultCellColor = '#fff';
 
 var $deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
 var $editInMainCanvasButton = $('#edit-block-from-main-canvas');
@@ -60,7 +62,7 @@ AnimatedBlock.prototype.addLayer = function (value, layerNumOption) {
   var layer = [];
   if (typeof value === 'string') {
     var color = value;
-    _.times(100, function () {
+    _.times(Math.pow((defaultCellSize / defaultTinyCellSize), 2), function () {
       layer.push(color);
     });
   } else if (typeof value === 'object') {
@@ -156,11 +158,11 @@ function drawOutline (context, x, y, size, color) {
 
   context.strokeStyle = color;
   context.beginPath();
-  context.moveTo(x-.5,y - .5);
-  context.lineTo(x+30.5, y - .5);
-  context.lineTo(x+30.5, y +30.5);
-  context.lineTo(x-.5, y+30.5);
-  context.lineTo(x-.5, y-.5);
+  context.moveTo(x-0.5,y - 0.5);
+  context.lineTo(x+60.5, y - 0.5);
+  context.lineTo(x+60.5, y +60.5);
+  context.lineTo(x-0.5, y+60.5);
+  context.lineTo(x-0.5, y-0.5);
   context.stroke();
 }
 
@@ -497,7 +499,7 @@ var editorArea = {
         }
       });
 
-      var $drawableLayers = $('#constructor-area-container .constructor-area').css('opacity', .5);
+      var $drawableLayers = $('#constructor-area-container .constructor-area').css('opacity', 0.5);
       var $selectedDrawableLayer = $('#constructor-area-container .constructor-area').eq(this.selectedLayerNum).css('opacity', 1);
 
       var $selectedLayer = $('.layers .layer-container').removeClass('selected').eq(this.selectedLayerNum).addClass('selected');
@@ -557,8 +559,10 @@ var editorArea = {
 
     var layers = this.$layersContainerElement.children('.layer-container');
     if (layers.length && typeof(layerNum) === 'number') {
+      // add it to the one after the selected layer
       layers.eq(layerNum - 1).after($layerContainer);
     } else {
+      // add it to the end
       this.$layersContainerElement.append($layerContainer);
     }
 
@@ -578,11 +582,11 @@ var editorArea = {
 
     var constructorArea = $('<canvas></canvas>')
                               .addClass('constructor-area')
-                              .attr('width', 300)
-                              .attr('height', 300)
+                              .attr('width', 600)
+                              .attr('height', 600)
                               .appendTo('#constructor-area-container');
 
-    var surface = new DrawableSurface(constructorArea, defaultCellSize);
+    var surface = new DrawableSurface(constructorArea, defaultEditCellSize);
     this.drawableSurfaces.splice(layerNum, 0, surface);
     self.setSelectedLayer(layerNum);
 
@@ -614,6 +618,7 @@ var editorArea = {
 
     $.subscribe('added-layer', function (event, addedLayerUpdate) {
       if (self.animatedBlock == addedLayerUpdate.animatedBlock) {
+        console.log(addedLayerUpdate);
         self.addLayer(addedLayerUpdate.layer, addedLayerUpdate.layerNum);
       }
     });
@@ -680,18 +685,19 @@ var mainArea = {
     return this.drawableSurfaces[0];
   },
   setup: function (firstLayer, secondLayer) {
-    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, null, firstLayer, secondLayer))
+    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultEditCellSize, '#fff', firstLayer, secondLayer));
     this.selectedDrawableSurface().startAnimating();
   }
 };
 
 // parent is an area, either mainArea or editorArea
-function ColorPalette (map, $container, parent) {
+function ColorPalette (map, $container, parent, size) {
   var self = this;
   self.map = [];
   self.$containerElement = $container;
   self.paletteElements = [];
   self.parent = parent;
+  self.cellSize = size || defaultCellSize;
 
   _.each(map, function (value) {
     self.addStyle(value);
@@ -705,7 +711,7 @@ ColorPalette.prototype.generatePaletteElement = function (value) {
   if (typeof(value) === 'object' && value.layers) {
     var animatedBlock = value;
 
-    var $animatedElement = makeNewBlock();
+    var $animatedElement = makeNewBlock(this.cellSize);
     $animatedElement.addClass('animated');
 
     animatedBlock.$animatedElement = $animatedElement;
@@ -1023,14 +1029,14 @@ $('#save').on('click', function (event) {
   event.preventDefault();
   var $clickedButton = $(event.currentTarget);
 
-  saveData(function () {
-    if ($clickedButton.text() === 'Save') {
+  if ($clickedButton.text() === 'Save') {
+    saveData(function () {
       $clickedButton.text('Saved!').css('color', '#adf2b1');
       setTimeout(function() {
         $clickedButton.text('Save').css('color', '#fff');
       }, 3000);
-    }
-  });
+    });
+  }
 });
 
 
@@ -1051,7 +1057,7 @@ var loadData = function (data) {
 
   colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
   mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
-  editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
+  editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
 
   return data;
 };
@@ -1084,8 +1090,7 @@ var load = function () {
 
     colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
     mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
-    editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea);
-    mainColorPalette.addStyle(new AnimatedBlock(tree));
+    editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
   }
 
 };
