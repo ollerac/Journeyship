@@ -9,21 +9,39 @@ var $exportBlockButton = $('#export-block');
 
 var $editorAreaContainer = $('#constructor-container');
 
-var colorDictionary = {"red": "#ff1100", "orange1": "#ff6e00", "orange2": "#ffa100", "yellow1": "#ffd400", "yellow2": "#f7ff00", "green1": "#95f200", "green2": "#00e32c", "blue1": "#00a0e6", "blue2": "#2b6af4", "purple1": "#3b00eb", "purple2": "#bd00eb", "pink": "#eb0068"};
-var grayscaleDictionary = {
-  "black1": "transparent",
-  "black2": "#fff",
-  "black3": "#e5e5e5",
-  "black4": "#cccccc",
-  "black5": "#b2b2b2",
-  "black6": "#999999",
-  "black7": "#808080",
-  "black8": "#666666",
-  "black9": "#4d4d4d",
-  "black10": "#333333",
-  "black11": "#1a1a1a",
-  "black12": "#000"
-};
+var colors = [];
+colors.push('#ffc0cb'); // light pink
+colors.push('#ff1493');
+colors.push('#dc143c');
+colors.push('#ff0000'); // red
+colors.push('#ffe3d2'); // skin color
+colors.push('#fdd7c0'); // skin color
+colors.push('#d2b48c'); // skin color
+colors.push('#d39b86');
+colors.push('#844206'); // brown
+colors.push('#ff6600'); // orange
+colors.push('#ffa502');
+colors.push('#feff04'); //yellow
+colors.push('#7cfc00'); // green
+colors.push('#32cd32'); // green
+colors.push('#00a500'); // green
+colors.push('#e0ffff'); // blue
+colors.push('#87ceeb'); // blue
+colors.push('#1c00ff'); // blue
+colors.push('#08007f'); // dark blue
+colors.push('#ee83ee'); // purple
+colors.push('#9400d3'); // purple
+colors.push('transparent');
+colors.push('#ffffff'); // white
+colors.push('#d3d3d3');
+colors.push('#c0c0c0');
+colors.push('#a9a9a9');
+colors.push('#808080');
+colors.push('#696969');
+colors.push('#474747');
+colors.push('#222222');
+colors.push('#000000'); // black
+
 
 // setup animated block
 
@@ -287,9 +305,8 @@ function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, seco
   self.animatedInterval = null;
   self.drawOnBackground = true;
 
+  // setup
   self.makeDrawable();
-  //self.renderFirstMap();
-  //self.startAnimating();
 }
 
 DrawableSurface.prototype.clear = function () {
@@ -342,7 +359,7 @@ DrawableSurface.prototype.makeDrawable = function () {
     var offY  = (event.offsetY || event.clientY - $(event.target).offset().top + window.pageYOffset);
 
     var positionInArray = getCellPositionInArrayFromPosition(offX, offY, self.cellSize, self.columns);
-    self.selectedBlocksMap = makeMap(null, self.columns * self.rows, {color: colorDictionary['red'], positions: [positionInArray]});
+    self.selectedBlocksMap = makeMap(null, self.columns * self.rows, {color: colors[3], positions: [positionInArray]});
 
     self.setupSelectedBlock(positionInArray);
   }
@@ -419,7 +436,7 @@ DrawableSurface.prototype.renderMap = function (map) {
       var position = getCellPositionFromIndex(index, self.columns);
 
       if (typeof(block) === 'object' && block.layers) {
-        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, 10, {
+        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
           x: position.x,
           y: position.y
         });
@@ -580,13 +597,13 @@ var editorArea = {
     var columns = $layerElement.width() / defaultTinyCellSize;
     applyMapToContext(layerPattern, context, defaultTinyCellSize, columns);
 
-    var constructorArea = $('<canvas></canvas>')
+    var $constructorArea = $('<canvas></canvas>')
                               .addClass('constructor-area')
                               .attr('width', 600)
                               .attr('height', 600)
                               .appendTo('#constructor-area-container');
 
-    var surface = new DrawableSurface(constructorArea, defaultEditCellSize);
+    var surface = new DrawableSurface($constructorArea, defaultEditCellSize);
     this.drawableSurfaces.splice(layerNum, 0, surface);
     self.setSelectedLayer(layerNum);
 
@@ -649,7 +666,9 @@ var editorArea = {
 
     $('#new-layer').on('click', function (event) {
       event.preventDefault();
-      self.animatedBlock.addLayer("transparent", self.selectedLayerNum + 1);
+
+      var colorOfNewLayer = self.animatedBlock.fromMainCanvas && self.animatedBlock.mainCanvasOnBackground ? '#fff' : 'transparent';
+      self.animatedBlock.addLayer(colorOfNewLayer, self.selectedLayerNum + 1);
     });
 
     $('#copy-layer').on('click', function (event) {
@@ -685,7 +704,7 @@ var mainArea = {
     return this.drawableSurfaces[0];
   },
   setup: function (firstLayer, secondLayer) {
-    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultEditCellSize, '#fff', firstLayer, secondLayer));
+    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, '#fff', firstLayer, secondLayer));
     this.selectedDrawableSurface().startAnimating();
   }
 };
@@ -1055,7 +1074,6 @@ var loadData = function (data) {
   editorArea.setup(data.editor.animatedBlock.layers);
   mainArea.setup(data.main.firstLayer, data.main.secondLayer);
 
-  colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
   mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
 
@@ -1088,7 +1106,6 @@ var load = function () {
     editorArea.setup();
     mainArea.setup();
 
-    colors = _.union(_.values(colorDictionary), _.values(grayscaleDictionary));
     mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
   }

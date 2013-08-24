@@ -1,5 +1,5 @@
 ### working on now:
-
+- transparency is set wrong if you create a new layer, create a copy of the first layer and then select it
 
 ### what i *need* before launching:
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
@@ -16,6 +16,7 @@
 - invite people
 
 ### next cycle
+- add arrow to show where the editor area is after clicking the new button or after selecting a block and clicking edit
 - make blocks follow mouse and snap to block position
 - background themes
 - cache breaker

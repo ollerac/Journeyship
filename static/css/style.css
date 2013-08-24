@@ -211,7 +211,7 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #fff;
   background-color: rgba(255,255,255,.5);
   clear: both;
-  width: 970px;
+  width: 1000px;
 }
 
 /* top bar */
@@ -221,7 +221,7 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,.5);
     padding: 10px 10px 10px 10px;
     overflow: auto;
-    width:  972px;
+    width:  1002px;
 }
 
 #main-color-palette-top-bar {
@@ -229,14 +229,14 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,.5);
     padding: 10px 10px 10px 10px;
     overflow: auto;
-    width:  970px;
+    width:  1000px;
     float: right;
 }
 
 /* Parent Container */
 
 .parent-container {
-  width: 990px;
+  width: 1020px;
   margin: 0 auto;
 }
 
@@ -254,7 +254,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #main-area-container {
-  width: 990px;
+  width: 1020px;
   height: 300px;
   position: relative;
 }
