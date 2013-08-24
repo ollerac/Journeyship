@@ -600,8 +600,16 @@ var editorArea = {
     var $constructorArea = $('<canvas></canvas>')
                               .addClass('constructor-area')
                               .attr('width', 600)
-                              .attr('height', 600)
-                              .appendTo('#constructor-area-container');
+                              .attr('height', 600);
+
+    var constructorAreas = $('#constructor-area-container .constructor-area');
+    if (constructorAreas.length && typeof(layerNum) === 'number') {
+      // add it to the one after the selected layer
+      constructorAreas.eq(layerNum - 1).after($constructorArea);
+    } else {
+      // add it to the end
+      $constructorArea.appendTo('#constructor-area-container');
+    }
 
     var surface = new DrawableSurface($constructorArea, defaultEditCellSize);
     this.drawableSurfaces.splice(layerNum, 0, surface);
@@ -635,7 +643,6 @@ var editorArea = {
 
     $.subscribe('added-layer', function (event, addedLayerUpdate) {
       if (self.animatedBlock == addedLayerUpdate.animatedBlock) {
-        console.log(addedLayerUpdate);
         self.addLayer(addedLayerUpdate.layer, addedLayerUpdate.layerNum);
       }
     });

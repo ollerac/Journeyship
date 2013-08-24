@@ -1,5 +1,7 @@
 ### working on now:
 - transparency is set wrong if you create a new layer, create a copy of the first layer and then select it
+  - it's a problem with the last layer appearing over the second layer
+    - i think it's a problem with setSelectedLayer
 
 ### what i *need* before launching:
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
