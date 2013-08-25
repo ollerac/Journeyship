@@ -1068,6 +1068,68 @@ $('#save').on('click', function (event) {
 });
 
 
+backgrounds = [];
+function addNewBackground (name, author, nameUrl, authorUrl, textColor, imageUrl, logoUrl) {
+  var newBackground = {
+    name: name,
+    author: author,
+    nameUrl: nameUrl,
+    authorUrl: authorUrl,
+    textColor: textColor,
+    imageUrl: imageUrl,
+    logoUrl: logoUrl
+  };
+
+  backgrounds.push(newBackground);
+}
+
+addNewBackground('DinPattern Blueprint', 'Evan Eckard', 'http://www.dinpattern.com/2011/05/31/blueprint/', 'http://www.evaneckard.com/', '#222', '/img/backgrounds/blueprint.gif', '/img/logos/journeyship-logo.png');
+addNewBackground('hand-drawn waves', 'Markovka', 'http://www.shutterstock.com/pic.mhtml?id=96193649', 'http://www.shutterstock.com/gallery-495859p1.html', '#fff', '/img/backgrounds/hand-drawn-waves.jpg', '/img/logos/journeyship-logo-purple.png');
+addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '#fff', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
+addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '#fff', '/img/backgrounds/party-lights.jpg', '/img/logos/journeyship-logo-orange.png');
+addNewBackground('people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html', '#fff', '/img/backgrounds/people.jpg', '/img/logos/journeyship-logo-white.png');
+addNewBackground('space, rockets, and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html', '#fff', '/img/backgrounds/spaceships.jpg', '/img/logos/journeyship-logo-blue.png');
+addNewBackground('DinPattern Stripe', 'Evan Eckard', 'http://www.dinpattern.com/2009/04/07/dinpattern-stripe/', 'http://www.evaneckard.com/', '#dadada', '/img/backgrounds/stripe.gif', '/img/logos/journeyship-logo-white.png');
+addNewBackground('pattern with waves', 'il67', 'http://www.shutterstock.com/pic.mhtml?id=70950994', 'http://www.shutterstock.com/gallery-196705p1.html', '#222', '/img/backgrounds/waves.jpg', '/img/logos/journeyship-logo-black.png');
+//addNewBackground('DinPattern Transmit', 'Evan Eckard', 'http://www.dinpattern.com/2010/07/06/transmit/', 'http://www.evaneckard.com/', '/img/backgrounds/transmit.gif');
+
+_.each(backgrounds, function(bg) {
+  $('<div></div>')
+    .addClass('background-item')
+    .css('background-image', 'url(' + bg.imageUrl + ')')
+    .data('bgInfo', bg)
+    .appendTo('.top-backgrounds-container');
+});
+
+function selectThisBackground (bg) {
+  $('body').css('background-image', 'url(' + bg.imageUrl + ')');
+  $('.page-heading').css('background-image', 'url(' + bg.logoUrl + ')');
+
+  $bgInfo = $('.background-image-info');
+  $bgInfo
+    .css('color', bg.textColor)
+    .children('a')
+    .css('color', bg.textColor)
+    .end()
+    .children('.background-image-name')
+    .text(bg.name)
+    .attr('href', bg.nameUrl)
+    .end()
+    .children('.background-image-artist')
+    .text(bg.author)
+    .attr('href', bg.authorUrl);
+
+  console.log($bgInfo);
+
+  selectedBackgroundImage = bg;
+}
+
+$('.background-item').on('click', function (event) {
+  event.preventDefault();
+  var $clickedItem = $(event.currentTarget);
+
+  selectThisBackground($clickedItem.data('bgInfo'));
+});
 
 
 var version;
@@ -1085,6 +1147,8 @@ var loadData = function (data) {
 
   mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
+
+  selectThisBackground(data.options.selectedBackground);
 
   return data;
 };
@@ -1117,6 +1181,7 @@ var load = function () {
 
     mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
+    selectThisBackground(backgrounds[_.random(backgrounds.length - 1)]);
   }
 
 };
@@ -1138,6 +1203,9 @@ var exportData = function () {
       palette: mainPaletteMap,
       firstLayer: firstLayerMap,
       secondLayer: secondLayerMap
+    },
+    options: {
+      selectedBackground: selectedBackgroundImage
     }
   };
 
@@ -1180,47 +1248,5 @@ var saveData = function (callback) {
 };
 
 
-backgrounds = [];
-function addNewBackground (name, author, nameUrl, authorUrl, imageUrl, logoUrl) {
-  var newBackground = {
-    name: name,
-    author: author,
-    nameUrl: nameUrl,
-    authorUrl: authorUrl,
-    imageUrl: imageUrl,
-    logoUrl: logoUrl
-  };
 
-  backgrounds.push(newBackground);
-}
-
-addNewBackground('DinPattern Blueprint', 'Evan Eckard', 'http://www.dinpattern.com/2011/05/31/blueprint/', 'http://www.evaneckard.com/', '/img/backgrounds/blueprint.gif', '/img/logos/journeyship-logo.png');
-addNewBackground('hand-drawn waves pattern', 'Markovka', 'http://www.shutterstock.com/pic.mhtml?id=96193649', 'http://www.shutterstock.com/gallery-495859p1.html', '/img/backgrounds/hand-drawn-waves.jpg', '/img/logos/journeyship-logo-purple.png');
-addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
-addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '/img/backgrounds/party-lights.jpg', '/img/logos/journeyship-logo-orange.png');
-addNewBackground('pattern with people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html','/img/backgrounds/people.jpg', '/img/logos/journeyship-logo-white.png');
-addNewBackground('space, rockets, comet, planets and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html','/img/backgrounds/spaceships.jpg', '/img/logos/journeyship-logo-blue.png');
-addNewBackground('DinPattern Stripe', 'Evan Eckard', 'http://www.dinpattern.com/2009/04/07/dinpattern-stripe/', 'http://www.evaneckard.com/', '/img/backgrounds/stripe.gif', '/img/logos/journeyship-logo-white.png');
-addNewBackground('seamless pattern with waves', 'il67', 'http://www.shutterstock.com/pic.mhtml?id=70950994', 'http://www.shutterstock.com/gallery-196705p1.html', '/img/backgrounds/waves.jpg', '/img/logos/journeyship-logo-black.png');
-//addNewBackground('DinPattern Transmit', 'Evan Eckard', 'http://www.dinpattern.com/2010/07/06/transmit/', 'http://www.evaneckard.com/', '/img/backgrounds/transmit.gif');
-
-_.each(backgrounds, function(bg) {
-  $('<div></div>')
-    .addClass('background-item')
-    .css('background-image', 'url(' + bg.imageUrl + ')')
-    .data('bgInfo', bg)
-    .appendTo('.top-backgrounds-container');
-});
-
-$('.background-item').on('click', function (event) {
-  event.preventDefault();
-  var $clickedItem = $(event.currentTarget);
-
-  $('body').css('background-image', 'url(' + $clickedItem.data('bgInfo').imageUrl + ')');
-  $('.page-heading').css('background-image', 'url(' + $clickedItem.data('bgInfo').logoUrl + ')');
-
-  selectedBackgroundImage = $clickedItem.data('bgInfo');
-});
-
-selectedBackgroundImage = backgrounds[0];
 

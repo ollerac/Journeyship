@@ -43,44 +43,51 @@
         <div id="main-color-palette" class="color-palette">
         </div>
       </div>
-    </div>
-    <div class="clear"></div>
+      <div class="clear"></div>
 
-    <div id="constructor-container">
-      <h2 class='area-heading'>
-        Editing Block
-        <div class='constructor-heading-button-container'>
-          <a id='save-block' class="save-button another-button has-icon" href="#">Update</a>
-          <a id='export-block' class="save-button another-button has-icon" href="#">Transfer to palette</a>          
-        </div>
-      </h2>
-      <div id="constructor-color-palette" class="color-palette">
-      </div>
-
-      <div id="constructor-layers-container">
-        <h3 class="section-heading">Preview</h3>
-        <div id="preview-container" class="preview-container area-container">
-          <canvas class='block' width='60' height='60'></canvas>
+      <div id="constructor-container">
+        <h2 class='area-heading'>
+          Editing Block
+          <div class='constructor-heading-button-container'>
+            <a id='save-block' class="save-button another-button has-icon" href="#">Update</a>
+            <a id='export-block' class="save-button another-button has-icon" href="#">Transfer to palette</a>          
+          </div>
+        </h2>
+        <div id="constructor-color-palette" class="color-palette">
         </div>
 
-        <h3 class="section-heading">Layers</h3>
-        <div class="layers">
-        </div>
-        <div class="buttons-container">
-          <a id="new-layer" class="new-button another-button has-icon" href="#">New Layer</a>
-          <a id="copy-layer" class="copy-button another-button has-icon" href="#">Copy Layer</a>
-          <a id="delete-layer" class="delete-button another-button has-icon" href="#">Delete Layer</a>
-          <div class='option-container'>
-            <label><input type='checkbox' id='enable-shadow' class='checkbox' /> <div class='option'>Make top layer<br/>transparent</div></label>
+        <div id="constructor-layers-container">
+          <h3 class="section-heading">Preview</h3>
+          <div id="preview-container" class="preview-container area-container">
+            <canvas class='block' width='60' height='60'></canvas>
+          </div>
+
+          <h3 class="section-heading">Layers</h3>
+          <div class="layers">
+          </div>
+          <div class="buttons-container">
+            <a id="new-layer" class="new-button another-button has-icon" href="#">New Layer</a>
+            <a id="copy-layer" class="copy-button another-button has-icon" href="#">Copy Layer</a>
+            <a id="delete-layer" class="delete-button another-button has-icon" href="#">Delete Layer</a>
+            <div class='option-container'>
+              <label><input type='checkbox' id='enable-shadow' class='checkbox' /> <div class='option'>Make top layer<br/>transparent</div></label>
+            </div>
           </div>
         </div>
+
+        <div id="constructor-area-container" class="area-container">
+        </div>
+
+        <div class="clear"></div>
       </div>
 
-      <div id="constructor-area-container" class="area-container">
+      <div class="footer">
+        <div class="background-image-info">
+          <span>background image:</span> <a class="background-image-name" href="#"></a> by <a class="background-image-artist" href="#"></a>
+        <div>
       </div>
-
-      <div class="clear"></div>
     </div>
+
 
     <!--<script src="../js/tree.js" type="text/javascript"></script>-->
     <script src="../js/jquery-1.10.2.min.js" type="text/javascript"></script>

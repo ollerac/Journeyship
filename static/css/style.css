@@ -3,7 +3,6 @@ body {
   font-size: 12px;
   margin-bottom: 200px;
   overflow: auto;
-  background: url(../img/backgrounds/blueprint.gif);
   font-family: sans-serif;
   line-height: 1.3em;
 }
@@ -58,7 +57,6 @@ h1, h2, h3, h4, h5, h6 {
 .page-heading {
   margin: 20px auto 30px;
   clear: both;
-  background: url(/img/logos/journeyship-logo.png) no-repeat;
   height: 223px;
   width: 638px;
   text-indent: -9999px;
@@ -268,7 +266,7 @@ h1, h2, h3, h4, h5, h6 {
 #constructor-container {
   width: 870px;
   margin: 30px auto 30px;
-  background-color: #fff;
+  background-color: #DCDCDC;
   padding: 40px 40px 30px 60px;
 }
 
@@ -373,10 +371,25 @@ h1, h2, h3, h4, h5, h6 {
 
 
 
+.background-image-info {
+  float: right;
+  color: white;
+  margin-top: 250px;
+  margin-bottom: 50px;
+  font-size: 14px;
+  text-shadow: 1px 1px 0px #888;
+  -moz-text-shadow: 1px 1px 0px #888;
+  -webkit-text-shadow: 1px 1px 0px #888;
+}
 
+.background-image-info a {
+  color: #eee;
+  font-weight: bold;
+}
 
-
-
+.background-image-info a:hover {
+  text-decoration: underline;
+}
 
 
 
