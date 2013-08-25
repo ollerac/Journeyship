@@ -1,3 +1,5 @@
+var selectedBackgroundImage;
+
 var defaultCellSize = 60;
 var defaultEditCellSize = 30;
 var defaultTinyCellSize = 3;
@@ -1178,12 +1180,44 @@ var saveData = function (callback) {
 };
 
 
+backgrounds = [];
+function addNewBackground (name, author, nameUrl, authorUrl, imageUrl) {
+  var newBackground = {
+    name: name,
+    author: author,
+    nameUrl: nameUrl,
+    authorUrl: authorUrl,
+    imageUrl: imageUrl
+  };
 
+  backgrounds.push(newBackground);
+}
 
+addNewBackground('DinPattern Blueprint', 'Evan Eckard', 'http://www.dinpattern.com/2011/05/31/blueprint/', 'http://www.evaneckard.com/', '/img/backgrounds/blueprint.gif');
+addNewBackground('hand-drawn waves pattern', 'Markovka', 'http://www.shutterstock.com/pic.mhtml?id=96193649', 'http://www.shutterstock.com/gallery-495859p1.html', '/img/backgrounds/hand-drawn-waves.jpg');
+addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '/img/backgrounds/monsters.jpg');
+addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '/img/backgrounds/party-lights.jpg');
+addNewBackground('pattern with people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html','/img/backgrounds/people.jpg');
+addNewBackground('space, rockets, comet, planets and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html','/img/backgrounds/spaceships.jpg');
+addNewBackground('DinPattern Stripe', 'Evan Eckard', 'http://www.dinpattern.com/2009/04/07/dinpattern-stripe/', 'http://www.evaneckard.com/', '/img/backgrounds/stripe.gif');
+//addNewBackground('DinPattern Transmit', 'Evan Eckard', 'http://www.dinpattern.com/2010/07/06/transmit/', 'http://www.evaneckard.com/', '/img/backgrounds/transmit.gif');
+addNewBackground('seamless pattern with waves', 'il67', 'http://www.shutterstock.com/pic.mhtml?id=70950994', 'http://www.shutterstock.com/gallery-196705p1.html', '/img/backgrounds/waves.jpg');
 
+_.each(backgrounds, function(bg) {
+  $('<div></div>')
+    .addClass('background-item')
+    .css('background-image', 'url(' + bg.imageUrl + ')')
+    .data('bgInfo', bg)
+    .appendTo('.top-backgrounds-container');
+});
 
+$('.background-item').on('click', function (event) {
+  event.preventDefault();
+  var $clickedItem = $(event.currentTarget);
 
+  $('body').css('background-image', 'url(' + $clickedItem.data('bgInfo').imageUrl + ')');
+  selectedBackgroundImage = $clickedItem.data('bgInfo');
+});
 
-
-
+selectedBackgroundImage = backgrounds[0];
 

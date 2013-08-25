@@ -3,7 +3,7 @@ body {
   font-size: 12px;
   margin-bottom: 200px;
   overflow: auto;
-  background: url(../img/bg.gif);
+  background: url(../img/backgrounds/blueprint.gif);
   font-family: sans-serif;
   line-height: 1.3em;
 }
@@ -23,6 +23,22 @@ a:hover {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
+}
+
+.top-backgrounds-container {
+  padding: 5px;
+  background: #fff;
+  float: right;
+  padding-left: 0;
+}
+
+.background-item {
+  background-repeat: repeat;
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  float: left;
+  cursor: pointer;
 }
 
 .block {
@@ -70,9 +86,6 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 3px;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
-  box-shadow: 0 1px 0px #bacbeb;
-  -moz-box-shadow: 0 1px 0px #bacbeb;
-  -webkit-box-shadow: 0 1px 0px #bacbeb;
   padding: 5px 12px;
   border: 1px solid #3b6fd3;
   background-color: #fff;
@@ -84,16 +97,10 @@ h1, h2, h3, h4, h5, h6 {
 .another-button:hover {
   color: #444;
   border: 1px solid #888;
-  box-shadow: 0 1px 0px #aaa;
-  -moz-box-shadow: 0 1px 0px #aaa;
-  -webkit-box-shadow: 0 1px 0px #aaa;
 }
 
 .another-button:active {
   top: 1px;
-  box-shadow: none;
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
 }
 
 .another-button.active {
@@ -101,9 +108,6 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #666;
   color: #fff;
   top: 1px;
-  box-shadow: none;
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
 }
 
 .another-button.has-icon {
@@ -208,25 +212,23 @@ h1, h2, h3, h4, h5, h6 {
 
 #main-color-palette {
   padding: 10px;
-  background-color: #fff;
-  background-color: rgba(255,255,255,.5);
+  background-color: #eee;
   clear: both;
   width: 1000px;
+  border-top: 1px solid #fff;
 }
 
 /* top bar */
 
 #main-container-top-bar {
-    background: #fff;
-    background: rgba(255,255,255,.5);
+    background: #333;
     padding: 10px 10px 10px 10px;
     overflow: auto;
     width:  1002px;
 }
 
 #main-color-palette-top-bar {
-    background: #fff;
-    background: rgba(255,255,255,.5);
+    background: #333;
     padding: 10px 10px 10px 10px;
     overflow: auto;
     width:  1000px;
@@ -257,15 +259,15 @@ h1, h2, h3, h4, h5, h6 {
   width: 1020px;
   height: 300px;
   position: relative;
+  margin-bottom: 10px;
 }
 
 /* Constructor */
 
 #constructor-container {
-  width: 890px;
+  width: 870px;
   margin: 30px auto 30px;
   background-color: #fff;
-  background-color: rgba(255,255,255,.5);
   padding: 40px 40px 30px 60px;
 }
 
@@ -357,8 +359,7 @@ h1, h2, h3, h4, h5, h6 {
 .hanging-button {
   float: left;
   margin-right: 10px;
-  background: #666;
-  background: rgba(0,0,0,.2);
+  background: #222;
   padding: 8px 18px;
   color: #fff;
   font-size: 14px;
