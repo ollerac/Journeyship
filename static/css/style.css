@@ -370,7 +370,18 @@ h1, h2, h3, h4, h5, h6 {
   background: #555;
 }
 
+/* 404 page */
+.container {
+  width: 700px;
+  background-color: white;
+  border: 1px solid #333;
+  margin: 20px auto;
+  padding: 20px;
+}
 
+body.not-found {
+  background: url(/img/backgrounds/blueprint.gif);
+}
 
 .background-image-info {
   float: right;
@@ -392,7 +403,10 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: underline;
 }
 
-
+/* browser reject */
+#jr_inner ul {
+  margin-top: 15px;
+}
 
 
 

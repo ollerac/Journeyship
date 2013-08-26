@@ -1,10 +1,13 @@
 ### working on now:
-
+- fix 404 page
 
 ### before launch
-- ask b-- to make a demo to show people how it works
-- more starting blocks, like trees and people and dogs and water flowing and boats
+- test in browsers
+  - opera 
+  - IE, make it work in ie9 and 10
+  - test in firefox
 - message about unsupported browsers (test to see if IE 8 and 9 are good with history.js), maybe use modernizr
+- more starting blocks, like trees and people and dogs and water flowing and boats
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
 - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
 - add google analytics
@@ -14,19 +17,15 @@
 - invite people
 
 ### next cycle
+- gotta look into performance issues: look at http://journeyship.com/4 in firefox
+- make blocks that can move!
 - add a blinking arrow to show where the editor area is after clicking the new button or after selecting a block and clicking edit
 - make blocks follow mouse and snap to block position
-- background themes
 - cache breaker
-- make animated blocks simple arrays, use angularjs
-- make blocks twice as big
-  - what about backwards compatibility?
-- get rid of colors in the main palette?
+- ? make animated blocks simple arrays, use angularjs
 - make scenes: each new scene clears the main canvas and resets all of its animated blocks
 - look through priorities and organize them
-- rewrite large parts of it using AngularJS
 - organize code
-- new design
 - simplify data model
 
 ### first priority:
@@ -68,6 +67,7 @@
 - selected block follows cursor
 
 ### would be nice to have:
+- don't load browser rejection script on every page load
 - if a block is made entirely of the same color, convert it back to just a color when it's saved...?
 - make the selected block dashed border move
 - undo button with infinite undos

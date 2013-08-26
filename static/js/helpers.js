@@ -1,7 +1,14 @@
 var mouseIsDown = false;
-document.body.addEventListener('mousedown', function () {
-  mouseIsDown = true;
-});
-document.body.addEventListener('mouseup', function () {
-  mouseIsDown = false;
-});
+
+(function () {
+  var body = $('body');
+
+  body.on('mousedown', function () {
+    mouseIsDown = true;
+  });
+
+  body.on('mouseup', function () {
+    mouseIsDown = false;
+  });
+
+})();
