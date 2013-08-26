@@ -57,10 +57,11 @@ h1, h2, h3, h4, h5, h6 {
 .page-heading {
   margin: 20px auto 30px;
   clear: both;
-  height: 223px;
-  width: 638px;
+  height: 225px;
+  width: 640px;
   text-indent: -9999px;
   overflow: hidden;
+  background-repeat: no-repeat;
 }
 
 .section-heading {
