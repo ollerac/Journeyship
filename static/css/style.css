@@ -55,7 +55,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .page-heading {
-  margin: 20px auto 30px;
+  margin: 0 auto 30px;
+  padding-top: 20px;
+  background-position: 0 20px;
   clear: both;
   height: 225px;
   width: 640px;

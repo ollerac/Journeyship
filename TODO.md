@@ -7,6 +7,7 @@
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - add google analytics
 - simple howto video or guided javascript walkthrough
+- fix top margin on firefox
 
 ### work on at home:
 - test in browsers
