@@ -1,15 +1,19 @@
 ### working on now:
-- fix 404 page
+- adding import and export functionality
+
+
 
 ### before launch
+- more starting blocks, like trees and people and dogs and flowing water and boats
+- add google analytics
+- simple howto video or guided javascript walkthrough
+
+### work on at home:
 - test in browsers
   - opera 
   - IE, make it work in ie9 and 10
   - test in firefox
 - message about unsupported browsers (test to see if IE 8 and 9 are good with history.js), maybe use modernizr
-- more starting blocks, like trees and people and dogs and flowing water and boats
-- add google analytics
-- simple howto video or guided javascript walkthrough
 
 ### after launch:
 - invite people

@@ -1,5 +1,6 @@
 var express = require('express');
 
+var ObjectID = require('mongodb').ObjectID;
 var app = express();
 var mongodbUrl;
 
@@ -19,6 +20,8 @@ var MongoClient = require('mongodb').MongoClient;
 
 MongoClient.connect(mongodbUrl, function(err, db) {
   if (err) throw err;
+
+  var blocksCollection = db.collection('blocks');
 
   var countersCollection = db.collection('counters');
 
@@ -40,6 +43,29 @@ MongoClient.connect(mongodbUrl, function(err, db) {
 
   app.get('/', function(req, res){
     res.sendfile('./static/views/index.html');
+  });
+
+  app.post('/exportblock', function(req, res) {
+    if (req.body.block) {
+      blocksCollection.insert({block: req.body.block}, {safe: true}, function (err, blocks) {
+        if (!err) {
+          res.send(blocks[0]);
+        } else {
+          res.send('error');
+        }
+      });
+    }
+  });
+
+  app.get('/block/:id', function(req, res) {
+    console.log(req.params.id);
+    blocksCollection.findOne({_id: ObjectID(req.params.id)}, function (err, block) {
+      if (!err) {
+        res.json(block);
+      } else {
+        res.send('error');
+      }
+    });
   });
 
   app.post('/savestory', function(req, res) {

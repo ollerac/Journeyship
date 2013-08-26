@@ -788,9 +788,12 @@ ColorPalette.prototype.getBlockWithId = function (id) {
   if (!id) return null;
 
   var matchingBlock = null;
-  _.each(this.map, function (block) {
+  _.each(this.map, function (block, index) {
     if (block.uniqueId === id) {
-      matchingBlock = block;
+      matchingBlock = {
+        matchingBlock: block,
+        index: index
+      };
       return false;
     }
   });
@@ -808,7 +811,7 @@ ColorPalette.prototype.addStyle = function (value) {
 ColorPalette.prototype.saveCustomBlock = function (layers, id) {
   var matchingBlock = this.getBlockWithId(id);
   if (matchingBlock) {
-    matchingBlock.layers = layers;
+    matchingBlock.matchingBlock.layers = layers;
   }
 };
 
@@ -1279,5 +1282,69 @@ $.reject({
   }
 });
 
+$('#export-editor-block').on('click', function (event) {
+  event.preventDefault();
+  $('#import-editor-block-url-container').hide();
+
+  if ($('#export-editor-block-url-container').is(':visible')) {
+    $('#export-editor-block-url-container').hide();
+  } else {
+    $('#export-editor-block-url-container').show();
+  }
+});
+
+$('#import-editor-block').on('click', function (event) {
+  event.preventDefault();
+  $('#export-editor-block-url-container').hide();
+
+  if ($('#import-editor-block-url-container').is(':visible')) {
+    $('#import-editor-block-url-container').hide();
+  } else {
+    $('#import-editor-block-url-container').show();
+  }
+});
+
+$('#import-editor-block-button').on('click', function (event) {
+  event.preventDefault();
+
+  var importUrl = $('#import-editor-block-url').val();
+
+  if (importUrl) {
+    $.ajax({
+      type: 'GET',
+      url: importUrl,
+      success: function (result) {
+        editorArea.makeNewAnimatedBlock(result.block, {
+          uniqueId: editorArea.animatedBlock.uniqueId
+        });
+      }
+    });
+  }
+});
+
+$('#export-editor-block-button').on('click', function (event) {
+  event.preventDefault();
+  $.ajax({
+    type: 'POST',
+    url: '/exportblock/',
+    data: {
+      block: editorArea.animatedBlock.layers
+    },
+    success: function (result) {
+      $('#export-editor-block-url').val(window.location.href + 'block/' + result._id);
+    }
+  });
+});
+
+
+$('#export-editor-block-url').on({
+  focus: function (event) {
+    event.preventDefault();
+    $(this).select();
+  },
+  mouseup: function (event) {
+    event.preventDefault();
+  }
+});
 
 

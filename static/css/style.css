@@ -409,5 +409,59 @@ body.not-found {
 }
 
 
+.constructor-footer {
+  width: 100%;
+  padding-top: 30px;
+  clear: both;
+}
+
+.import-export-container {
+  float: right;
+}
+
+.import-export-container .button-holder {
+  float: right;
+  margin-bottom: 10px;
+}
+
+#export-editor-block-url, #import-editor-block-url {
+  width: 400px;
+}
+
+#import-editor-block-url-container {
+  display: none;
+}
+
+#export-editor-block-url-container {
+  display: none;
+}
+
+#import-editor-block-button, #export-editor-block-button {
+  margin-top: 10px;
+  float: right;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
