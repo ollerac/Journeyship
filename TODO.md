@@ -7,9 +7,7 @@
   - IE, make it work in ie9 and 10
   - test in firefox
 - message about unsupported browsers (test to see if IE 8 and 9 are good with history.js), maybe use modernizr
-- more starting blocks, like trees and people and dogs and water flowing and boats
-- BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
-- BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
+- more starting blocks, like trees and people and dogs and flowing water and boats
 - add google analytics
 - simple howto video or guided javascript walkthrough
 
@@ -17,8 +15,9 @@
 - invite people
 
 ### next cycle
-- gotta look into performance issues: look at http://journeyship.com/4 in firefox
+- export and import editor area blocks
 - make blocks that can move!
+  - add checkbox: "Show mover blocks"
 - add a blinking arrow to show where the editor area is after clicking the new button or after selecting a block and clicking edit
 - make blocks follow mouse and snap to block position
 - cache breaker
@@ -27,6 +26,9 @@
 - look through priorities and organize them
 - organize code
 - simplify data model
+- look into the getNextAnimationFrame method for canvas
+- gotta look into performance issues: look at http://journeyship.com/4 in firefox
+
 
 ### first priority:
 - select should open edit
@@ -78,4 +80,14 @@
 ### eventually:
 - add EventEmitter2 library to make handling events easier. object could inherit from event emitters.
 - maybe: add javascript-state-machine library. what could i use it for?
+
+### backlog:
+- BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). can't replicate easily. not a known issue in google search.
+
+
+
+
+
+
+
 
