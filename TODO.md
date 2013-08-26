@@ -37,6 +37,7 @@
 - drag layers up and down in editor
 
 ### would be *really* nice to have:
+- maybe lighten the backgrounds a bit
 - after user accounts: save blocks from other people's projects into yours
 - edit more space, more than one block
   - make all blocks bigger?
