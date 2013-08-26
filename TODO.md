@@ -1,16 +1,10 @@
 ### working on now:
-- add journeyship logo
-- background theme
-  - 8 patterns total, $30...$50, give attribution
-  - added background images, got them switching
-  - need to add attribution
-  - need to save background image with save data
-- start with a random background image
+
 
 ### before launch
-- ask ben to make a demo to show people how it works
+- ask b-- to make a demo to show people how it works
 - more starting blocks, like trees and people and dogs and water flowing and boats
-- message about unsupported browsers (test to see if IE 8 and 9 are good with history.js)
+- message about unsupported browsers (test to see if IE 8 and 9 are good with history.js), maybe use modernizr
 - BUG: copy layer, delete the one before, select one and then the other. somewhere in there the copied layer gets lost
 - BUG: when you leave the app for a while, the main canvas turns transparent and when you draw on it with a color it draws with an animated block instead (even though it doesn't show up on the canvas). maybe google this.
 - add google analytics
