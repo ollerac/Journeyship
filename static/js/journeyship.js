@@ -299,10 +299,11 @@ function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, seco
   self.cellSize = cellSize || defaultCellSize;
   self.columns = self.$element.width() / self.cellSize;
   self.rows = self.$element.height() / self.cellSize;
-  self.selectedStyle = '#000';
+  self.selectedStyle = {style: '#000'};
   self.defaultCellColor = defaultCellColor || '#fff';
   self.map = firstLayer || self.makeMap(self.defaultCellColor); //background, also potentially animated
   self.animatedMap = secondLayer || self.makeMap(null); // foreground
+  self.movementMap = self.makeMap(null);
   self.selectedBlocksMap = [];
   self.animatedInterval = null;
   self.drawOnBackground = true;
@@ -325,8 +326,9 @@ DrawableSurface.prototype.startAnimating = function () {
   self.animatedInterval = setInterval(function() {
     self.clear();
     self.renderFirstMap();
+    self.renderMovementMap();
     self.renderSecondMap();
-    self.renderSelectedBlocksMap(self.selectedBlocksMap);
+    self.renderSelectedBlocksMap();
   }, 300);
 };
 
@@ -380,21 +382,25 @@ DrawableSurface.prototype.makeDrawable = function () {
     var drawingContext = self.$element[0].getContext('2d');
     clearCell(drawingContext, cellPosition.x, cellPosition.y, self.cellSize);
 
-    if (typeof(self.selectedStyle) === 'string') {
-      if (self.selectedStyle !== 'transparent') {
-        drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle);
+    if (typeof(self.selectedStyle.style) === 'object' && self.selectedStyle.info && self.selectedStyle.info.type === 'movement') {
+      self.movementMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.style.layers), {
+        type: self.selectedStyle.info.type
+      });
+    } else if (typeof(self.selectedStyle.style) === 'string') {
+      if (self.selectedStyle.style !== 'transparent') {
+        drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle.style);
       }
 
       if (self.drawOnBackground) {
-        self.map[positionInArray] = self.selectedStyle;
+        self.map[positionInArray] = self.selectedStyle.style;
       } else {
-        self.animatedMap[positionInArray] = self.selectedStyle;
+        self.animatedMap[positionInArray] = self.selectedStyle.style;
       }
-    } else if (typeof(self.selectedStyle === 'object') && self.selectedStyle.layers) {
+    } else if (typeof(self.selectedStyle.style) === 'object' && self.selectedStyle.style.layers) {
       if (self.drawOnBackground) {
-        self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+        self.map[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.style.layers));
       } else {
-        self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.layers));
+        self.animatedMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.style.layers));
       }
 
       _.each(self.map, function (block) {
@@ -413,7 +419,8 @@ DrawableSurface.prototype.makeDrawable = function () {
     $.publish("updated-map", {
       surface: self,
       index: positionInArray,
-      value: self.selectedStyle
+      value: self.selectedStyle.style,
+      valueInfo: self.selectedStyle.info
     });
 
   }
@@ -457,7 +464,7 @@ DrawableSurface.prototype.renderSelectedBlocksMap = function (map) {
   var self = this;
   var context = self.$element[0].getContext('2d');
 
-  _.each(map, function (block, index) {
+  _.each(self.selectedBlocksMap, function (block, index) {
     if (block) {
       var position = getCellPositionFromIndex(index, self.columns);
 
@@ -474,12 +481,18 @@ DrawableSurface.prototype.renderSecondMap = function () {
   this.renderMap(this.animatedMap);
 };
 
+DrawableSurface.prototype.renderMovementMap = function () {
+  this.renderMap(this.movementMap);
+};
+
 
 var editorArea = {
   animatedBlock: null,
   drawableSurfaces: [],
   selectedLayerNum: 0,
-  selectedStyle: '#000',
+  selectedStyle: {
+    style: '#000'
+  },
   $layersContainerElement: $('.layers'),
   makeNewAnimatedBlock: function (layers, options) {
     var self = this;
@@ -533,18 +546,38 @@ var editorArea = {
       });
     }
   },
-  setSelectedStyle: function (style) {
-    this.selectedStyle = style;
+  setSelectedStyle: function (style, info) {
+    var self = this;
+
+    this.selectedStyle.style = style;
+
+    if (info) {
+      this.selectedStyle.info = info;
+    } else {
+      this.selectedStyle.info = null;
+    }
 
     _.each(this.drawableSurfaces, function (surface) {
-      surface.selectedStyle = style;
+      surface.selectedStyle.style = style;
+
+      if (self.selectedStyle.info) {
+        surface.selectedStyle.info = self.selectedStyle.info;
+      } else {
+        surface.selectedStyle.info = null;
+      }
     });
   },
   refreshSelectedStyle: function () {
     var self = this;
 
     _.each(this.drawableSurfaces, function (surface) {
-      surface.selectedStyle = self.selectedStyle;
+      surface.selectedStyle.style = self.selectedStyle.style;
+
+      if (self.selectedStyle.info) {
+        surface.selectedStyle.info = self.selectedStyle.info;
+      } else {
+        surface.selectedStyle.info = null;
+      }
     });
   },
   selectedDrawableSurface: function () {
@@ -696,21 +729,40 @@ var editorArea = {
 
 var mainArea = {
   drawableSurfaces: [],
-  selectedStyle: '#000',
-  setSelectedStyle: function (style) {
-    this.selectedStyle = style;
-    this.drawableSurfaces[0].selectedStyle = style;
+  selectedStyle: {
+    style: '#000',
+  },
+  setSelectedStyle: function (style, info) {
+    this.selectedStyle.style = style;
+    this.drawableSurfaces[0].selectedStyle.style = style;
+
+    if (info) {
+      this.selectedStyle.info = info;
+      this.drawableSurfaces[0].selectedStyle.info = info;
+    } else {
+      this.selectedStyle.info = null;
+      this.drawableSurfaces[0].selectedStyle.info = null;      
+    }
 
     $.publish('selected-style', {
       surface: this,
-      style: style
+      style: {
+        style: style,
+        info: info
+      }
     });
   },
   refreshSelectedStyle: function () {
     var self = this;
 
     _.each(this.drawableSurfaces, function (surface) {
-      surface.selectedStyle = self.selectedStyle;
+      surface.selectedStyle.style = self.selectedStyle.style;
+
+      if (self.selectedStyle.info) {
+        surface.selectedStyle.info = self.selectedStyle.info;
+      } else {
+        surface.selectedStyle.info = null;
+      }
     });
   },
   selectedDrawableSurface: function () {
@@ -736,7 +788,7 @@ function ColorPalette (map, $container, parent, size) {
   });
 }
 
-ColorPalette.prototype.generatePaletteElement = function (value) {
+ColorPalette.prototype.generatePaletteElement = function (value, info) {
   var $paletteElementContainer = makeNewElement();
   $paletteElementContainer.addClass('palette-element-container');
 
@@ -751,6 +803,10 @@ ColorPalette.prototype.generatePaletteElement = function (value) {
 
     $paletteElementContainer.append($animatedElement);
     $paletteElementContainer.data('paletteValue', {type: 'animated', value: animatedBlock});
+
+    if (info) {
+      $paletteElementContainer.data('paletteInfo', info);
+    }
   } else if (typeof(value) === 'string') {
     var color = value;
 
@@ -803,8 +859,16 @@ ColorPalette.prototype.getBlockWithId = function (id) {
 
 // pass in a new AnimatedBlock or a color as a string
 ColorPalette.prototype.addStyle = function (value) {
-  this.addMapValue(value);
-  var paletteElement = this.generatePaletteElement(value);
+  var paletteElement;
+
+  if (typeof(value) === 'object' && value.type && value.type === 'movement') {
+    this.addMapValue(value.block);
+    paletteElement = this.generatePaletteElement(value.block, {type: value.type, direction: value.direction});
+  } else {
+    this.addMapValue(value);
+    paletteElement = this.generatePaletteElement(value);
+  }
+
   this.addPaletteElement(paletteElement);
 };
 
@@ -826,27 +890,26 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
     $clickedElement.siblings('.palette-element-container.selected').removeClass('selected');
     $clickedElement.addClass('selected');
 
-    self.parent.setSelectedStyle($clickedElement.data('paletteValue').value);
+    self.parent.setSelectedStyle($clickedElement.data('paletteValue').value, $clickedElement.data('paletteInfo'));
   });
 };
 
 $.subscribe('selected-style', function (event, update) {
   var buttons = $('#copy-block, #delete-block');
   var $editorAreaElement = $('#constructor-container');
-  if (typeof(update.style) === 'object' && update.style.layers) {
+  if (typeof(update.style) === 'object' && ((update.style.info && update.style.info.type === 'movement') || !(update.style.style && update.style.style.layers))) {
+    buttons.hide();
+    $editorAreaElement.hide();
+  } else {
     buttons.css('display', 'inline-block');
     buttons.show();
 
     $editorAreaElement.show();
-    editorArea.makeNewAnimatedBlock(_.cloneDeep(update.style.layers), {uniqueId: update.style.uniqueId});
-  } else {
-    buttons.hide();
-    $editorAreaElement.hide();
+    editorArea.makeNewAnimatedBlock(_.cloneDeep(update.style.style.layers), {uniqueId: update.style.style.uniqueId});
   }
 
   disableMainCanvasSelect();
 });
-
 
 $('#new-block').on('click', function (event) {
   event.preventDefault();
@@ -893,13 +956,13 @@ $('#save-block').on('click', function (event) {
 $('#copy-block').on('click', function (event) {
   event.preventDefault();
 
-  var newAnimatedBlock = editorArea.makeNewAnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.layers));
-  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.layers), {uniqueId: newAnimatedBlock.uniqueId}));
+  var newAnimatedBlock = editorArea.makeNewAnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.style.layers));
+  mainColorPalette.addStyle(new AnimatedBlock(_.cloneDeep(mainArea.selectedDrawableSurface().selectedStyle.style.layers), {uniqueId: newAnimatedBlock.uniqueId}));
 });
 
 $('#delete-block').on('click', function (event) {
   event.preventDefault();
-  var selectedAnimatedBlock = mainColorPalette.parent.selectedStyle;
+  var selectedAnimatedBlock = mainColorPalette.parent.selectedStyle.style;
   // weird
   var index = mainColorPalette.map.indexOf(selectedAnimatedBlock);
 
@@ -1184,7 +1247,15 @@ var load = function () {
     editorArea.setup();
     mainArea.setup();
 
-    mainColorPalette = new ColorPalette (colors, $('#main-color-palette'), mainArea);
+    var movements = [];
+    // !!! working on
+    // movements.push({
+    //   block: new AnimatedBlock(JSON.parse(moveRight)),
+    //   type: 'movement',
+    //   direction: 'right'
+    // });
+
+    mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
     selectThisBackground(backgrounds[_.random(backgrounds.length - 1)]);
   }

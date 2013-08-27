@@ -1,13 +1,11 @@
 ### working on now:
-- adding import and export functionality
-
-
+- make 'delete' remove movement blocks no matter if fg or bg is selected
 
 ### before launch
 - more starting blocks, like trees and people and dogs and flowing water and boats
-- add google analytics
 - simple howto video or guided javascript walkthrough
-- fix top margin on firefox
+- cache breaker
+- selected block follows mouse on canvas
 
 ### work on at home:
 - test in browsers
@@ -20,20 +18,22 @@
 - invite people
 
 ### next cycle
-- export and import editor area blocks
+- undo!!!
+  - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
+    - make general savedata function for this and for the general save
+- give palette blocks a light checkered gray background so it's clear that transparent blocks are transparent
 - make blocks that can move!
-  - add checkbox: "Show mover blocks"
-- add a blinking arrow to show where the editor area is after clicking the new button or after selecting a block and clicking edit
+  - add checkbox: "Show mover blocks" (only if there's one on the canvas)
+  - show message: "Only blocks placed on the foreground layer can move"
+- add a blinking arrow to show where the editor area is after clicking the new button or after selecting a block on the main canvas and clicking edit
 - make blocks follow mouse and snap to block position
-- cache breaker
 - ? make animated blocks simple arrays, use angularjs
 - make scenes: each new scene clears the main canvas and resets all of its animated blocks
+- look into the getNextAnimationFrame method for canvas
+- gotta look into performance issues: look at http://journeyship.com/4 in firefox
 - look through priorities and organize them
 - organize code
 - simplify data model
-- look into the getNextAnimationFrame method for canvas
-- gotta look into performance issues: look at http://journeyship.com/4 in firefox
-
 
 ### first priority:
 - select should open edit
