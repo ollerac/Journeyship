@@ -6,6 +6,9 @@
 - simple howto video or guided javascript walkthrough
 - cache breaker
 - selected block follows mouse on canvas
+- import/export
+  - clicking export link should generate a link and there should be a 'hide' button
+  - clicking import should change the button to green and say 'Imported'
 
 ### work on at home:
 - test in browsers

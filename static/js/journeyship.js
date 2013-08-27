@@ -1353,16 +1353,6 @@ $.reject({
   }
 });
 
-$('#export-editor-block').on('click', function (event) {
-  event.preventDefault();
-  $('#import-editor-block-url-container').hide();
-
-  if ($('#export-editor-block-url-container').is(':visible')) {
-    $('#export-editor-block-url-container').hide();
-  } else {
-    $('#export-editor-block-url-container').show();
-  }
-});
 
 $('#import-editor-block').on('click', function (event) {
   event.preventDefault();
@@ -1393,18 +1383,26 @@ $('#import-editor-block-button').on('click', function (event) {
   }
 });
 
-$('#export-editor-block-button').on('click', function (event) {
+$('#export-editor-block').on('click', function (event) {
   event.preventDefault();
-  $.ajax({
-    type: 'POST',
-    url: '/exportblock/',
-    data: {
-      block: editorArea.animatedBlock.layers
-    },
-    success: function (result) {
-      $('#export-editor-block-url').val(window.location.href + 'block/' + result._id);
-    }
-  });
+  $('#import-editor-block-url-container').hide();
+
+  if ($('#export-editor-block-url-container').is(':visible')) {
+    $('#export-editor-block-url-container').hide();
+  } else {
+    $('#export-editor-block-url-container').show();
+
+    $.ajax({
+      type: 'POST',
+      url: '/exportblock/',
+      data: {
+        block: editorArea.animatedBlock.layers
+      },
+      success: function (result) {
+        $('#export-editor-block-url').val(window.location.origin + '/block/' + result._id);
+      }
+    });
+  }
 });
 
 

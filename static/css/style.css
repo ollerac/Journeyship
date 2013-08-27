@@ -438,7 +438,7 @@ body.not-found {
   display: none;
 }
 
-#import-editor-block-button, #export-editor-block-button {
+#import-editor-block-button {
   margin-top: 10px;
   float: right;
 }
