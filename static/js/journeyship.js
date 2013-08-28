@@ -482,44 +482,63 @@ DrawableSurface.prototype.renderMap = function (map, options) {
   var self = this;
   var context = self.$element[0].getContext('2d');
 
+  var skipThese = [];
+
   _.each(map, function (block, index, list) {
-    if (block) {
+    var newIndex = index;
+
+    if (block && skipThese.indexOf(index) === -1) {
       if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
         if (self.movementMap[index].direction === 'right') {
-          if (index < self.columns) {
-            index += 1;
-            list[index] = block;
-            list.splice(index, 1);
-          }
-        }
-        if (self.movementMap[index].direction === 'left') {
-          if (index > self.columns * getCellRowAndColumnFromIndex(index).row) {
-            index -= 1;
-            list[index] = block;
-            list.splice(index, 1);
-          }
-        }
-        if (self.movementMap[index].direction === 'up') {
-          var cellAbove = getCellAboveThisIndex(index);
+          if (index % self.columns !== 0) {
+            console.log('right', list[index + 1], list[index], list);
+            newIndex = index + 1;
 
-          if (cellAbove) {
-            index = cellAbove;
-            list[index] = block;
-            list.splice(index, 1);
+            if (typeof(block) === 'object' && block.layers) {
+              list[newIndex] = new AnimatedBlock(_.cloneDeep(block.layers));
+            } else {
+              list[newIndex] = block;
+            }
+
+            skipThese.push(newIndex);
+            
+            list[index] = null;
           }
-        }
-        if (self.movementMap[index].direction === 'up') {
-          var cellBelow = getCellBelowThisIndex(index);
+        } else if (self.movementMap[index].direction === 'left') {
+          if (index > self.columns * getCellRowAndColumnFromIndex(index, self.columns).row) {
+            console.log('left', list[index - 1], list[index]);
+            newIndex = index - 1;
+
+            if (typeof(block) === 'object' && block.layers) {
+              list[newIndex] = new AnimatedBlock(_.cloneDeep(block.layers));
+            } else {
+              list[newIndex] = block;
+            }
+
+            list[index] = null;
+          }
+        } else if (self.movementMap[index].direction === 'up') {
+          var cellAbove = getCellAboveThisIndex(index, self.columns);
+
+          if (cellAbove || cellAbove === 0) {
+            newIndex = cellAbove;
+            list[cellAbove] = block;
+            list[index] = null;
+          }
+        } else if (self.movementMap[index].direction === 'down') {
+          var cellBelow = getCellBelowThisIndex(index, self.rows, self.columns);
 
           if (cellBelow) {
-            index = cellBelow;
-            list[index] = block;
-            list.splice(index, 1);
+            newIndex = cellBelow;
+            list[cellBelow] = block;
+            list[index] = null;
+
+            skipThese.push(cellBelow);
           }
         }
       }
 
-      var position = getCellPositionFromIndex(index, self.columns);
+      var position = getCellPositionFromIndex(newIndex, self.columns);
 
       if (typeof(block) === 'object' && block.layers) {
         applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
@@ -816,7 +835,7 @@ var mainArea = {
       this.drawableSurfaces[0].selectedStyle.info = info;
     } else {
       this.selectedStyle.info = null;
-      this.drawableSurfaces[0].selectedStyle.info = null;      
+      this.drawableSurfaces[0].selectedStyle.info = null;
     }
 
     $.publish('selected-style', {
@@ -1338,11 +1357,26 @@ var load = function () {
     mainArea.setup();
 
     var movements = [];
-    // movements.push({
-    //   block: new AnimatedBlock(JSON.parse(moveRight)),
-    //   type: 'movement',
-    //   direction: 'right'
-    // });
+    movements.push({
+      block: new AnimatedBlock(JSON.parse(moveUp)),
+      type: 'movement',
+      direction: 'up'
+    });
+    movements.push({
+      block: new AnimatedBlock(JSON.parse(moveDown)),
+      type: 'movement',
+      direction: 'down'
+    });
+    movements.push({
+      block: new AnimatedBlock(JSON.parse(moveRight)),
+      type: 'movement',
+      direction: 'right'
+    });
+    movements.push({
+      block: new AnimatedBlock(JSON.parse(moveLeft)),
+      type: 'movement',
+      direction: 'left'
+    });
 
     mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
