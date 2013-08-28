@@ -313,10 +313,6 @@ function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, seco
   self.drawOnBackground = true;
 
   // setup
-  if (typeof(G_vmlCanvasManager) !== 'undefined') {
-    G_vmlCanvasManager.initElement(self.$element[0]);
-  }
-
   self.makeDrawable();
 }
 
@@ -691,7 +687,7 @@ var editorArea = {
     }
   },
   setup: function (layers) {
-    self = this;
+    var self = this;
 
     self.animatedBlock = new AnimatedBlock(layers || []);
 
@@ -1169,15 +1165,15 @@ function addNewBackground (name, author, nameUrl, authorUrl, textColor, textShad
   backgrounds.push(newBackground);
 }
 
-addNewBackground('Wild Olivia', 'Badhon Ebrahim', 'http://subtlepatterns.com/wild-oliva/', 'http://dribbble.com/graphcoder', '#222', '#fff', '/img/backgrounds/wild_oliva.png', '/img/logos/journeyship-logo-white.png');
+addNewBackground('Wild Olivia', 'Badhon Ebrahim', 'http://subtlepatterns.com/wild-oliva/', 'http://dribbble.com/graphcoder', '#fff', '#333', '/img/backgrounds/wild_oliva.png', '/img/logos/journeyship-logo-white.png');
 addNewBackground('Shattered', 'Luuk van Baars', 'http://subtlepatterns.com/shattered/', 'http://luukvanbaars.com/', '#222', '#fff', '/img/backgrounds/shattered.png', '/img/logos/journeyship-logo.png');
 addNewBackground('Tree Bark', 'GetDiscount', 'http://subtlepatterns.com/tree-bark/', 'http://getdiscount.co.uk/', '#222', '#fff', '/img/backgrounds/tree_bark.png', '/img/logos/journeyship-logo.png');
 addNewBackground('Tweed', 'Simon Leo', 'http://subtlepatterns.com/tweed/', '#', '#fff', '#333', '/img/backgrounds/tweed.png', '/img/logos/journeyship-logo-blue.png');
 addNewBackground('DinPattern Blueprint', 'Evan Eckard', 'http://www.dinpattern.com/2011/05/31/blueprint/', 'http://www.evaneckard.com/', '#222', '#fff', '/img/backgrounds/blueprint.gif', '/img/logos/journeyship-logo.png');
-addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '#fff', '#333', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
+addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '#222', '#fff', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
 addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '#fff', '#333', '/img/backgrounds/party-lights.jpg', '/img/logos/journeyship-logo-orange.png');
-addNewBackground('people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html', '#fff', '#333', '/img/backgrounds/people.jpg', '/img/logos/journeyship-logo-white.png');
-addNewBackground('space, rockets, and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html', '#fff', '#333', '/img/backgrounds/spaceships.jpg', '/img/logos/journeyship-logo-blue.png');
+addNewBackground('people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html', '#222', '#fff', '/img/backgrounds/people.jpg', '/img/logos/journeyship-logo-white.png');
+addNewBackground('space, rockets, and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html', '#222', '#fff', '/img/backgrounds/spaceships.jpg', '/img/logos/journeyship-logo-blue.png');
 addNewBackground('DinPattern Stripe', 'Evan Eckard', 'http://www.dinpattern.com/2009/04/07/dinpattern-stripe/', 'http://www.evaneckard.com/', '#fff', '#333', '/img/backgrounds/stripe.gif', '/img/logos/journeyship-logo-white.png');
 addNewBackground('pattern with waves', 'il67', 'http://www.shutterstock.com/pic.mhtml?id=70950994', 'http://www.shutterstock.com/gallery-196705p1.html', '#222', '#fff', '/img/backgrounds/waves.jpg', '/img/logos/journeyship-logo-black.png');
 //addNewBackground('hand-drawn waves', 'Markovka', 'http://www.shutterstock.com/pic.mhtml?id=96193649', 'http://www.shutterstock.com/gallery-495859p1.html', '#fff', '/img/backgrounds/hand-drawn-waves.jpg', '/img/logos/journeyship-logo-purple.png');
@@ -1198,7 +1194,7 @@ function selectThisBackground (bg) {
   $bgInfo = $('.background-image-info');
   $bgInfo
     .css('color', bg.textColor)
-    .css('text-shadow', '1px 1px 0 #' + bg.textShadow)
+    .css('text-shadow', '1px 1px 0 ' + bg.textShadow)
     .children('a')
     .css('color', bg.textColor)
     .end()
@@ -1244,7 +1240,13 @@ var loadData = function (data) {
 
 var load = function () {
 
-  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+  var paths;
+
+  if (!Modernizr.history) {
+    paths = window.location.hash.match(/#(\d+)\/?(\d+)?/);
+  } else {
+    paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+  }
 
   if (paths) {
 
@@ -1311,7 +1313,13 @@ var exportData = function () {
 var saveData = function (callback) {
   storyData = exportData();
 
-  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+  var paths;
+
+  if (!Modernizr.history) {
+    paths = window.location.hash.match(/#(\d+)\/?(\d+)?/);
+  } else {
+    paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
+  }
 
   var dataToSave = {
     story: storyData
@@ -1329,8 +1337,10 @@ var saveData = function (callback) {
     success: function (result) {
       var ids = result._id.split("-");
       var id = ids[0];
-      var version = parseInt(ids[1], 10); // so there's no second slash for the first save
-      History.pushState(null, null, '/' + id + (version ? '/' + version : ''));
+      var version = parseInt(ids[1], 10); // get a number so if it's 0 there's no second slash for the first save
+
+      History.pushState(null, null, id + '/' + (version ? version + '/' : ''));
+
       version = result.version;
 
       if (callback) {

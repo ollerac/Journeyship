@@ -391,9 +391,6 @@ body.not-found {
   margin-top: 250px;
   margin-bottom: 50px;
   font-size: 14px;
-  text-shadow: 1px 1px 0px #888;
-  -moz-text-shadow: 1px 1px 0px #888;
-  -webkit-text-shadow: 1px 1px 0px #888;
 }
 
 .background-image-info a {
