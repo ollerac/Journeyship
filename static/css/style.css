@@ -168,8 +168,14 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 30px;
 }
 
-#bg-fg-switch {
+#bg-fg-switch, #bg-fg-switch-text {
   float: right;
+}
+
+#bg-fg-switch-text {
+  color: #ccc;
+  margin-right: 10px;
+  margin-top: 6px;
 }
 
 .constructor-heading-button-container {

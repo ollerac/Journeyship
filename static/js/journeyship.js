@@ -1016,9 +1016,11 @@ $.subscribe('selected-layer', function(event, update) {
 $('#bg-fg-switch').on('click', function (event) {
   event.preventDefault();
   var button = $(event.currentTarget);
+  var $noticeText = $('#bg-fg-switch-text');
 
   if (mainArea.selectedDrawableSurface().drawOnBackground) {
-    button.text('Editing Foreground');
+    button.text('Edit Background');
+    $noticeText.text('Editing Foreground Layer');
     mainArea.selectedDrawableSurface().drawOnBackground = false;
 
     $editorAreaContainer.hide();
@@ -1028,7 +1030,8 @@ $('#bg-fg-switch').on('click', function (event) {
       mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
     }
   } else {
-    button.text('Editing Background');
+    button.text('Edit Foreground');
+    $noticeText.text('Editing Background Layer');
     mainArea.selectedDrawableSurface().drawOnBackground = true;
 
     $editorAreaContainer.hide();
