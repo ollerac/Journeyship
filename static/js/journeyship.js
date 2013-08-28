@@ -50,7 +50,9 @@ colors.push('#000000'); // black
 function AnimatedBlock (layers, options) {
   var defaults = {
     uniqueId: _.uniqueId('id-'),
-    fromMainCanvas: false
+    fromMainCanvas: false,
+    type: null,
+    direction: null
   };
 
   _.extend(defaults, options);
@@ -64,6 +66,8 @@ function AnimatedBlock (layers, options) {
   self.fromMainCanvas = defaults.fromMainCanvas;
   self.mainCanvasPosition = defaults.mainCanvasPosition;
   self.mainCanvasOnBackground = defaults.mainCanvasOnBackground;
+  self.type = defaults.type;
+  self.direction = defaults.direction;
 
   _.each(layers, function (layer) {
     self.addLayer(layer);
@@ -384,7 +388,8 @@ DrawableSurface.prototype.makeDrawable = function () {
 
     if (typeof(self.selectedStyle.style) === 'object' && self.selectedStyle.info && self.selectedStyle.info.type === 'movement') {
       self.movementMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.style.layers), {
-        type: self.selectedStyle.info.type
+        type: self.selectedStyle.info.type,
+        direction: self.selectedStyle.info.direction
       });
     } else if (typeof(self.selectedStyle.style) === 'string') {
       if (self.selectedStyle.style !== 'transparent') {
@@ -440,13 +445,23 @@ DrawableSurface.prototype.makeDrawable = function () {
   });
 };
 
-DrawableSurface.prototype.renderMap = function (map) {
+DrawableSurface.prototype.renderMap = function (map, options) {
+  defaults = {
+    move: false
+  };
+
+  _.extend(defaults, options);
+
   var self = this;
   var context = self.$element[0].getContext('2d');
 
   _.each(map, function (block, index) {
     if (block) {
       var position = getCellPositionFromIndex(index, self.columns);
+
+      if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
+      // working on
+      }
 
       if (typeof(block) === 'object' && block.layers) {
         applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
@@ -478,7 +493,7 @@ DrawableSurface.prototype.renderFirstMap = function () {
 };
 
 DrawableSurface.prototype.renderSecondMap = function () {
-  this.renderMap(this.animatedMap);
+  this.renderMap(this.animatedMap, {move: true});
 };
 
 DrawableSurface.prototype.renderMovementMap = function () {
@@ -1248,7 +1263,6 @@ var load = function () {
     mainArea.setup();
 
     var movements = [];
-    // !!! working on
     // movements.push({
     //   block: new AnimatedBlock(JSON.parse(moveRight)),
     //   type: 'movement',
@@ -1399,7 +1413,7 @@ $('#export-editor-block').on('click', function (event) {
         block: editorArea.animatedBlock.layers
       },
       success: function (result) {
-        $('#export-editor-block-url').val(window.location.origin + '/block/' + result._id);
+        $('#export-editor-block-url').val(window.location.protocol + '//' + window.location.host + '/block/' + result._id);
       }
     });
   }
