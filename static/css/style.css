@@ -31,6 +31,10 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 0;
 }
 
+.area-container {
+  background: url(/img/transparent-block-bg.png);
+}
+
 .background-item {
   background-repeat: repeat;
   width: 20px;
@@ -206,6 +210,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 2px solid transparent;
   overflow: auto;
   float: left;
+  background: url(/img/transparent-block-bg.png);
+  margin: 2px;
 }
 
 .color-palette .palette-element-container.selected {
@@ -267,9 +273,9 @@ h1, h2, h3, h4, h5, h6 {
 /* Constructor */
 
 #constructor-container {
-  width: 870px;
+  width: 890px;
   margin: 30px auto 30px;
-  background-color: #DCDCDC;
+  background-color: #FFF;
   padding: 40px 40px 30px 60px;
 }
 
@@ -323,7 +329,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #constructor-color-palette {
-  width: 108px;
+  width: 122px;
 }
 
 .preview-container {

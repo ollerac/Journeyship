@@ -1400,7 +1400,9 @@ $('#import-editor-block-button').on('click', function (event) {
 
   var importUrl = $('#import-editor-block-url').val();
 
-  if (importUrl) {
+  var $clickedButton = $(event.currentTarget);
+
+  if (importUrl && $clickedButton.text() === 'Import') {
     $.ajax({
       type: 'GET',
       url: importUrl,
@@ -1408,6 +1410,11 @@ $('#import-editor-block-button').on('click', function (event) {
         editorArea.makeNewAnimatedBlock(result.block, {
           uniqueId: editorArea.animatedBlock.uniqueId
         });
+
+        $clickedButton.text('Imported!').css('color', '#00A500');
+        setTimeout(function() {
+          $clickedButton.text('Import').css('color', '#3f7de0');
+        }, 3000);
       }
     });
   }
