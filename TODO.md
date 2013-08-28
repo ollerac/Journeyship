@@ -4,11 +4,13 @@
 ### before launch
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - simple howto video or guided javascript walkthrough
+  - use https://github.com/jeff-optimizely/Guiders-JS or https://github.com/zurb/joyride, http://zurb.com/playground/jquery-joyride-feature-tour-plugin
 - cache breaker
 - selected block follows mouse on canvas
 - import/export
   - clicking export link should generate a link and there should be a 'hide' button
   - clicking import should change the button to green and say 'Imported'
+- add footer with creative commons license info and github link
 
 ### work on at home:
 - test in browsers
