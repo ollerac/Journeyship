@@ -733,12 +733,14 @@ var editorArea = {
     self.refreshSelectedStyle();
   },
   removeLayer: function (layerNum) {
+    var self = this;
+
     // don't use this directly, remove from the animatedBlock instead
     $('#constructor-area-container .constructor-area').eq(layerNum).remove();
     $('.layers .layer-container').eq(layerNum).remove();
-    this.drawableSurfaces.splice(layerNum, 1);
+    self.drawableSurfaces.splice(layerNum, 1);
 
-    if (this.drawableSurfaces.length) {
+    if (self.drawableSurfaces.length) {
       if (self.selectedLayerNum === 0) {
         self.setSelectedLayer(self.selectedLayerNum);
       } else {
