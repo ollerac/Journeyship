@@ -13,11 +13,8 @@
 - add footer with creative commons license info and github link
 
 ### work on at home:
-- test in browsers
-  - opera 
-  - IE, make it work in ie9 and 10
-  - test in firefox
-- message about unsupported browsers (test to see if IE 8 and 9 are good with history.js), maybe use modernizr
+- fix just enough bugs in ie8 to get the browser msg to display
+
 
 ### after launch:
 - invite people

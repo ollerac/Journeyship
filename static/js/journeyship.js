@@ -220,6 +220,10 @@ function getCellRowAndColumnFromIndex (index, containerColumns) {
   };
 }
 
+function getCellIndexFromRowAndColumn (row, column, columns) {
+  return (columns * row) + column;
+}
+
 function getCellRowAndColumnFromPosition (x, y, cellSize) {
   if (!cellSize) {
     cellSize = defaultCellSize;
@@ -291,7 +295,34 @@ function makeMap (cellColor, cellCount, options) {
   return map;
 }
 
+function getCellAboveThisIndex (index, columns) {
+  if (index <= columns) {
+    return null;
+  }
+  return index - columns;
+}
 
+function getCellAboveThisIndex (index, columns) {
+  if (typeof(index) === 'undefined' || typeof(columns) === 'undefined') {
+    throw('Requires index and columns');
+  }
+
+  if (index <= columns) {
+    return null;
+  }
+  return index - columns;
+}
+
+function getCellBelowThisIndex (index, rows, columns) {
+  if (typeof(index) === 'undefined' || typeof(rows) === 'undefined' || typeof(columns) === 'undefined') {
+    throw('Requires index and rows and columns');
+  }
+
+  if (index >= (rows * columns) - columns) {
+    return null;
+  }
+  return index + columns;
+}
 
 
 
@@ -451,13 +482,44 @@ DrawableSurface.prototype.renderMap = function (map, options) {
   var self = this;
   var context = self.$element[0].getContext('2d');
 
-  _.each(map, function (block, index) {
+  _.each(map, function (block, index, list) {
     if (block) {
-      var position = getCellPositionFromIndex(index, self.columns);
-
       if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
-      // working on
+        if (self.movementMap[index].direction === 'right') {
+          if (index < self.columns) {
+            index += 1;
+            list[index] = block;
+            list.splice(index, 1);
+          }
+        }
+        if (self.movementMap[index].direction === 'left') {
+          if (index > self.columns * getCellRowAndColumnFromIndex(index).row) {
+            index -= 1;
+            list[index] = block;
+            list.splice(index, 1);
+          }
+        }
+        if (self.movementMap[index].direction === 'up') {
+          var cellAbove = getCellAboveThisIndex(index);
+
+          if (cellAbove) {
+            index = cellAbove;
+            list[index] = block;
+            list.splice(index, 1);
+          }
+        }
+        if (self.movementMap[index].direction === 'up') {
+          var cellBelow = getCellBelowThisIndex(index);
+
+          if (cellBelow) {
+            index = cellBelow;
+            list[index] = block;
+            list.splice(index, 1);
+          }
+        }
       }
+
+      var position = getCellPositionFromIndex(index, self.columns);
 
       if (typeof(block) === 'object' && block.layers) {
         applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
