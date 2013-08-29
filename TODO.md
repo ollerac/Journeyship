@@ -2,21 +2,18 @@
 
 
 ### before launch
-- problem with movement blocks: dont load properly after being saved, don't cycle through animations
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - simple howto video or guided javascript walkthrough
   - use https://github.com/jeff-optimizely/Guiders-JS or https://github.com/zurb/joyride, http://zurb.com/playground/jquery-joyride-feature-tour-plugin
 - cache breaker
 - add footer with creative commons license info and github link
 
-### work on at home:
-- fix just enough bugs in ie8 to get the browser msg to display
-
 
 ### after launch:
 - invite people
 
 ### next cycle
+- gotta look into performance issues: look at http://journeyship.com/4 in firefox
 - don't use selected block to carry info about movement type, just use animated block
 - separate main js file into modules and concatenate and minify on deploy
 - selected block follows mouse on canvas
@@ -32,7 +29,6 @@
 - ? make animated blocks simple arrays, use angularjs
 - make scenes: each new scene clears the main canvas and resets all of its animated blocks
 - look into the getNextAnimationFrame method for canvas
-- gotta look into performance issues: look at http://journeyship.com/4 in firefox
 - look through priorities and organize them
 - organize code
 - simplify data model

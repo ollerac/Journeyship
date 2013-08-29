@@ -464,7 +464,7 @@ body.not-found {
   position: absolute;
   top: -20px;
   left: 15px;
-  background: #000;
+  background: #f00;
   padding: 4px 8px;
 }
 
