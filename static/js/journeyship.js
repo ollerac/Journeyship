@@ -4,6 +4,7 @@ var defaultCellSize = 60;
 var defaultEditCellSize = 30;
 var defaultTinyCellSize = 3;
 var defaultCellColor = '#fff';
+var displayMovementBlocksInMainCanvas = true;
 
 var $deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
 var $editInMainCanvasButton = $('#edit-block-from-main-canvas');
@@ -357,7 +358,9 @@ DrawableSurface.prototype.startAnimating = function () {
   self.animatedInterval = setInterval(function() {
     self.clear();
     self.renderFirstMap();
-    self.renderMovementMap();
+    if (displayMovementBlocksInMainCanvas) {
+      self.renderMovementMap();
+    }
     self.renderSecondMap();
     self.renderSelectedBlocksMap();
   }, 300);
@@ -701,7 +704,7 @@ var editorArea = {
     // layer menu setup
     var $layerElement = makeNewBlock();
     var $layerContainer = makeNewElement();
-    var $arrowElement = $('<div class="arrow"><img src="../img/arrow.png" /></div>');
+    var $arrowElement = $('<div class="arrow"><img src="/img/arrow.png" /></div>');
     $layerContainer.addClass('block area-container layer-container selected');
     $layerContainer.append($layerElement.add($arrowElement));
 
@@ -981,6 +984,20 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
   $paletteElement.on('click', function (event) {
     var $clickedElement = $(event.currentTarget);
 
+    var paletteInfo = $clickedElement.data('paletteInfo');
+    var timesSeenMovementMsg = parseInt($.cookie('timesSeenMovementMsg'), 10) || 0;
+    if (paletteInfo && paletteInfo.type === 'movement' && timesSeenMovementMsg < 6 && !$('.tooltip').length) {
+      $msgBlock = $('<div class="tooltip">Only blocks placed in the foreground can be moved</div>');
+      $clickedElement.after($msgBlock.css('color', '#fff'));
+      $.cookie('timesSeenMovementMsg', timesSeenMovementMsg + 1);
+      $msgBlock.on('click', function () {
+        $(this).remove();
+      });
+      setTimeout(function () {
+        $msgBlock.remove();
+      }, 6000);
+    }
+
     $clickedElement.siblings('.palette-element-container.selected').removeClass('selected');
     $clickedElement.addClass('selected');
 
@@ -1092,6 +1109,14 @@ $('#enable-shadow').on('click', function () {
 $.subscribe('selected-layer', function(event, update) {
   if (shadowEnabled) {
     applyShadow();
+  }
+});
+
+$('#show-movement-blocks').on('click', function () {
+  if (this.checked) {
+    displayMovementBlocksInMainCanvas = true;
+  } else {
+    displayMovementBlocksInMainCanvas = false;
   }
 });
 
@@ -1215,6 +1240,7 @@ $deleteFromMainCanvasButton.on('click', function (event) {
 
   var selectedBlock = mainArea.selectedDrawableSurface().selectedBlock;
   selectedBlock.map[selectedBlock.position] = selectedBlock.onBackground ? '#fff' : null;
+  mainArea.selectedDrawableSurface().movementMap[selectedBlock.position] = null;
 
   // reset selected block
   mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
@@ -1440,7 +1466,7 @@ var saveData = function (callback) {
       var id = ids[0];
       var version = parseInt(ids[1], 10); // get a number so if it's 0 there's no second slash for the first save
 
-      History.pushState(null, null, id + '/' + (version ? version + '/' : ''));
+      History.pushState(null, null, '/' + id + '/' + (version ? version + '/' : ''));
 
       version = result.version;
 

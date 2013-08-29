@@ -2,14 +2,11 @@
 - make 'delete' remove movement blocks no matter if fg or bg is selected
 
 ### before launch
+- selectedBlock.position
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - simple howto video or guided javascript walkthrough
   - use https://github.com/jeff-optimizely/Guiders-JS or https://github.com/zurb/joyride, http://zurb.com/playground/jquery-joyride-feature-tour-plugin
 - cache breaker
-- selected block follows mouse on canvas
-- import/export
-  - clicking export link should generate a link and there should be a 'hide' button
-  - clicking import should change the button to green and say 'Imported'
 - add footer with creative commons license info and github link
 
 ### work on at home:
@@ -20,6 +17,7 @@
 - invite people
 
 ### next cycle
+- selected block follows mouse on canvas
 - undo!!!
   - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
     - make general savedata function for this and for the general save

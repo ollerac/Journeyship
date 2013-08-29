@@ -229,6 +229,7 @@ h1, h2, h3, h4, h5, h6 {
   clear: both;
   width: 1000px;
   border-top: 1px solid #fff;
+  position: relative;
 }
 
 /* top bar */
@@ -453,9 +454,19 @@ body.not-found {
   float: right;
 }
 
+.show-movement-blocks-container {
+  display: inline-block;
+  color: #fff;
+  margin-left: 15px;
+}
 
-
-
+.tooltip {
+  position: absolute;
+  top: -20px;
+  left: 15px;
+  background: #000;
+  padding: 4px 8px;
+}
 
 
 
