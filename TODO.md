@@ -1,5 +1,5 @@
 ### working on now:
-- make 'delete' remove movement blocks no matter if fg or bg is selected
+
 
 ### before launch
 - problem with movement blocks: dont load properly after being saved, don't cycle through animations

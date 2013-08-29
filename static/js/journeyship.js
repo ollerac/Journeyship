@@ -1382,10 +1382,10 @@ var load = function () {
     mainArea.setup();
 
     var movements = [];
-    movements.push(new AnimatedBlock(JSON.parse(moveUp), {type: 'movement', direction: 'up'}));
-    movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
-    movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
-    movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
+    // movements.push(new AnimatedBlock(JSON.parse(moveUp), {type: 'movement', direction: 'up'}));
+    // movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
+    // movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
+    // movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
 
     mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
@@ -1462,36 +1462,6 @@ var saveData = function (callback) {
     }
   });
 };
-
-$.reject({
-  reject: {
-    all: false,
-    msie5: true,
-    msie6: true,
-    msie7: true,
-    msie8: true
-  },
-  header: 'Did you know that your Internet Browser is out of date?',
-  paragraph1: 'Your browser is out of date and is not compatible with '+
-        'our website. A list of the most popular web browsers can be '+
-        'found below.',
-  paragraph2: 'Just click one of the icons to go to their download page.',
-  close: false,
-  browserInfo: {
-    firefox: {
-      text: 'Firefox 23'
-    },
-    chrome: {
-      text: 'Chrome 29'
-    },
-    msie: {
-      text: 'Internet Explorer 9 & 10'
-    },
-    safari: {
-      text: 'Safari 6'
-    }
-  }
-});
 
 
 $('#import-editor-block').on('click', function (event) {
