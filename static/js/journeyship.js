@@ -329,7 +329,7 @@ function getCellBelowThisIndex (index, rows, columns) {
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, secondLayer) {
+function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, secondLayer, movementMap) {
   var self = this;
   self.$element = $element;
   self.cellSize = cellSize || defaultCellSize;
@@ -339,7 +339,7 @@ function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, seco
   self.defaultCellColor = defaultCellColor || '#fff';
   self.map = firstLayer || self.makeMap(self.defaultCellColor); //background, also potentially animated
   self.animatedMap = secondLayer || self.makeMap(null); // foreground
-  self.movementMap = self.makeMap(null);
+  self.movementMap = movementMap || self.makeMap(null);
   self.selectedBlocksMap = [];
   self.animatedInterval = null;
   self.drawOnBackground = true;
@@ -492,27 +492,12 @@ DrawableSurface.prototype.renderMap = function (map, options) {
 
     if (block && skipThese.indexOf(index) === -1) {
 
-      var position = getCellPositionFromIndex(newIndex, self.columns);
-
-      if (typeof(block) === 'object' && block.layers) {
-        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
-          x: position.x,
-          y: position.y
-        });
-      } else {
-        drawCell(context, position.x, position.y, defaultCellSize, block);
-      }
-
       if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
         if (self.movementMap[index].direction === 'right') {
           if (index % self.columns !== 0) {
             newIndex = index + 1;
 
-            if (typeof(block) === 'object' && block.layers) {
-              list[newIndex] = new AnimatedBlock(_.cloneDeep(block.layers));
-            } else {
-              list[newIndex] = block;
-            }
+            list[newIndex] = block;
 
             skipThese.push(newIndex);
             
@@ -522,11 +507,7 @@ DrawableSurface.prototype.renderMap = function (map, options) {
           if (index > self.columns * getCellRowAndColumnFromIndex(index, self.columns).row) {
             newIndex = index - 1;
 
-            if (typeof(block) === 'object' && block.layers) {
-              list[newIndex] = new AnimatedBlock(_.cloneDeep(block.layers));
-            } else {
-              list[newIndex] = block;
-            }
+            list[newIndex] = block;
 
             list[index] = null;
           }
@@ -550,6 +531,18 @@ DrawableSurface.prototype.renderMap = function (map, options) {
           }
         }
       }
+
+      var position = getCellPositionFromIndex(newIndex, self.columns);
+
+      if (typeof(block) === 'object' && block.layers) {
+        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
+          x: position.x,
+          y: position.y
+        });
+      } else {
+        drawCell(context, position.x, position.y, defaultCellSize, block);
+      }
+
     }
   });
 };
@@ -864,8 +857,8 @@ var mainArea = {
   selectedDrawableSurface: function () {
     return this.drawableSurfaces[0];
   },
-  setup: function (firstLayer, secondLayer) {
-    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, '#fff', firstLayer, secondLayer));
+  setup: function (firstLayer, secondLayer, movementMap) {
+    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, '#fff', firstLayer, secondLayer, movementMap));
     this.selectedDrawableSurface().startAnimating();
   }
 };
@@ -1337,9 +1330,10 @@ var loadData = function (data) {
   replaceLayersWithAnimatedBlocks(data.main.palette);
   replaceLayersWithAnimatedBlocks(data.main.firstLayer);
   replaceLayersWithAnimatedBlocks(data.main.secondLayer);
+  replaceLayersWithAnimatedBlocks(data.main.movementMap);
 
   editorArea.setup(data.editor.animatedBlock.layers);
-  mainArea.setup(data.main.firstLayer, data.main.secondLayer);
+  mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
 
   mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
@@ -1382,10 +1376,10 @@ var load = function () {
     mainArea.setup();
 
     var movements = [];
-    // movements.push(new AnimatedBlock(JSON.parse(moveUp), {type: 'movement', direction: 'up'}));
-    // movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
-    // movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
-    // movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveUp), {type: 'movement', direction: 'up'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
 
     mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
@@ -1400,6 +1394,7 @@ var exportData = function () {
   var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
   var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
   var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
+  var movementMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().movementMap));
 
   var storyData = {
     editor: {
@@ -1410,7 +1405,8 @@ var exportData = function () {
     main: {
       palette: mainPaletteMap,
       firstLayer: firstLayerMap,
-      secondLayer: secondLayerMap
+      secondLayer: secondLayerMap,
+      movementMap: movementMap
     },
     options: {
       selectedBackground: selectedBackgroundImage
