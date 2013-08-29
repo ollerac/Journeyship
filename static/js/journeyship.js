@@ -491,10 +491,21 @@ DrawableSurface.prototype.renderMap = function (map, options) {
     var newIndex = index;
 
     if (block && skipThese.indexOf(index) === -1) {
+
+      var position = getCellPositionFromIndex(newIndex, self.columns);
+
+      if (typeof(block) === 'object' && block.layers) {
+        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
+          x: position.x,
+          y: position.y
+        });
+      } else {
+        drawCell(context, position.x, position.y, defaultCellSize, block);
+      }
+
       if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
         if (self.movementMap[index].direction === 'right') {
           if (index % self.columns !== 0) {
-            console.log('right', list[index + 1], list[index], list);
             newIndex = index + 1;
 
             if (typeof(block) === 'object' && block.layers) {
@@ -509,7 +520,6 @@ DrawableSurface.prototype.renderMap = function (map, options) {
           }
         } else if (self.movementMap[index].direction === 'left') {
           if (index > self.columns * getCellRowAndColumnFromIndex(index, self.columns).row) {
-            console.log('left', list[index - 1], list[index]);
             newIndex = index - 1;
 
             if (typeof(block) === 'object' && block.layers) {
@@ -539,17 +549,6 @@ DrawableSurface.prototype.renderMap = function (map, options) {
             skipThese.push(cellBelow);
           }
         }
-      }
-
-      var position = getCellPositionFromIndex(newIndex, self.columns);
-
-      if (typeof(block) === 'object' && block.layers) {
-        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
-          x: position.x,
-          y: position.y
-        });
-      } else {
-        drawCell(context, position.x, position.y, defaultCellSize, block);
       }
     }
   });
@@ -959,8 +958,8 @@ ColorPalette.prototype.addStyle = function (value) {
   var paletteElement;
 
   if (typeof(value) === 'object' && value.type && value.type === 'movement') {
-    this.addMapValue(value.block);
-    paletteElement = this.generatePaletteElement(value.block, {type: value.type, direction: value.direction});
+    this.addMapValue(value);
+    paletteElement = this.generatePaletteElement(value, {type: value.type, direction: value.direction});
   } else {
     this.addMapValue(value);
     paletteElement = this.generatePaletteElement(value);
@@ -1280,7 +1279,7 @@ function addNewBackground (name, author, nameUrl, authorUrl, textColor, textShad
 addNewBackground('Wild Olivia', 'Badhon Ebrahim', 'http://subtlepatterns.com/wild-oliva/', 'http://dribbble.com/graphcoder', '#fff', '#333', '/img/backgrounds/wild_oliva.png', '/img/logos/journeyship-logo-white.png');
 addNewBackground('Shattered', 'Luuk van Baars', 'http://subtlepatterns.com/shattered/', 'http://luukvanbaars.com/', '#222', '#fff', '/img/backgrounds/shattered.png', '/img/logos/journeyship-logo.png');
 addNewBackground('Tree Bark', 'GetDiscount', 'http://subtlepatterns.com/tree-bark/', 'http://getdiscount.co.uk/', '#222', '#fff', '/img/backgrounds/tree_bark.png', '/img/logos/journeyship-logo.png');
-addNewBackground('Tweed', 'Simon Leo', 'http://subtlepatterns.com/tweed/', '#', '#fff', '#333', '/img/backgrounds/tweed.png', '/img/logos/journeyship-logo-blue.png');
+addNewBackground('Tweed', 'Simon Leo', 'http://subtlepatterns.com/tweed/', '#', '#fff', '#333', '/img/backgrounds/tweed.png', '/img/logos/journeyship-logo.png');
 addNewBackground('DinPattern Blueprint', 'Evan Eckard', 'http://www.dinpattern.com/2011/05/31/blueprint/', 'http://www.evaneckard.com/', '#222', '#fff', '/img/backgrounds/blueprint.gif', '/img/logos/journeyship-logo.png');
 addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '#222', '#fff', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
 addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '#fff', '#333', '/img/backgrounds/party-lights.jpg', '/img/logos/journeyship-logo-orange.png');
@@ -1383,26 +1382,10 @@ var load = function () {
     mainArea.setup();
 
     var movements = [];
-    movements.push({
-      block: new AnimatedBlock(JSON.parse(moveUp)),
-      type: 'movement',
-      direction: 'up'
-    });
-    movements.push({
-      block: new AnimatedBlock(JSON.parse(moveDown)),
-      type: 'movement',
-      direction: 'down'
-    });
-    movements.push({
-      block: new AnimatedBlock(JSON.parse(moveRight)),
-      type: 'movement',
-      direction: 'right'
-    });
-    movements.push({
-      block: new AnimatedBlock(JSON.parse(moveLeft)),
-      type: 'movement',
-      direction: 'left'
-    });
+    movements.push(new AnimatedBlock(JSON.parse(moveUp), {type: 'movement', direction: 'up'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
+    movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
 
     mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);

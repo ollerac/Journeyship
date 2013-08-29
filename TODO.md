@@ -2,7 +2,7 @@
 - make 'delete' remove movement blocks no matter if fg or bg is selected
 
 ### before launch
-- selectedBlock.position
+- problem with movement blocks: dont load properly after being saved, don't cycle through animations
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - simple howto video or guided javascript walkthrough
   - use https://github.com/jeff-optimizely/Guiders-JS or https://github.com/zurb/joyride, http://zurb.com/playground/jquery-joyride-feature-tour-plugin
@@ -17,6 +17,8 @@
 - invite people
 
 ### next cycle
+- don't use selected block to carry info about movement type, just use animated block
+- separate main js file into modules and concatenate and minify on deploy
 - selected block follows mouse on canvas
 - undo!!!
   - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
