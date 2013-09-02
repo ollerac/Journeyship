@@ -341,7 +341,7 @@ function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, seco
   self.animatedMap = secondLayer || self.makeMap(null); // foreground
   self.movementMap = movementMap || self.makeMap(null);
   self.selectedBlocksMap = [];
-  self.animatedInterval = null;
+  self.stopAnimation = false;
   self.drawOnBackground = true;
 
   // setup
@@ -354,20 +354,30 @@ DrawableSurface.prototype.clear = function () {
 
 DrawableSurface.prototype.startAnimating = function () {
   var self = this;
+  var fps = 3;
+  self.stopAnimation = false;
 
-  self.animatedInterval = setInterval(function() {
-    self.clear();
-    self.renderFirstMap();
-    if (displayMovementBlocksInMainCanvas) {
-      self.renderMovementMap();
+  function draw () {
+    if (!self.stopAnimation) {
+      setTimeout(function() {
+        requestAnimationFrame (draw);
+
+        self.clear();
+        self.renderFirstMap();
+        if (displayMovementBlocksInMainCanvas) {
+          self.renderMovementMap();
+        }
+        self.renderSecondMap();
+        self.renderSelectedBlocksMap();
+      }, 1000 / fps);
     }
-    self.renderSecondMap();
-    self.renderSelectedBlocksMap();
-  }, 300);
+  }
+
+  draw();
 };
 
 DrawableSurface.prototype.pauseAnimating = function () {
-  clearInterval(this.animatedInterval);
+  this.stopAnimation = true;
 };
 
 DrawableSurface.prototype.makeMap = function (cellColor) {
@@ -485,6 +495,7 @@ DrawableSurface.prototype.renderMap = function (map, options) {
   var self = this;
   var context = self.$element[0].getContext('2d');
 
+  // skips places where a block was moved into so it doesn't cause a chain reaction (this documentation should be better, i know)
   var skipThese = [];
 
   _.each(map, function (block, index, list) {

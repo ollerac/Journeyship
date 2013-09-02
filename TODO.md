@@ -5,18 +5,28 @@
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - simple howto video or guided javascript walkthrough
   - use https://github.com/jeff-optimizely/Guiders-JS or https://github.com/zurb/joyride, http://zurb.com/playground/jquery-joyride-feature-tour-plugin
+    - no, use 
 - cache breaker
 - add footer with creative commons license info and github link
+- canvas performance
+  - try this: draw all colors at one time
+    - first step, try just setting one color for the context color at the top level
+      - didn't help
+  - replaced main setInterval with requestAnimationFrame
+  - bulk editing rectangles before filling them -- didn't work for some reason... frustrating
+
 
 
 ### after launch:
 - invite people
 
 ### next cycle
+- checkbox: only show the selected layer
 - gotta look into performance issues: look at http://journeyship.com/4 in firefox
 - don't use selected block to carry info about movement type, just use animated block
 - separate main js file into modules and concatenate and minify on deploy
 - selected block follows mouse on canvas
+- show a list of recently creating journeyships
 - undo!!!
   - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
     - make general savedata function for this and for the general save
@@ -40,6 +50,7 @@
 - drag layers up and down in editor
 
 ### would be *really* nice to have:
+- replace other setIntervals with requestAnimationFrame
 - maybe lighten the backgrounds a bit
 - after user accounts: save blocks from other people's projects into yours
 - edit more space, more than one block
