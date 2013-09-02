@@ -1,21 +1,10 @@
+### general
+- backward compatability is hard, would be a good thing to get better at
+
 ### working on now:
 - need to implement loading indicator and stop the browser from freezing when loading big projects
 
 ### launch date: monday, september 9th
-- canvas performance, pre-render all blocks
-  - no: maybe store references to these canvas blocks on special properties of the mainArea and editorArea and then also in the data attributes of the color palette animated elements?
-    -instead: store the reference to the canvas blocks on the animated blocks themselves, then just update all animated blocks with the same id when one of them is updated. be careful what you give the same id.
-  - all animated blocks in the main canvas should have the same id as the block they were painted from, unless they were edited afterwards by selecting a block
-  - add pre-rendered blocks on load
-    - each animated block in main color palette
-    - each animated block in main canvas area (fg and bg), if it doesn't have the same id as one already in the main color palette
-  - add pre-rendered block on update
-    - updating an editor block that's from the main color palette
-    - updating a main canvas block (and the corresponding main color palette block if there is one)
-  - change how animations happen, grab from pre-rendered blocks
-    - editor block animation
-    - each main color palette animated block
-    - each main canvas block (fg and bg) animated block
 - more starting blocks, like trees and people and dogs and flowing water and boats
 - add footer
   - creative commons license info 
@@ -34,6 +23,14 @@
 - use cache breaker (part of yeoman or grunt or bower?)
 
 ### next cycle
+- need better test animations to see if things are working going forward
+- easy: make function for animated blocks called 'replacelayers' that accepts layers as arguments and replaces the current ones. use this in the '#save-block' area instead of what's there. and then use regeneratePrerenderedLayers inside this new function
+- prerendered blocks
+  - currently i'm regenerating the prerendered canvas blocks every time a layer is added or changed or updated. i should just regenerate the ones that need it
+    - onchange: use _.isEqual to compare each layer and only regenerate the layer that needs to be regenerated, function: addPrerenderedLayerFor(layerIndex)
+    - on add: make a function addPrerenderedLayerAt(index)
+    - on delete: make a function deletePrerenderedLayerAt(index)
+  - currently each animated block had its own prerendered blocks. this isn't necessary if they have the same id as a block that was already created. blocks should have the same id if they weren't edited separately by using the 'select' button. this way they can all be updated at the same time. this will also save a lot of memory
 - movement blocks
   - button: 'reset position' for blocks that have been moved
 - checkbox: only show the selected layer

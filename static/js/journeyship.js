@@ -195,10 +195,11 @@ AnimatedBlock.prototype.animate = function () {
 
 AnimatedBlock.prototype.startAnimation = function () {
   var self = this;
+  var fps = 3;
 
   self.animationInterval = setInterval(function () {
     self.animate();
-  }, 300);
+  }, 1000 / fps);
 };
 
 AnimatedBlock.prototype.pauseAnimation = function () {
@@ -1384,10 +1385,12 @@ var spinnerOpts = {
   length: 50,
   color: '#fff'
 };
-var target = document.getElementById('load');
-var spinner = new Spinner(spinnerOpts).spin(target);
 
 var loadData = function (data) {
+  var target = document.getElementById('load');
+  target.style.display = 'block';
+  var spinner = new Spinner(spinnerOpts).spin(target);
+
   var finishedNum = 0;
   $.subscribe('finishedProcessingLayersAsAnimatedBlocks', function (event) {
     finishedNum = finishedNum + 1;

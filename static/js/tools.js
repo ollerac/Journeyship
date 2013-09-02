@@ -63,16 +63,21 @@ function processArray(items, process) {
 }
 
 function replaceLayersWithAnimatedBlocks (map) {
-  processArray(map, function (value, index) {
-    if (_.isObject(value) && value.type === 'movement') {
-      map[index] = new AnimatedBlock(value.layers, {type: value.type, direction: value.direction});
-    } else if (_.isArray(value) && value.length > 0) {
-      map[index] = new AnimatedBlock(value);
-    } else if (typeof(value) === 'object' && value && value.length === 0) {
-      // temporary fix for null layers that were saved with no layers
-      map[index] = null;
-    }
-  });
+  if (map) {
+    processArray(map, function (value, index) {
+      if (_.isObject(value) && value.type === 'movement') {
+        map[index] = new AnimatedBlock(value.layers, {type: value.type, direction: value.direction});
+      } else if (_.isArray(value) && value.length > 0) {
+        map[index] = new AnimatedBlock(value);
+      } else if (typeof(value) === 'object' && value && value.length === 0) {
+        // temporary fix for null layers that were saved with no layers
+        map[index] = null;
+      }
+    });
+  } else {
+    // hack: movementMap isn't there
+    $.publish('finishedProcessingLayersAsAnimatedBlocks');
+  }
 }
 
 function replaceAnimatedBlocksWithTheirLayers (map) {

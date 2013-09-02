@@ -479,6 +479,7 @@ body.not-found {
   border-radius: 10px;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
+  display: none;
 }
 
 #big-one {
