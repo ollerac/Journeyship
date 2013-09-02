@@ -1,32 +1,42 @@
 ### working on now:
 
 
-### before launch
+### launch date: monday, september 9th
+- canvas performance, pre-render all blocks
+  - maybe store references to these canvas blocks on special properties of the mainArea and editorArea and then also in the data attributes of the color palette animated elements?
+  - all animated blocks in the main canvas should have the same id as the block they were painted from, unless they were edited afterwards by selecting a block
+  - add pre-rendered blocks on load
+    - each animated block in main color palette
+    - each animated block in main canvas area (fg and bg), if it doesn't have the same id as one already in the main color palette
+  - add pre-rendered block on update
+    - updating an editor block that's from the main color palette
+    - updating a main canvas block (and the corresponding main color palette block if there is one)
+  - change how animations happen, grab from pre-rendered blocks
+    - editor block animation
+    - each main color palette animated block
+    - each main canvas block (fg and bg) animated block
 - more starting blocks, like trees and people and dogs and flowing water and boats
-- simple howto video or guided javascript walkthrough
-  - use https://github.com/jeff-optimizely/Guiders-JS or https://github.com/zurb/joyride, http://zurb.com/playground/jquery-joyride-feature-tour-plugin
-    - no, use 
-- cache breaker
 - add footer with creative commons license info and github link
-- canvas performance
-  - try this: draw all colors at one time
-    - first step, try just setting one color for the context color at the top level
-      - didn't help
-  - replaced main setInterval with requestAnimationFrame
-  - bulk editing rectangles before filling them -- didn't work for some reason... frustrating
+- simple howto video or guided javascript walkthrough
+  - use hopscotch
 
-
-
-### after launch:
+### after launch
 - invite people
 
+### after launch
+- minify and concatenate js
+- start using a css preprocessor
+- use cache breaker (part of yeoman or grunt or bower?)
+
 ### next cycle
+- movement blocks
+  - button: 'reset position' for blocks that have been moved
 - checkbox: only show the selected layer
 - gotta look into performance issues: look at http://journeyship.com/4 in firefox
 - don't use selected block to carry info about movement type, just use animated block
 - separate main js file into modules and concatenate and minify on deploy
 - selected block follows mouse on canvas
-- show a list of recently creating journeyships
+- show a list of recently created journeyships
 - undo!!!
   - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
     - make general savedata function for this and for the general save

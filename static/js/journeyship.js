@@ -1541,3 +1541,39 @@ $('#export-editor-block-url').on({
 });
 
 
+function drawMario (cnvs) {
+  cnvs.fillStyle = 'red';
+  cnvs.fillRect(5,5,20,20);
+}
+
+var m_canvas = document.createElement('canvas');
+m_canvas.width = 60;
+m_canvas.height = 60;
+var m_context = m_canvas.getContext('2d');
+drawMario(m_context);
+
+function render() {
+  mainArea.selectedDrawableSurface().$element[0].getContext('2d').drawImage(m_canvas, 0, 0);
+  //requestAnimationFrame(render);
+}
+
+render();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
