@@ -39,21 +39,40 @@ function makeNewBlock (size) {
   return block;
 }
 
+var startTime = +new Date();
+var endCounter = false;
 
+function processArray(items, process) {
+  var idx = 0;
+  var todo = items.concat();
+
+  setTimeout(function() {
+    process(todo.shift(), idx);
+    if(todo.length > 0) {
+      idx++;
+      setTimeout(arguments.callee, 25);
+    } else {
+      $.publish('finishedProcessingLayersAsAnimatedBlocks');
+    }
+
+    if (!endCounter && +new Date() - startTime > 5000) {
+      $.publish('bigOne');
+      endCounter = true;
+    }
+  }, 25);
+}
 
 function replaceLayersWithAnimatedBlocks (map) {
-  _.each(map, function (value, index, list) {
+  processArray(map, function (value, index) {
     if (_.isObject(value) && value.type === 'movement') {
-      list[index] = new AnimatedBlock(value.layers, {type: value.type, direction: value.direction});
+      map[index] = new AnimatedBlock(value.layers, {type: value.type, direction: value.direction});
     } else if (_.isArray(value) && value.length > 0) {
-      list[index] = new AnimatedBlock(value);
+      map[index] = new AnimatedBlock(value);
     } else if (typeof(value) === 'object' && value && value.length === 0) {
       // temporary fix for null layers that were saved with no layers
-      list[index] = null;
+      map[index] = null;
     }
   });
-
-  return map;
 }
 
 function replaceAnimatedBlocksWithTheirLayers (map) {

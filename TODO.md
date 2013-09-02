@@ -1,9 +1,10 @@
 ### working on now:
-
+- need to implement loading indicator and stop the browser from freezing when loading big projects
 
 ### launch date: monday, september 9th
 - canvas performance, pre-render all blocks
-  - maybe store references to these canvas blocks on special properties of the mainArea and editorArea and then also in the data attributes of the color palette animated elements?
+  - no: maybe store references to these canvas blocks on special properties of the mainArea and editorArea and then also in the data attributes of the color palette animated elements?
+    -instead: store the reference to the canvas blocks on the animated blocks themselves, then just update all animated blocks with the same id when one of them is updated. be careful what you give the same id.
   - all animated blocks in the main canvas should have the same id as the block they were painted from, unless they were edited afterwards by selecting a block
   - add pre-rendered blocks on load
     - each animated block in main color palette
@@ -16,7 +17,11 @@
     - each main color palette animated block
     - each main canvas block (fg and bg) animated block
 - more starting blocks, like trees and people and dogs and flowing water and boats
-- add footer with creative commons license info and github link
+- add footer
+  - creative commons license info 
+  - github link
+  - social share buttons
+
 - simple howto video or guided javascript walkthrough
   - use hopscotch
 

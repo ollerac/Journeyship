@@ -173,7 +173,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #bg-fg-switch-text {
-  color: #ccc;
+  color: #ffcd82;
   margin-right: 10px;
   margin-top: 6px;
 }
@@ -468,9 +468,27 @@ body.not-found {
   padding: 4px 8px;
 }
 
+#load {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: #111;
+  width: 300px;
+  height: 300px;
+  z-index: 1000;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
 
-
-
+#big-one {
+  display: none;
+  color: #fff;
+  position: absolute;
+  bottom: 12px;
+  left: 10px;
+  font-size: 18px;
+}
 
 
 

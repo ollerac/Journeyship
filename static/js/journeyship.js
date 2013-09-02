@@ -48,6 +48,20 @@ colors.push('#000000'); // black
 
 // setup animated block
 
+function generatePrerenderedLayers(layers) {
+  var prerenderedLayers = [];
+  _.each(layers, function (layer) {
+    var canvasLayer = document.createElement('canvas');
+    canvasLayer.width = defaultCellSize;
+    canvasLayer.height = defaultCellSize;
+    var canvasContext = canvasLayer.getContext('2d');
+    applyMapToContext(layer, canvasContext, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize);
+    prerenderedLayers.push(canvasLayer);
+  });
+
+  return prerenderedLayers;
+}
+
 function AnimatedBlock (layers, options) {
   var defaults = {
     uniqueId: _.uniqueId('id-'),
@@ -60,7 +74,8 @@ function AnimatedBlock (layers, options) {
 
   var self = this;
   self.layers = [];
-  self.layerIndex = -1;
+  self.prerenderedLayers = [];
+  self.layerIndex = 0;
   self.animationInterval = null;
   self.$animatedElement = null;
   self.uniqueId = defaults.uniqueId;
@@ -73,14 +88,20 @@ function AnimatedBlock (layers, options) {
   _.each(layers, function (layer) {
     self.addLayer(layer);
   });
+
+  self.prerenderedLayers = generatePrerenderedLayers(self.layers);
 }
+
+AnimatedBlock.prototype.regeneratePrerenderedLayers = function () {
+  this.prerenderedLayers = generatePrerenderedLayers(this.layers);
+};
 
 AnimatedBlock.prototype.clearAnimation = function () {
   this.$animatedElement[0].getContext('2d').clearRect(0,0,this.$animatedElement[0].width,this.$animatedElement[0].height);
 };
 
 AnimatedBlock.prototype.resetIndex = function () {
-  this.layerIndex = -1;
+  this.layerIndex = 0;
 };
 
 AnimatedBlock.prototype.addLayer = function (value, layerNumOption) {
@@ -102,6 +123,8 @@ AnimatedBlock.prototype.addLayer = function (value, layerNumOption) {
     animatedBlock: this,
     layerNum: layerNum
   });
+
+  this.prerenderedLayers = generatePrerenderedLayers(this.layers);
 };
 
 AnimatedBlock.prototype.addLayers = function (layers) {
@@ -119,11 +142,15 @@ AnimatedBlock.prototype.changeLayerValue = function (layerNum, indexNum, newValu
   }
 
   this.layers[layerNum][indexNum] = newValue;
+
+  this.prerenderedLayers = generatePrerenderedLayers(this.layers);
 };
 
 AnimatedBlock.prototype.removeLayer = function (layerNum) {
   this.layers.splice(layerNum, 1);
   $.publish('removed-layer', layerNum);
+
+  this.prerenderedLayers = generatePrerenderedLayers(this.layers);
 };
 
 AnimatedBlock.prototype.removeAllLayers = function () {
@@ -131,28 +158,39 @@ AnimatedBlock.prototype.removeAllLayers = function () {
   _.each(self.layers, function (layer, index) {
     self.removeLayer(0);
   });
+
+  self.prerenderedLayers = generatePrerenderedLayers(self.layers);
 };
 
 AnimatedBlock.prototype.nextLayer = function () {
-  this.layerIndex++;
+  return this.layers[this.nextLayerNum()];
+};
 
+AnimatedBlock.prototype.nextLayerNum = function () {
   if (this.layers.length) {
-    if (this.layerIndex == this.layers.length) {
+    var newLayerIndex = this.layerIndex;
+
+    if (this.layerIndex + 1 === this.layers.length) {
       this.layerIndex = 0;
-      return this.layers[this.layerIndex];
     } else {
-      return this.layers[this.layerIndex];
+      this.layerIndex = this.layerIndex + 1;
     }
+
+    return newLayerIndex;
   }
 };
 
 AnimatedBlock.prototype.animate = function () {
   var self = this;
-  var context = self.$animatedElement[0].getContext('2d');
-  var layer = self.nextLayer();
-  // this should show and hide elements instead of drawing over and over again
-  self.clearAnimation();
-  applyMapToContext(layer, context, defaultTinyCellSize, self.$animatedElement.width() / defaultTinyCellSize);
+
+  if (this.layers.length) {
+    var context = self.$animatedElement[0].getContext('2d');
+    self.clearAnimation();
+    if (this.prerenderedLayers.length) {
+      var prerenderedLayer = this.prerenderedLayers[this.nextLayerNum()];
+      context.drawImage(prerenderedLayer, 0, 0);
+    }
+  }
 };
 
 AnimatedBlock.prototype.startAnimation = function () {
@@ -546,10 +584,10 @@ DrawableSurface.prototype.renderMap = function (map, options) {
       var position = getCellPositionFromIndex(newIndex, self.columns);
 
       if (typeof(block) === 'object' && block.layers) {
-        applyMapToContext(block.nextLayer(), context, defaultTinyCellSize, defaultCellSize / defaultTinyCellSize, {
-          x: position.x,
-          y: position.y
-        });
+        if (block.prerenderedLayers.length) {
+          var prerenderedLayer = block.prerenderedLayers[block.nextLayerNum()];
+          context.drawImage(prerenderedLayer, position.x, position.y);
+        }
       } else {
         drawCell(context, position.x, position.y, defaultCellSize, block);
       }
@@ -976,6 +1014,7 @@ ColorPalette.prototype.saveCustomBlock = function (layers, id) {
   var matchingBlock = this.getBlockWithId(id);
   if (matchingBlock) {
     matchingBlock.matchingBlock.layers = layers;
+    matchingBlock.matchingBlock.regeneratePrerenderedLayers();
   }
 };
 
@@ -1025,6 +1064,7 @@ $.subscribe('selected-style', function (event, update) {
   disableMainCanvasSelect();
 });
 
+//!!!
 $('#new-block').on('click', function (event) {
   event.preventDefault();
   $('#constructor-container').show();
@@ -1038,18 +1078,21 @@ $('#save-block').on('click', function (event) {
   var animBlock = editorArea.animatedBlock;
 
   if (animBlock.fromMainCanvas) {
+    // update the animated block at the saved position with the new layers
     if (animBlock.mainCanvasOnBackground) {
       mainArea.selectedDrawableSurface().map[animBlock.mainCanvasPosition].layers = _.cloneDeep(animBlock.layers);
+      mainArea.selectedDrawableSurface().map[animBlock.mainCanvasPosition].regeneratePrerenderedLayers();
     } else {
       mainArea.selectedDrawableSurface().animatedMap[animBlock.mainCanvasPosition].layers = _.cloneDeep(animBlock.layers);
+      mainArea.selectedDrawableSurface().animatedMap[animBlock.mainCanvasPosition].regeneratePrerenderedLayers();
     }
 
+    // reset the index of all animated blocks on fg and bg layer
     _.each(mainArea.selectedDrawableSurface().map, function (block) {
       if (block && typeof(block) === 'object' && block.layers) {
         block.resetIndex();
       }
     });
-
     _.each(mainArea.selectedDrawableSurface().animatedMap, function (block) {
       if (block && typeof(block) === 'object' && block.layers) {
         block.resetIndex();
@@ -1336,17 +1379,37 @@ var version;
 var colors;
 var mainColorPalette;
 var editorAreaColorPalette;
+var spinnerOpts = {
+  radius: 60,
+  length: 50,
+  color: '#fff'
+};
+var target = document.getElementById('load');
+var spinner = new Spinner(spinnerOpts).spin(target);
 
 var loadData = function (data) {
+  var finishedNum = 0;
+  $.subscribe('finishedProcessingLayersAsAnimatedBlocks', function (event) {
+    finishedNum = finishedNum + 1;
+    if (finishedNum === 4) {
+      spinner.stop();
+      target.remove();
+
+      mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
+      mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
+    }
+  });
+
+  $.subscribe('bigOne', function () {
+    $('#big-one').show();
+  });
+
   replaceLayersWithAnimatedBlocks(data.main.palette);
   replaceLayersWithAnimatedBlocks(data.main.firstLayer);
   replaceLayersWithAnimatedBlocks(data.main.secondLayer);
   replaceLayersWithAnimatedBlocks(data.main.movementMap);
 
   editorArea.setup(data.editor.animatedBlock.layers);
-  mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
-
-  mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
 
   selectThisBackground(data.options.selectedBackground);
@@ -1395,6 +1458,9 @@ var load = function () {
     mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
     selectThisBackground(backgrounds[_.random(backgrounds.length - 1)]);
+
+    spinner.stop();
+    target.remove();
   }
 
 };
@@ -1541,23 +1607,7 @@ $('#export-editor-block-url').on({
 });
 
 
-function drawMario (cnvs) {
-  cnvs.fillStyle = 'red';
-  cnvs.fillRect(5,5,20,20);
-}
 
-var m_canvas = document.createElement('canvas');
-m_canvas.width = 60;
-m_canvas.height = 60;
-var m_context = m_canvas.getContext('2d');
-drawMario(m_context);
-
-function render() {
-  mainArea.selectedDrawableSurface().$element[0].getContext('2d').drawImage(m_canvas, 0, 0);
-  //requestAnimationFrame(render);
-}
-
-render();
 
 
 
