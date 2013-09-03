@@ -42,7 +42,7 @@ function makeNewBlock (size) {
 var startTime = +new Date();
 var endCounter = false;
 
-function processArray(items, process) {
+function processArray(items, process, finished) {
   var idx = 0;
   var todo = items.concat();
 
@@ -52,7 +52,7 @@ function processArray(items, process) {
       idx++;
       setTimeout(arguments.callee, 25);
     } else {
-      $.publish('finishedProcessingLayersAsAnimatedBlocks');
+      finished();
     }
 
     if (!endCounter && +new Date() - startTime > 5000) {
@@ -62,7 +62,7 @@ function processArray(items, process) {
   }, 25);
 }
 
-function replaceLayersWithAnimatedBlocks (map) {
+function replaceLayersWithAnimatedBlocks (map, eventNameWhenDone) {
   if (map) {
     processArray(map, function (value, index) {
       if (_.isObject(value) && value.type === 'movement') {
@@ -73,10 +73,12 @@ function replaceLayersWithAnimatedBlocks (map) {
         // temporary fix for null layers that were saved with no layers
         map[index] = null;
       }
+    }, function () {
+      $.publish(eventNameWhenDone);
     });
   } else {
     // hack: movementMap isn't there
-    $.publish('finishedProcessingLayersAsAnimatedBlocks');
+    $.publish(eventNameWhenDone);
   }
 }
 

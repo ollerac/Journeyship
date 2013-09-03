@@ -540,11 +540,13 @@ DrawableSurface.prototype.renderMap = function (map, options) {
   _.each(map, function (block, index, list) {
     var newIndex = index;
 
+    // this doesn't make sense for skipThese, look into this
     if (block && skipThese.indexOf(index) === -1) {
 
       if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
+        
         if (self.movementMap[index].direction === 'right') {
-          if (index % self.columns !== 0) {
+          if (index === 0 || index % self.columns !== 0) {
             newIndex = index + 1;
 
             list[newIndex] = block;
@@ -1324,17 +1326,17 @@ function addNewBackground (name, author, nameUrl, authorUrl, textColor, textShad
   backgrounds.push(newBackground);
 }
 
-addNewBackground('Wild Olivia', 'Badhon Ebrahim', 'http://subtlepatterns.com/wild-oliva/', 'http://dribbble.com/graphcoder', '#fff', '#333', '/img/backgrounds/wild_oliva.png', '/img/logos/journeyship-logo-white.png');
+addNewBackground('Wild Olivia', 'Badhon Ebrahim', 'http://subtlepatterns.com/wild-oliva/', 'http://dribbble.com/graphcoder', '#fff', '#333', '/img/backgrounds/wild_oliva.png', '/img/logos/journeyship-logo.png');
 addNewBackground('Shattered', 'Luuk van Baars', 'http://subtlepatterns.com/shattered/', 'http://luukvanbaars.com/', '#222', '#fff', '/img/backgrounds/shattered.png', '/img/logos/journeyship-logo.png');
 addNewBackground('Tree Bark', 'GetDiscount', 'http://subtlepatterns.com/tree-bark/', 'http://getdiscount.co.uk/', '#222', '#fff', '/img/backgrounds/tree_bark.png', '/img/logos/journeyship-logo.png');
 addNewBackground('Tweed', 'Simon Leo', 'http://subtlepatterns.com/tweed/', '#', '#fff', '#333', '/img/backgrounds/tweed.png', '/img/logos/journeyship-logo.png');
 addNewBackground('DinPattern Blueprint', 'Evan Eckard', 'http://www.dinpattern.com/2011/05/31/blueprint/', 'http://www.evaneckard.com/', '#222', '#fff', '/img/backgrounds/blueprint.gif', '/img/logos/journeyship-logo.png');
-addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '#222', '#fff', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
-addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '#fff', '#333', '/img/backgrounds/party-lights.jpg', '/img/logos/journeyship-logo-orange.png');
-addNewBackground('people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html', '#222', '#fff', '/img/backgrounds/people.jpg', '/img/logos/journeyship-logo-white.png');
-addNewBackground('space, rockets, and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html', '#222', '#fff', '/img/backgrounds/spaceships.jpg', '/img/logos/journeyship-logo-blue.png');
-addNewBackground('DinPattern Stripe', 'Evan Eckard', 'http://www.dinpattern.com/2009/04/07/dinpattern-stripe/', 'http://www.evaneckard.com/', '#fff', '#333', '/img/backgrounds/stripe.gif', '/img/logos/journeyship-logo-white.png');
-addNewBackground('pattern with waves', 'il67', 'http://www.shutterstock.com/pic.mhtml?id=70950994', 'http://www.shutterstock.com/gallery-196705p1.html', '#222', '#fff', '/img/backgrounds/waves.jpg', '/img/logos/journeyship-logo-black.png');
+addNewBackground('Party Lights', 'Patrick Hoesly', 'http://www.flickr.com/photos/zooboing/4425770337/', 'http://www.flickr.com/photos/zooboing/', '#fff', '#333', '/img/backgrounds/party-lights.jpg', '/img/logos/journeyship-logo.png');
+addNewBackground('DinPattern Stripe', 'Evan Eckard', 'http://www.dinpattern.com/2009/04/07/dinpattern-stripe/', 'http://www.evaneckard.com/', '#fff', '#333', '/img/backgrounds/stripe.gif', '/img/logos/journeyship-logo.png');
+addNewBackground('pattern with waves', 'il67', 'http://www.shutterstock.com/pic.mhtml?id=70950994', 'http://www.shutterstock.com/gallery-196705p1.html', '#222', '#fff', '/img/backgrounds/waves.jpg', '/img/logos/journeyship-logo.png');
+//addNewBackground('Alien and monsters', 'trendywest', 'http://www.shutterstock.com/pic.mhtml?id=74496550', 'http://www.shutterstock.com/gallery-73363p1.html', '#222', '#fff', '/img/backgrounds/monsters.jpg', '/img/logos/journeyship-logo-black.png');
+//addNewBackground('people\'s faces','Chief Crow Daria','http://www.shutterstock.com/pic.mhtml?id=84098341','http://www.shutterstock.com/gallery-224326p1.html', '#222', '#fff', '/img/backgrounds/people.jpg', '/img/logos/journeyship-logo-white.png');
+//addNewBackground('space, rockets, and stars', 'TashaNatasha','http://www.shutterstock.com/pic.mhtml?id=138028943','http://www.shutterstock.com/gallery-1013693p1.html', '#222', '#fff', '/img/backgrounds/spaceships.jpg', '/img/logos/journeyship-logo-blue.png');
 //addNewBackground('hand-drawn waves', 'Markovka', 'http://www.shutterstock.com/pic.mhtml?id=96193649', 'http://www.shutterstock.com/gallery-495859p1.html', '#fff', '/img/backgrounds/hand-drawn-waves.jpg', '/img/logos/journeyship-logo-purple.png');
 //addNewBackground('DinPattern Transmit', 'Evan Eckard', 'http://www.dinpattern.com/2010/07/06/transmit/', 'http://www.evaneckard.com/', '/img/backgrounds/transmit.gif');
 
@@ -1407,10 +1409,10 @@ var loadData = function (data) {
     $('#big-one').show();
   });
 
-  replaceLayersWithAnimatedBlocks(data.main.palette);
-  replaceLayersWithAnimatedBlocks(data.main.firstLayer);
-  replaceLayersWithAnimatedBlocks(data.main.secondLayer);
-  replaceLayersWithAnimatedBlocks(data.main.movementMap);
+  replaceLayersWithAnimatedBlocks(data.main.palette, 'finishedProcessingLayersAsAnimatedBlocks');
+  replaceLayersWithAnimatedBlocks(data.main.firstLayer, 'finishedProcessingLayersAsAnimatedBlocks');
+  replaceLayersWithAnimatedBlocks(data.main.secondLayer, 'finishedProcessingLayersAsAnimatedBlocks');
+  replaceLayersWithAnimatedBlocks(data.main.movementMap, 'finishedProcessingLayersAsAnimatedBlocks');
 
   editorArea.setup(data.editor.animatedBlock.layers);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
@@ -1609,18 +1611,24 @@ $('#export-editor-block-url').on({
 
 function exportJustMainArea () {
   return JSON.stringify({
-    map: mainArea.selectedDrawableSurface().map,
-    animatedMap: mainArea.selectedDrawableSurface().animatedMap,
-    movementMap: mainArea.selectedDrawableSurface().movementMap
+    map: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map)),
+    animatedMap: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap)),
+    movementMap: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().movementMap))
   });
 }
 
 function importJustMainArea (data) {
   var importData = JSON.parse(data);
 
-  mainArea.selectedDrawableSurface().map = importData.map;
-  mainArea.selectedDrawableSurface().animatedMap = importData.animatedMap;
-  mainArea.selectedDrawableSurface().movementMap = importData.movementMap;
+  replaceLayersWithAnimatedBlocks(importData.map, 'replaceFormImportMainArea');
+  replaceLayersWithAnimatedBlocks(importData.animatedMap, 'replaceFormImportMainArea');
+  replaceLayersWithAnimatedBlocks(importData.movementMap, 'replaceFormImportMainArea');
+
+  $.subscribe('replaceFormImportMainArea', function () {
+    mainArea.selectedDrawableSurface().map = importData.map;
+    mainArea.selectedDrawableSurface().animatedMap = importData.animatedMap;
+    mainArea.selectedDrawableSurface().movementMap = importData.movementMap;
+  });
 }
 
 
