@@ -1461,9 +1461,6 @@ var load = function () {
     mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
     selectThisBackground(backgrounds[_.random(backgrounds.length - 1)]);
-
-    spinner.stop();
-    target.remove();
   }
 
 };
@@ -1609,6 +1606,22 @@ $('#export-editor-block-url').on({
   }
 });
 
+
+function exportJustMainArea () {
+  return JSON.stringify({
+    map: mainArea.selectedDrawableSurface().map,
+    animatedMap: mainArea.selectedDrawableSurface().animatedMap,
+    movementMap: mainArea.selectedDrawableSurface().movementMap
+  });
+}
+
+function importJustMainArea (data) {
+  var importData = JSON.parse(data);
+
+  mainArea.selectedDrawableSurface().map = importData.map;
+  mainArea.selectedDrawableSurface().animatedMap = importData.animatedMap;
+  mainArea.selectedDrawableSurface().movementMap = importData.movementMap;
+}
 
 
 
