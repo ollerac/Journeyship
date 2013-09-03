@@ -1,3 +1,9 @@
+/* JavaScript Sync/Async forEach - v0.1.2 - 1/10/2012
+ * http://github.com/cowboy/javascript-sync-async-foreach
+ * Copyright (c) 2012 "Cowboy" Ben Alman; Licensed MIT */
+(function(a){a.forEach=function(a,b,c){var d=-1,e=a.length>>>0;(function f(g){var h,j=g===!1;do++d;while(!(d in a)&&d!==e);if(j||d===e){c&&c(!j,a);return}g=b.call({async:function(){return h=!0,f}},a[d],d,a),h||f(g)})()}})(typeof exports=="object"&&exports||this);
+
+
 (function($) {
 
   var o = $({});
@@ -42,39 +48,35 @@ function makeNewBlock (size) {
 var startTime = +new Date();
 var endCounter = false;
 
-function processArray(items, process, finished) {
-  var idx = 0;
-  var todo = items.concat();
+var a = [1,2,3,4,5];
+forEach(a, function (item, index) {
+  console.log(item);
 
-  setTimeout(function() {
-    process(todo.shift(), idx);
-    if(todo.length > 0) {
-      idx++;
-      setTimeout(arguments.callee, 25);
-    } else {
-      finished();
-    }
+  var done = this.async();
+  setTimeout(done, 1);
+});
 
-    if (!endCounter && +new Date() - startTime > 5000) {
-      $.publish('bigOne');
-      endCounter = true;
-    }
-  }, 25);
-}
 
 function replaceLayersWithAnimatedBlocks (map, eventNameWhenDone) {
   if (map) {
-    processArray(map, function (value, index) {
+    var lengthOfMap = map.length;
+
+    forEach(map, function (value, index, list) {
       if (_.isObject(value) && value.type === 'movement') {
-        map[index] = new AnimatedBlock(value.layers, {type: value.type, direction: value.direction});
+        list[index] = new AnimatedBlock(value.layers, {type: value.type, direction: value.direction});
       } else if (_.isArray(value) && value.length > 0) {
-        map[index] = new AnimatedBlock(value);
+        list[index] = new AnimatedBlock(value);
       } else if (typeof(value) === 'object' && value && value.length === 0) {
         // temporary fix for null layers that were saved with no layers
-        map[index] = null;
+        list[index] = null;
       }
-    }, function () {
-      $.publish(eventNameWhenDone);
+
+      if (index + 1 === lengthOfMap) {
+        $.publish(eventNameWhenDone);
+      }
+
+      var done = this.async();
+      setTimeout(done, 1);
     });
   } else {
     // hack: movementMap isn't there

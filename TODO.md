@@ -2,17 +2,19 @@
 - backward compatability is hard, would be a good thing to get better at
 
 ### working on now:
-- need to implement loading indicator and stop the browser from freezing when loading big projects
+
 
 ### launch date: monday, september 9th
-- more starting blocks, like trees and people and dogs and flowing water and boats
+- make a largish project locally, test it in IE, Firefox, Safari
+- deploy to prod, test old projects with the new setup
+- add more starting blocks, like trees and people and dogs and flowing water and boats
 - add footer
   - creative commons license info 
   - github link
   - social share buttons
-
-- simple howto video or guided javascript walkthrough
-  - use hopscotch
+- guided javascript walkthrough: use hopscotch
+  - button: 'Tutorial' < 'click me!'
+  - first of all, welcome! journeyship is a small app you can use to create animations
 
 ### after launch
 - invite people
@@ -23,6 +25,9 @@
 - use cache breaker (part of yeoman or grunt or bower?)
 
 ### next cycle
+- 'what is this?' page
+  - github link
+  - about journeyship video
 - need better test animations to see if things are working going forward
 - easy: make function for animated blocks called 'replacelayers' that accepts layers as arguments and replaces the current ones. use this in the '#save-block' area instead of what's there. and then use regeneratePrerenderedLayers inside this new function
 - prerendered blocks
