@@ -45,19 +45,10 @@ function makeNewBlock (size) {
   return block;
 }
 
-var startTime = +new Date();
-var endCounter = false;
-
-var a = [1,2,3,4,5];
-forEach(a, function (item, index) {
-  console.log(item);
-
-  var done = this.async();
-  setTimeout(done, 1);
-});
-
 
 function replaceLayersWithAnimatedBlocks (map, eventNameWhenDone) {
+  var deferred = new $.Deferred();
+
   if (map) {
     var lengthOfMap = map.length;
 
@@ -72,7 +63,7 @@ function replaceLayersWithAnimatedBlocks (map, eventNameWhenDone) {
       }
 
       if (index + 1 === lengthOfMap) {
-        $.publish(eventNameWhenDone);
+        deferred.resolve();
       }
 
       var done = this.async();
@@ -80,8 +71,10 @@ function replaceLayersWithAnimatedBlocks (map, eventNameWhenDone) {
     });
   } else {
     // hack: movementMap isn't there
-    $.publish(eventNameWhenDone);
+    deferred.resolve();
   }
+
+  return deferred;
 }
 
 function replaceAnimatedBlocksWithTheirLayers (map) {

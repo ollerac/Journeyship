@@ -1393,26 +1393,13 @@ var loadData = function (data) {
   target.style.display = 'block';
   var spinner = new Spinner(spinnerOpts).spin(target);
 
-  var finishedNum = 0;
-  $.subscribe('finishedProcessingLayersAsAnimatedBlocks', function (event) {
-    finishedNum = finishedNum + 1;
-    if (finishedNum === 4) {
-      spinner.stop();
-      target.remove();
+  $.when(replaceLayersWithAnimatedBlocks(data.main.palette), replaceLayersWithAnimatedBlocks(data.main.firstLayer), replaceLayersWithAnimatedBlocks(data.main.secondLayer), replaceLayersWithAnimatedBlocks(data.main.movementMap)).then(function () {
+    spinner.stop();
+    target.remove();
 
-      mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
-      mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
-    }
-  });
-
-  $.subscribe('bigOne', function () {
-    $('#big-one').show();
-  });
-
-  replaceLayersWithAnimatedBlocks(data.main.palette, 'finishedProcessingLayersAsAnimatedBlocks');
-  replaceLayersWithAnimatedBlocks(data.main.firstLayer, 'finishedProcessingLayersAsAnimatedBlocks');
-  replaceLayersWithAnimatedBlocks(data.main.secondLayer, 'finishedProcessingLayersAsAnimatedBlocks');
-  replaceLayersWithAnimatedBlocks(data.main.movementMap, 'finishedProcessingLayersAsAnimatedBlocks');
+    mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
+    mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
+  });  
 
   editorArea.setup(data.editor.animatedBlock.layers);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
@@ -1620,11 +1607,7 @@ function exportJustMainArea () {
 function importJustMainArea (data) {
   var importData = JSON.parse(data);
 
-  replaceLayersWithAnimatedBlocks(importData.map, 'replaceFormImportMainArea');
-  replaceLayersWithAnimatedBlocks(importData.animatedMap, 'replaceFormImportMainArea');
-  replaceLayersWithAnimatedBlocks(importData.movementMap, 'replaceFormImportMainArea');
-
-  $.subscribe('replaceFormImportMainArea', function () {
+  $.when(replaceLayersWithAnimatedBlocks(importData.map), replaceLayersWithAnimatedBlocks(importData.animatedMap), replaceLayersWithAnimatedBlocks(importData.movementMap)).then(function () {
     mainArea.selectedDrawableSurface().map = importData.map;
     mainArea.selectedDrawableSurface().animatedMap = importData.animatedMap;
     mainArea.selectedDrawableSurface().movementMap = importData.movementMap;
