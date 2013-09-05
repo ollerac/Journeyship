@@ -2,7 +2,7 @@
 - backward compatability is hard, would be a good thing to get better at
 
 ### working on now:
-
+- adding meta description
 
 ### launch date: monday, september 9th
 - make a largish project locally, test it in IE, Firefox, Safari
@@ -25,6 +25,8 @@
 - use cache breaker (part of yeoman or grunt or bower?)
 
 ### next cycle
+- ability to convert animation to video and download or embed
+- selected block follows mouse on canvas
 - 'what is this?' page
   - github link
   - about journeyship video
@@ -39,18 +41,12 @@
 - movement blocks
   - button: 'reset position' for blocks that have been moved
 - checkbox: only show the selected layer
-- gotta look into performance issues: look at http://journeyship.com/4 in firefox
 - don't use selected block to carry info about movement type, just use animated block
 - separate main js file into modules and concatenate and minify on deploy
-- selected block follows mouse on canvas
 - show a list of recently created journeyships
 - undo!!!
   - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
     - make general savedata function for this and for the general save
-- give palette blocks a light checkered gray background so it's clear that transparent blocks are transparent
-- make blocks that can move!
-  - add checkbox: "Show mover blocks" (only if there's one on the canvas)
-  - show message: "Only blocks placed on the foreground layer can move"
 - add a blinking arrow to show where the editor area is after clicking the new button or after selecting a block on the main canvas and clicking edit
 - make blocks follow mouse and snap to block position
 - ? make animated blocks simple arrays, use angularjs
