@@ -1,7 +1,6 @@
 body {
   color: #222;
   font-size: 12px;
-  margin-bottom: 200px;
   overflow: auto;
   font-family: sans-serif;
   line-height: 1.3em;
@@ -405,9 +404,8 @@ body.not-found {
 .background-image-info {
   float: right;
   color: white;
-  margin-top: 250px;
-  margin-bottom: 50px;
-  font-size: 14px;
+  clear: both;
+  margin-bottom: 20px;
 }
 
 .background-image-info a {
@@ -496,12 +494,24 @@ body.not-found {
   font-size: 18px;
 }
 
+.footer {
+  margin: 200px 0 50px 0;
+  background-color: #444;
+  overflow: auto;
+  padding: 30px 20px;
+  color: #fff;
+  font-size: 12px;
+}
 
+.footer a {
+  color: #87CEEB;
+}
 
-
-
-
-
+.license-info {
+  padding-top: 10px;
+  text-align: center;
+  clear: both;
+}
 
 
 

@@ -1354,11 +1354,6 @@ function selectThisBackground (bg) {
 
   $bgInfo = $('.background-image-info');
   $bgInfo
-    .css('color', bg.textColor)
-    .css('text-shadow', '1px 1px 0 ' + bg.textShadow)
-    .children('a')
-    .css('color', bg.textColor)
-    .end()
     .children('.background-image-name')
     .text(bg.name)
     .attr('href', bg.nameUrl)
@@ -1446,8 +1441,14 @@ var load = function () {
     movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
     movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
     movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
+    var contentBlocks = [];
+    contentBlocks.push(new AnimatedBlock(horse));
+    contentBlocks.push(new AnimatedBlock(flowers)); 
+    contentBlocks.push(new AnimatedBlock(tree));
+    contentBlocks.push(new AnimatedBlock(moon));
+    contentBlocks.push(new AnimatedBlock(ship));
 
-    mainColorPalette = new ColorPalette (_.union(movements, colors), $('#main-color-palette'), mainArea);
+    mainColorPalette = new ColorPalette (_.union(movements, colors, contentBlocks), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
     selectThisBackground(backgrounds[_.random(backgrounds.length - 1)]);
   }

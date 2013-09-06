@@ -2,13 +2,10 @@
 - backward compatability is hard, would be a good thing to get better at
 
 ### working on now:
-- testing in ie10, loading isn't working
 
 
 ### launch date: monday, september 9th
-- make a largish project locally, test it in IE, Firefox, Safari
-- deploy to prod, test old projects with the new setup
-- add more starting blocks, like trees and people and dogs and flowing water and boats
+- made an example project: http://journeyship.com/9/
 - add footer
   - creative commons license info 
   - github link

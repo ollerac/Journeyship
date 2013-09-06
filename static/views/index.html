@@ -7,6 +7,7 @@
     <title>Journey Ship | Create an animation!</title>
     <link rel="stylesheet" type="text/css" href="/css/normalize-v2.1.2.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/social-likes.css">
     <script type="text/javascript">
     if (window.location.hostname.indexOf('localhost') < 0) {
       var heap=heap||[];heap.load=function(a){window._heapid=a;var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.heapanalytics.com/js/heap.js";var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);var d=function(a){return function(){heap.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track"];for(var f=0;f<e.length;f++)heap[e[f]]=d(e[f])};
@@ -108,8 +109,18 @@
       </div>
 
       <div class="footer">
+        <ul class="social-likes" data-url="http://journeyship.com">
+          <li class="facebook" title="Share link on Facebook">Facebook</li>
+          <li class="twitter" title="Share link on Twitter">Twitter</li>
+          <li class="plusone" title="Share link on Google+">Google+</li>
+        </ul>
         <div class="background-image-info">
-          <span>background image:</span> <a class="background-image-name" href="#"></a> by <a class="background-image-artist" href="#"></a>
+          <span>the background image is</span> <a class="background-image-name" href="#"></a> by <a class="background-image-artist" href="#"></a>
+        </div>
+        <div class="license-info">
+          Animations made on JourneyShip.com are licensed under the <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Creative Commons Attribution License</a>. JourneyShip is open source: <a href="https://github.com/ollerac/Journeyship">GitHub Repo</a>.
+        </div>
+        <div class="github-info">
         </div>
       </div>
     </div>
@@ -122,6 +133,7 @@
     <![endif]-->
 
     <!--[if gte IE 9]>-->
+    <script type="text/javascript" src='/js/content/content-blocks.js'></script>
     <script type="text/javascript" src='/js/spin.min.js'></script>
     <script type="text/javascript" src='/js/modernizr-custom.js'></script>
     <script type="text/javascript" src='/js/jquery.cookie.js'></script>
@@ -131,6 +143,7 @@
     <script type="text/javascript" src='/js/helpers.js'></script>
     <script type="text/javascript" src='/js/movement.js'></script>
     <script type="text/javascript" src='/js/journeyship.js'></script>
+    <script type="text/javascript" src='/js/social-likes.min.js'></script>    
     <!--<![endif]-->
 
   </body>
