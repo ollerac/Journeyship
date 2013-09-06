@@ -1389,17 +1389,17 @@ var spinnerOpts = {
 };
 
 var loadData = function (data) {
-  var target = document.getElementById('load');
-  target.style.display = 'block';
-  var spinner = new Spinner(spinnerOpts).spin(target);
+  var $target = $('#load');
+  $target.css('display', 'block');
+  var spinner = new Spinner(spinnerOpts).spin($target.get(0));
 
   $.when(replaceLayersWithAnimatedBlocks(data.main.palette), replaceLayersWithAnimatedBlocks(data.main.firstLayer), replaceLayersWithAnimatedBlocks(data.main.secondLayer), replaceLayersWithAnimatedBlocks(data.main.movementMap)).then(function () {
     spinner.stop();
-    target.remove();
+    $target.remove();
 
     mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
     mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
-  });  
+  });
 
   editorArea.setup(data.editor.animatedBlock.layers);
   editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);

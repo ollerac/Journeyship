@@ -2,7 +2,8 @@
 - backward compatability is hard, would be a good thing to get better at
 
 ### working on now:
-- adding meta description
+- testing in ie10, loading isn't working
+
 
 ### launch date: monday, september 9th
 - make a largish project locally, test it in IE, Firefox, Safari
@@ -20,9 +21,10 @@
 - invite people
 
 ### after launch
-- minify and concatenate js
-- start using a css preprocessor
+- minify and concatenate js (part of grunt)
+- start using a css preprocessor (part of grunt)
 - use cache breaker (part of yeoman or grunt or bower?)
+- make a t-shirt (http://www.customink.com/)
 
 ### next cycle
 - ability to convert animation to video and download or embed
