@@ -6,10 +6,7 @@
 
 ### launch date: monday, september 9th
 - made an example project: http://journeyship.com/9/
-- add footer
-  - creative commons license info 
-  - github link
-  - social share buttons
+  - add this or another one to an 'Example Animation' tab
 - guided javascript walkthrough: use hopscotch
   - button: 'Tutorial' < 'click me!'
   - first of all, welcome! journeyship is a small app you can use to create animations
