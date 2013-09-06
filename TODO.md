@@ -27,6 +27,10 @@
 - make a t-shirt (http://www.customink.com/)
 
 ### next cycle
+- found bug: select a block on the main canvas and click 'transfer to palette' and it will update a version of the block that was already transferred instead of making a new one
+- undo!!!
+  - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
+    - make general savedata function for this and for the general save
 - ability to convert animation to video and download or embed
 - selected block follows mouse on canvas
 - 'what is this?' page
@@ -46,9 +50,6 @@
 - don't use selected block to carry info about movement type, just use animated block
 - separate main js file into modules and concatenate and minify on deploy
 - show a list of recently created journeyships
-- undo!!!
-  - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it
-    - make general savedata function for this and for the general save
 - add a blinking arrow to show where the editor area is after clicking the new button or after selecting a block on the main canvas and clicking edit
 - make blocks follow mouse and snap to block position
 - ? make animated blocks simple arrays, use angularjs
