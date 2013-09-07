@@ -1501,6 +1501,7 @@ function importJustMainArea (data) {
 
 $("#take-tour").on('click', function (event) {
   event.preventDefault();
+  hopscotch.endTour();
   hopscotch.startTour(tour, 0);
 });
 

@@ -7,13 +7,15 @@ var tour = {
       title: "Welcome to JourneyShip!",
       content: "Hello! You've come to a website where you can draw little pixelated animations and then share them online. I hope you enjoy taking a look around.",
       target: "site-title",
-      placement: "bottom"
+      placement: "bottom",
+      xOffset: 200
     },
     {
       title: "This is the main canvas!",
       content: "This is where you'll be able to draw your animations!",
       target: "main-area",
-      placement: "top"
+      placement: "top",
+      xOffset: 200
     },
     {
       title: "This button is how you create a new animated block!",
@@ -25,43 +27,50 @@ var tour = {
       title: "This is where your new animated blocks will appear!",
       content: "If you created a new one it should be the last block in this series.",
       target: "main-color-palette",
-      placement: "bottom"
+      placement: "bottom",
+      xOffset: 400
     },
     {
       title: "This is the main editor area!",
       content: "This is where you can draw new animations to add to the canvas above.",
       target: "constructor-area-container",
-      placement: "top"
+      placement: "top",
+      xOffset: 100
     },
     {
       title: "This is the color palette!",
       content: "Try selecting a color and then click on the editor area to draw. You can hold down your mouse and drag in order to draw more smoothly!",
       target: "constructor-color-palette",
-      placement: "left"
+      placement: "left",
+      yOffset: 100
     },
     {
       title: "Click this \"Update\" button to save your animated block!",
       content: "After you click it you'll see it update the block in the main color palette above.",
       target: "save-block",
-      placement: "right"
+      placement: "right",
+      yOffset: -20
     },
     {
       title: "Select one of these blocks in order to start drawing!",
       content: "You'll be able to paint with it on the main canvas above. Just click on it and then click on the main canvas.",
       target: "main-color-palette",
-      placement: "top"
+      placement: "top",
+      xOffset: 300
     },
     {
       title: "This button lets you switch between the foreground layer and the background layer!",
       content: "There are two layers on this canvas, one in front and one in back. Characters and animals and other things that move around should be put on the foreground layer, while buildings and scenery should be placed on the background layer.",
       target: "bg-fg-switch",
-      placement: "left"
+      placement: "left",
+      yOffset: -20
     },
     {
       title: "Try drawing on the main canvas!",
       content: "Note: If you see a checkered pattern show through that means the canvas is transparent in that area. Try filling it in with a solid color and then switch to the foreground layer and try painting again with the same block.",
       target: "main-area",
-      placement: "top"
+      placement: "top",
+      xOffset: 300
     },
     {
       title: "The save button!",
@@ -77,21 +86,24 @@ var tour = {
     },
     {
       title: "Use this \"Select\" button to select any block on the main canvas below!",
-      content: "When you click this button it'll turn gray to show you it's active. Then you can click anywhere on the canvas below and it will select that square. Pay *special* attention to whether you have the background layer or the foreground layer active.",
+      content: "When you click this button it'll turn gray to show you it's active. Then you can click anywhere on the canvas below and it will select that square. Pay <i>special</i> attention to whether you have the background layer or the foreground layer active.",
       target: "select-block-from-main-canvas",
-      placement: "right"
+      placement: "right",
+      yOffset: -20
     },
     {
       title: "The button next to the select button is the edit button!",
-      content: "This button shows up after you've selected a square. It's a super powerful button because it lets you edit *any* block on the canvas, whether it's on the background layer or the foreground layer!",
+      content: "This button shows up after you've selected a square. It's a super powerful button because it lets you edit <i>any</i> block on the canvas, whether it's on the background layer or the foreground layer!",
       target: "select-block-from-main-canvas",
-      placement: "bottom"
+      placement: "bottom",
+      xOffset: 75
     },
     {
       title: "How about we get down to business and create an animation?",
-      content: "Let's start by selecting one of the animated blocks from below or by just clicking the new button.",
+      content: "Let's start by selecting one of the animated blocks from above or by just clicking the new button.",
       target: "main-color-palette",
-      placement: "top"
+      placement: "bottom",
+      xOffset: 400
     },
     {
       title: "This \"New Layer\" button will allow you to create a simple animation",
@@ -109,37 +121,43 @@ var tour = {
       title: "You can also make a copy of the selected layer.",
       content: "If you want to make a new layer based on a previous layer, select the layer you want to copy by clicking on it and then click this \"Copy Layer\" button. Copied layers make it easier to create detailed animated blocks that look like they're moving.",
       target: "copy-layer",
-      placement: "right"
+      placement: "right",
+      yOffset: -20
     },
     {
       title: "Don't like a layer?",
       content: "Click this \"Delete Layer\" button if you feel like removing a layer from your animation. First, select the layer by clicking on it and then press this button. Be careful, there's no undo!",
       target: "delete-layer",
-      placement: "right"
+      placement: "right",
+      yOffset: -20
     },
     {
       title: "Want to see the previous layers more easily?",
       content: "Click this checkbox if you want to make the top layer a little transparent so you can see what's going on on the layers that come before it.",
       target: "enable-shadow",
-      placement: "bottom"
+      placement: "bottom",
+      yOffset: 13
     },
     {
       title: "Here's a secret!",
       content: "If you really like an animated block that you created in another project go to that project and click this \"Export\" button. It will generate a web address that you can copy and paste into another project's \"Import\" box.",
       target: "export-editor-block",
-      placement: "left"
+      placement: "left",
+      yOffset: -24
     },
     {
       title: "Click the \"Import\" link in order to get see the import box",
       content: "Paste the web address you got in the previous step (after clicking \"Export\") and then click the \"Import Editor Area\" button. Then it'll load up that animated block right here!",
       target: "import-editor-block",
-      placement: "left"
+      placement: "left",
+      yOffset: -24
     },
     {
-      title: "Enjoy!!! That's it for the tour!",
+      title: "Enjoy!!! That's it for now!",
       content: "I hope you have a fun time creating lots of animations and drawings! Please send me an email if you have any questions or comments: <a href='mailto:david@storylog.com'>david@storylog.com</a>",
       target: "site-title",
-      placement: "bottom"
+      placement: "bottom",
+      xOffset: 200
     },
     {
       title: "And don't forget to save!",
