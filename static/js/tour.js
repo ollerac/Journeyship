@@ -5,7 +5,7 @@ var tour = {
   steps: [
     {
       title: "Welcome to JourneyShip!",
-      content: "Hello! You've come to a website where you can draw one page pixelated animations and then share them online. I hope you enjoy taking a look around.",
+      content: "Hello! You've come to a website where you can draw little pixelated animations and then share them online. I hope you enjoy taking a look around.",
       target: "site-title",
       placement: "bottom"
     },

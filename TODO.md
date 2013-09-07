@@ -2,13 +2,9 @@
 - backward compatability is hard, would be a good thing to get better at
 
 ### working on now:
-- remove mover blocks functionality
-- fix issue with history.js
 
 ### launch date: monday, september 9th
-- guided javascript walkthrough: use hopscotch
-  - button: 'Tutorial' < 'click me!'
-  - first of all, welcome! journeyship is a small app you can use to create animations
+
 
 ### after launch
 - invite people
