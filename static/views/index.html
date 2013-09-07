@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/css/normalize-v2.1.2.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" type="text/css" href="/css/social-likes.css">
+    <link rel="stylesheet" type="text/css" href="/css/hopscotch-0.1.1.min.css">
     <script type="text/javascript">
     if (window.location.hostname.indexOf('localhost') < 0) {
       var heap=heap||[];heap.load=function(a){window._heapid=a;var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.heapanalytics.com/js/heap.js";var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);var d=function(a){return function(){heap.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track"];for(var f=0;f<e.length;f++)heap[e[f]]=d(e[f])};
@@ -26,12 +27,14 @@
       <div class='top-button-container'>
         <a id='new' class='hanging-button' href='/'>New</a>
         <a id='save' class='hanging-button' href='#'>Save</a>
+        <a id='take-tour' class='hanging-button' href='#'>Take a Tour</a>
+        <a id='see-example' class='hanging-button' href='/9/1'>See an Example</a>
         <div style="clear: both"></div>
         <!--<a id='demo' class='hanging-button' href='/7/1'>View Demo</a>-->    
       </div>
 
       <div class='main-container'>
-        <h1 class="page-heading">Journey Ship</h1>
+        <h1 class="page-heading" id="site-title">Journey Ship</h1>
 
         <div id='main-container-top-bar'>
           <a id='bg-fg-switch' class='edit-button another-button has-icon' href='#'>Edit Foreground</a>
@@ -39,9 +42,6 @@
           <a id='select-block-from-main-canvas' class='select-button another-button has-icon' href='#'>Select</a>
           <a id='edit-block-from-main-canvas' class='edit-button another-button has-icon' href='#'>Edit</a>
           <a id='delete-block-from-main-canvas' class='delete-button another-button has-icon' href='#'>Delete</a>
-          <div class="show-movement-blocks-container">
-            <label><input type='checkbox' id='show-movement-blocks' class='checkbox' checked/> <div class='option'>Show mover blocks</div></label>
-          </div>
         </div>
 
         <div id="main-area-container" class="area-container">
@@ -100,7 +100,7 @@
             </div>
             <div id='import-editor-block-url-container'>
               <div><input id='import-editor-block-url' type='text' /></div>
-              <div><a href='#' id='import-editor-block-button' class='another-button'>Import</a></div>
+              <div><a href='#' id='import-editor-block-button' class='another-button'>Import Editor Area</a></div>
             </div>
           </div>
         </div>
@@ -109,19 +109,22 @@
       </div>
 
       <div class="footer">
+        <div class="license-info">
+          <span xmlns:dct="http://purl.org/dc/terms/" xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#">
+            This animation is licensed under the public domain 
+            <a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">
+              <img src="http://i.creativecommons.org/p/zero/1.0/80x15.png" style="border-style: none;" alt="CC0" />
+            </a>
+          </span>
+        </div>        
+        <div class="background-image-info">
+          <span>the background image is</span> <a class="background-image-name" href="#"></a> by <a class="background-image-artist" href="#"></a> &copy; 2013
+        </div>
         <ul class="social-likes" data-url="http://journeyship.com">
           <li class="facebook" title="Share link on Facebook">Facebook</li>
           <li class="twitter" title="Share link on Twitter">Twitter</li>
           <li class="plusone" title="Share link on Google+">Google+</li>
         </ul>
-        <div class="background-image-info">
-          <span>the background image is</span> <a class="background-image-name" href="#"></a> by <a class="background-image-artist" href="#"></a>
-        </div>
-        <div class="license-info">
-          Animations made on JourneyShip.com are licensed under the <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Creative Commons Attribution License</a>. JourneyShip is open source: <a href="https://github.com/ollerac/Journeyship">GitHub Repo</a>.
-        </div>
-        <div class="github-info">
-        </div>
       </div>
     </div>
 
@@ -136,12 +139,13 @@
     <script type="text/javascript" src='/js/content/content-blocks.js'></script>
     <script type="text/javascript" src='/js/spin.min.js'></script>
     <script type="text/javascript" src='/js/modernizr-custom.js'></script>
-    <script type="text/javascript" src='/js/jquery.cookie.js'></script>
     <script type="text/javascript" src='/js/jquery.history.js'></script>
     <script type="text/javascript" src='/js/lodash-v1.3.1.min.js'></script>
     <script type="text/javascript" src='/js/tools.js'></script>
     <script type="text/javascript" src='/js/helpers.js'></script>
     <script type="text/javascript" src='/js/movement.js'></script>
+    <script type="text/javascript" src='/js/hopscotch-0.1.1.min.js'></script>
+    <script type="text/javascript" src='/js/tour.js'></script>        
     <script type="text/javascript" src='/js/journeyship.js'></script>
     <script type="text/javascript" src='/js/social-likes.min.js'></script>    
     <!--<![endif]-->

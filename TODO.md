@@ -2,17 +2,18 @@
 - backward compatability is hard, would be a good thing to get better at
 
 ### working on now:
-
+- remove mover blocks functionality
+- fix issue with history.js
 
 ### launch date: monday, september 9th
-- made an example project: http://journeyship.com/9/
-  - add this or another one to an 'Example Animation' tab
 - guided javascript walkthrough: use hopscotch
   - button: 'Tutorial' < 'click me!'
   - first of all, welcome! journeyship is a small app you can use to create animations
 
 ### after launch
 - invite people
+- feedback army
+- make t-shirt
 
 ### after launch
 - minify and concatenate js (part of grunt)
@@ -21,6 +22,7 @@
 - make a t-shirt (http://www.customink.com/)
 
 ### next cycle
+- add import/export to main area
 - found bug: select a block on the main canvas and click 'transfer to palette' and it will update a version of the block that was already transferred instead of making a new one
 - undo!!!
   - after every change make a copy of the major areas and put them in a queue, when user presses undo pop the last thing put in the que and load it

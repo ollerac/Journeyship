@@ -404,8 +404,6 @@ body.not-found {
 .background-image-info {
   float: right;
   color: white;
-  clear: both;
-  margin-bottom: 20px;
 }
 
 .background-image-info a {
@@ -485,20 +483,11 @@ body.not-found {
   display: none;
 }
 
-#big-one {
-  display: none;
-  color: #fff;
-  position: absolute;
-  bottom: 12px;
-  left: 10px;
-  font-size: 18px;
-}
-
 .footer {
   margin: 200px 0 50px 0;
   background-color: #444;
   overflow: auto;
-  padding: 30px 20px;
+  padding: 10px;
   color: #fff;
   font-size: 12px;
 }
@@ -508,17 +497,20 @@ body.not-found {
 }
 
 .license-info {
-  padding-top: 10px;
-  text-align: center;
+  float: left;
+}
+
+.footer .social-likes {
+  margin: 25px auto 0;
   clear: both;
 }
 
+#new {
+  background-color: #3273CD;
+}
 
-
-
-
-
-
-
+#save {
+  background-color: #4EB650;
+}
 
 

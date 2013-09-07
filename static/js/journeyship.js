@@ -4,7 +4,6 @@ var defaultCellSize = 60;
 var defaultEditCellSize = 30;
 var defaultTinyCellSize = 3;
 var defaultCellColor = '#fff';
-var displayMovementBlocksInMainCanvas = true;
 
 var $deleteFromMainCanvasButton = $('#delete-block-from-main-canvas');
 var $editInMainCanvasButton = $('#edit-block-from-main-canvas');
@@ -368,7 +367,7 @@ function getCellBelowThisIndex (index, rows, columns) {
 
 // drawable surface setup (i.e. the main canvas and the constructor canvas)
 
-function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, secondLayer, movementMap) {
+function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, secondLayer) {
   var self = this;
   self.$element = $element;
   self.cellSize = cellSize || defaultCellSize;
@@ -378,7 +377,6 @@ function DrawableSurface ($element, cellSize, defaultCellColor, firstLayer, seco
   self.defaultCellColor = defaultCellColor || '#fff';
   self.map = firstLayer || self.makeMap(self.defaultCellColor); //background, also potentially animated
   self.animatedMap = secondLayer || self.makeMap(null); // foreground
-  self.movementMap = movementMap || self.makeMap(null);
   self.selectedBlocksMap = [];
   self.stopAnimation = false;
   self.drawOnBackground = true;
@@ -403,9 +401,6 @@ DrawableSurface.prototype.startAnimating = function () {
 
         self.clear();
         self.renderFirstMap();
-        if (displayMovementBlocksInMainCanvas) {
-          self.renderMovementMap();
-        }
         self.renderSecondMap();
         self.renderSelectedBlocksMap();
       }, 1000 / fps);
@@ -465,12 +460,7 @@ DrawableSurface.prototype.makeDrawable = function () {
     var drawingContext = self.$element[0].getContext('2d');
     clearCell(drawingContext, cellPosition.x, cellPosition.y, self.cellSize);
 
-    if (typeof(self.selectedStyle.style) === 'object' && self.selectedStyle.info && self.selectedStyle.info.type === 'movement') {
-      self.movementMap[positionInArray] = new AnimatedBlock(_.cloneDeep(self.selectedStyle.style.layers), {
-        type: self.selectedStyle.info.type,
-        direction: self.selectedStyle.info.direction
-      });
-    } else if (typeof(self.selectedStyle.style) === 'string') {
+    if (typeof(self.selectedStyle.style) === 'string') {
       if (self.selectedStyle.style !== 'transparent') {
         drawCell(self.$element[0].getContext('2d'), cellPosition.x, cellPosition.y, self.cellSize, self.selectedStyle.style);
       }
@@ -524,67 +514,13 @@ DrawableSurface.prototype.makeDrawable = function () {
   });
 };
 
-DrawableSurface.prototype.renderMap = function (map, options) {
-  defaults = {
-    move: false
-  };
-
-  _.extend(defaults, options);
-
+DrawableSurface.prototype.renderMap = function (map) {
   var self = this;
   var context = self.$element[0].getContext('2d');
 
-  // skips places where a block was moved into so it doesn't cause a chain reaction (this documentation should be better, i know)
-  var skipThese = [];
-
   _.each(map, function (block, index, list) {
-    var newIndex = index;
-
-    // this doesn't make sense for skipThese, look into this
-    if (block && skipThese.indexOf(index) === -1) {
-
-      if (defaults.move && typeof(self.movementMap[index]) === 'object' && self.movementMap[index] !== null && self.movementMap[index].type === 'movement') {
-        
-        if (self.movementMap[index].direction === 'right') {
-          if (index === 0 || index % self.columns !== 0) {
-            newIndex = index + 1;
-
-            list[newIndex] = block;
-
-            skipThese.push(newIndex);
-            
-            list[index] = null;
-          }
-        } else if (self.movementMap[index].direction === 'left') {
-          if (index > self.columns * getCellRowAndColumnFromIndex(index, self.columns).row) {
-            newIndex = index - 1;
-
-            list[newIndex] = block;
-
-            list[index] = null;
-          }
-        } else if (self.movementMap[index].direction === 'up') {
-          var cellAbove = getCellAboveThisIndex(index, self.columns);
-
-          if (cellAbove || cellAbove === 0) {
-            newIndex = cellAbove;
-            list[cellAbove] = block;
-            list[index] = null;
-          }
-        } else if (self.movementMap[index].direction === 'down') {
-          var cellBelow = getCellBelowThisIndex(index, self.rows, self.columns);
-
-          if (cellBelow) {
-            newIndex = cellBelow;
-            list[cellBelow] = block;
-            list[index] = null;
-
-            skipThese.push(cellBelow);
-          }
-        }
-      }
-
-      var position = getCellPositionFromIndex(newIndex, self.columns);
+    if (block) {
+      var position = getCellPositionFromIndex(index, self.columns);
 
       if (typeof(block) === 'object' && block.layers) {
         if (block.prerenderedLayers.length) {
@@ -617,11 +553,7 @@ DrawableSurface.prototype.renderFirstMap = function () {
 };
 
 DrawableSurface.prototype.renderSecondMap = function () {
-  this.renderMap(this.animatedMap, {move: true});
-};
-
-DrawableSurface.prototype.renderMovementMap = function () {
-  this.renderMap(this.movementMap);
+  this.renderMap(this.animatedMap);
 };
 
 
@@ -909,8 +841,8 @@ var mainArea = {
   selectedDrawableSurface: function () {
     return this.drawableSurfaces[0];
   },
-  setup: function (firstLayer, secondLayer, movementMap) {
-    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, '#fff', firstLayer, secondLayer, movementMap));
+  setup: function (firstLayer, secondLayer) {
+    this.drawableSurfaces.push(new DrawableSurface($('#main-area'), defaultCellSize, '#fff', firstLayer, secondLayer));
     this.selectedDrawableSurface().startAnimating();
   }
 };
@@ -929,7 +861,7 @@ function ColorPalette (map, $container, parent, size) {
   });
 }
 
-ColorPalette.prototype.generatePaletteElement = function (value, info) {
+ColorPalette.prototype.generatePaletteElement = function (value) {
   var $paletteElementContainer = makeNewElement();
   $paletteElementContainer.addClass('palette-element-container');
 
@@ -944,10 +876,6 @@ ColorPalette.prototype.generatePaletteElement = function (value, info) {
 
     $paletteElementContainer.append($animatedElement);
     $paletteElementContainer.data('paletteValue', {type: 'animated', value: animatedBlock});
-
-    if (info) {
-      $paletteElementContainer.data('paletteInfo', info);
-    }
   } else if (typeof(value) === 'string') {
     var color = value;
 
@@ -1002,13 +930,8 @@ ColorPalette.prototype.getBlockWithId = function (id) {
 ColorPalette.prototype.addStyle = function (value) {
   var paletteElement;
 
-  if (typeof(value) === 'object' && value.type && value.type === 'movement') {
-    this.addMapValue(value);
-    paletteElement = this.generatePaletteElement(value, {type: value.type, direction: value.direction});
-  } else {
-    this.addMapValue(value);
-    paletteElement = this.generatePaletteElement(value);
-  }
+  this.addMapValue(value);
+  paletteElement = this.generatePaletteElement(value);
 
   this.addPaletteElement(paletteElement);
 };
@@ -1029,20 +952,6 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
   $paletteElement.on('click', function (event) {
     var $clickedElement = $(event.currentTarget);
 
-    var paletteInfo = $clickedElement.data('paletteInfo');
-    var timesSeenMovementMsg = parseInt($.cookie('timesSeenMovementMsg'), 10) || 0;
-    if (paletteInfo && paletteInfo.type === 'movement' && timesSeenMovementMsg < 6 && !$('.tooltip').length) {
-      $msgBlock = $('<div class="tooltip">Only blocks placed in the foreground can be moved</div>');
-      $clickedElement.after($msgBlock.css('color', '#fff'));
-      $.cookie('timesSeenMovementMsg', timesSeenMovementMsg + 1);
-      $msgBlock.on('click', function () {
-        $(this).remove();
-      });
-      setTimeout(function () {
-        $msgBlock.remove();
-      }, 6000);
-    }
-
     $clickedElement.siblings('.palette-element-container.selected').removeClass('selected');
     $clickedElement.addClass('selected');
 
@@ -1053,7 +962,7 @@ ColorPalette.prototype.addEventListeners = function ($paletteElement) {
 $.subscribe('selected-style', function (event, update) {
   var buttons = $('#copy-block, #delete-block');
   var $editorAreaElement = $('#constructor-container');
-  if (typeof(update.style) === 'object' && ((update.style.info && update.style.info.type === 'movement') || !(update.style.style && update.style.style.layers))) {
+  if (typeof(update.style) === 'object' && !(update.style.style && update.style.style.layers)) {
     buttons.hide();
     $editorAreaElement.hide();
   } else {
@@ -1158,14 +1067,6 @@ $('#enable-shadow').on('click', function () {
 $.subscribe('selected-layer', function(event, update) {
   if (shadowEnabled) {
     applyShadow();
-  }
-});
-
-$('#show-movement-blocks').on('click', function () {
-  if (this.checked) {
-    displayMovementBlocksInMainCanvas = true;
-  } else {
-    displayMovementBlocksInMainCanvas = false;
   }
 });
 
@@ -1289,7 +1190,6 @@ $deleteFromMainCanvasButton.on('click', function (event) {
 
   var selectedBlock = mainArea.selectedDrawableSurface().selectedBlock;
   selectedBlock.map[selectedBlock.position] = selectedBlock.onBackground ? '#fff' : null;
-  mainArea.selectedDrawableSurface().movementMap[selectedBlock.position] = null;
 
   // reset selected block
   mainArea.selectedDrawableSurface().setupSelectedBlock(mainArea.selectedDrawableSurface().selectedBlock.position);
@@ -1388,11 +1288,11 @@ var loadData = function (data) {
   $target.css('display', 'block');
   var spinner = new Spinner(spinnerOpts).spin($target.get(0));
 
-  $.when(replaceLayersWithAnimatedBlocks(data.main.palette), replaceLayersWithAnimatedBlocks(data.main.firstLayer), replaceLayersWithAnimatedBlocks(data.main.secondLayer), replaceLayersWithAnimatedBlocks(data.main.movementMap)).then(function () {
+  $.when(replaceLayersWithAnimatedBlocks(data.main.palette), replaceLayersWithAnimatedBlocks(data.main.firstLayer), replaceLayersWithAnimatedBlocks(data.main.secondLayer)).then(function () {
     spinner.stop();
     $target.remove();
 
-    mainArea.setup(data.main.firstLayer, data.main.secondLayer, data.main.movementMap);
+    mainArea.setup(data.main.firstLayer, data.main.secondLayer);
     mainColorPalette = new ColorPalette (data.main.palette, $('#main-color-palette'), mainArea);
   });
 
@@ -1436,11 +1336,6 @@ var load = function () {
     editorArea.setup();
     mainArea.setup();
 
-    var movements = [];
-    movements.push(new AnimatedBlock(JSON.parse(moveUp), {type: 'movement', direction: 'up'}));
-    movements.push(new AnimatedBlock(JSON.parse(moveDown), {type: 'movement', direction: 'down'}));
-    movements.push(new AnimatedBlock(JSON.parse(moveRight), {type: 'movement', direction: 'right'}));
-    movements.push(new AnimatedBlock(JSON.parse(moveLeft), {type: 'movement', direction: 'left'}));
     var contentBlocks = [];
     contentBlocks.push(new AnimatedBlock(horse));
     contentBlocks.push(new AnimatedBlock(flowers)); 
@@ -1448,7 +1343,7 @@ var load = function () {
     contentBlocks.push(new AnimatedBlock(moon));
     contentBlocks.push(new AnimatedBlock(ship));
 
-    mainColorPalette = new ColorPalette (_.union(movements, colors, contentBlocks), $('#main-color-palette'), mainArea);
+    mainColorPalette = new ColorPalette (_.union(colors, contentBlocks), $('#main-color-palette'), mainArea);
     editorAreaColorPalette = new ColorPalette (colors, $('#constructor-color-palette'), editorArea, defaultEditCellSize);
     selectThisBackground(backgrounds[_.random(backgrounds.length - 1)]);
   }
@@ -1461,7 +1356,6 @@ var exportData = function () {
   var mainPaletteMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainColorPalette.map));
   var firstLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map));
   var secondLayerMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap));
-  var movementMap = replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().movementMap));
 
   var storyData = {
     editor: {
@@ -1472,8 +1366,7 @@ var exportData = function () {
     main: {
       palette: mainPaletteMap,
       firstLayer: firstLayerMap,
-      secondLayer: secondLayerMap,
-      movementMap: movementMap
+      secondLayer: secondLayerMap
     },
     options: {
       selectedBackground: selectedBackgroundImage
@@ -1600,22 +1493,23 @@ $('#export-editor-block-url').on({
 function exportJustMainArea () {
   return JSON.stringify({
     map: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().map)),
-    animatedMap: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap)),
-    movementMap: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().movementMap))
+    animatedMap: replaceAnimatedBlocksWithTheirLayers(_.cloneDeep(mainArea.selectedDrawableSurface().animatedMap))
   });
 }
 
 function importJustMainArea (data) {
   var importData = JSON.parse(data);
 
-  $.when(replaceLayersWithAnimatedBlocks(importData.map), replaceLayersWithAnimatedBlocks(importData.animatedMap), replaceLayersWithAnimatedBlocks(importData.movementMap)).then(function () {
+  $.when(replaceLayersWithAnimatedBlocks(importData.map), replaceLayersWithAnimatedBlocks(importData.animatedMap)).then(function () {
     mainArea.selectedDrawableSurface().map = importData.map;
     mainArea.selectedDrawableSurface().animatedMap = importData.animatedMap;
-    mainArea.selectedDrawableSurface().movementMap = importData.movementMap;
   });
 }
 
-
+$("#take-tour").on('click', function (event) {
+  event.preventDefault();
+  hopscotch.startTour(tour, 0);
+});
 
 
 
