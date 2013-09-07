@@ -1306,13 +1306,7 @@ var loadData = function (data) {
 
 var load = function () {
 
-  var paths;
-
-  if (!Modernizr.history) {
-    paths = window.location.hash.match(/#(\d+)\/?(\d+)?/);
-  } else {
-    paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
-  }
+  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
 
   if (paths) {
 
@@ -1379,13 +1373,7 @@ var exportData = function () {
 var saveData = function (callback) {
   storyData = exportData();
 
-  var paths;
-
-  if (!Modernizr.history) {
-    paths = window.location.hash.match(/#(\d+)\/?(\d+)?/);
-  } else {
-    paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
-  }
+  var paths = window.location.pathname.match(/\/(\d+)\/?(\d+)?/);
 
   var dataToSave = {
     story: storyData
@@ -1405,8 +1393,13 @@ var saveData = function (callback) {
       var id = ids[0];
       var version = parseInt(ids[1], 10); // get a number so if it's 0 there's no second slash for the first save
 
-      History.pushState(null, null, '/' + id + '/' + (version ? version + '/' : ''));
-
+      var newPath = '/' + id + '/' + (version ? version + '/' : '');
+      if (!Modernizr.history) {
+        window.location.pathname = newPath;
+      } else {
+        History.pushState(null, null, newPath);
+      }
+      
       version = result.version;
 
       if (callback) {
