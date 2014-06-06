@@ -3,8 +3,7 @@
 
 
 ### working on now:
-- 
-sgxkirxwnmfh
+- nginx -s reload
 
 ### launch date: monday, september 9th
 
