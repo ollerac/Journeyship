@@ -13,7 +13,7 @@ app.configure('development', function () {
 
 app.configure('production', function () {
   var dbPass = require('./mongo-db-info.js');
-  mongodbUrl = 'mongodb://david:' + dbPass + '@paulo.mongohq.com:10073/journeyship';
+  mongodbUrl = 'mongodb://david:' + dbPass + '@127.0.0.1:27017/journeyship';
 });
 
 var MongoClient = require('mongodb').MongoClient;

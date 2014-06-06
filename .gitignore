@@ -219,3 +219,4 @@ pip-log.txt
 .mr.developer.cfg
 journeyship.com.conf
 post-receive.sh
+mongo-db-info.js

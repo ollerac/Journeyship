@@ -1,3 +1,3 @@
-var mongoDbPass = "Cupcake5";
+var mongoDbPass = "grAnalA56";
 
 module.exports = mongoDbPass;
