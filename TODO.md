@@ -1,6 +1,7 @@
 ### general
 - backward compatability is hard, would be a good thing to get better at
 
+
 ### working on now:
 - 
 sgxkirxwnmfh
