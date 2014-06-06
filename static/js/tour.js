@@ -86,7 +86,7 @@ var tour = {
     },
     {
       title: "Use this \"Select\" button to select any block on the main canvas below!",
-      content: "When you click this button it'll turn gray to show you it's active. Then you can click anywhere on the canvas below and it will select that square. Pay <i>special</i> attention to whether you have the background layer or the foreground layer active.",
+      content: "When you click this button it'll turn gray to show you it's active. Then you can click anywhere on the canvas below and it will select that square. Pay <i>special</i> attention to whether you have the background layer or the foreground layer active. <b>Try it now before continuing!</b>",
       target: "select-block-from-main-canvas",
       placement: "right",
       yOffset: -20
@@ -100,7 +100,7 @@ var tour = {
     },
     {
       title: "How about we get down to business and create an animation?",
-      content: "Let's start by selecting one of the animated blocks from above or by just clicking the new button.",
+      content: "Let's start by selecting one of the animated blocks from above or by just clicking the new button. <b>Try it now before continuing!</b>",
       target: "main-color-palette",
       placement: "bottom",
       xOffset: 400
@@ -126,7 +126,7 @@ var tour = {
     },
     {
       title: "Don't like a layer?",
-      content: "Click this \"Delete Layer\" button if you feel like removing a layer from your animation. First, select the layer by clicking on it and then press this button. Be careful, there's no undo!",
+      content: "Click this \"Delete Layer\" button if you feel like removing a layer from your animation. First, select the layer by clicking on it and then press this button. <b>Be careful, there's no undo!</b>",
       target: "delete-layer",
       placement: "right",
       yOffset: -20
@@ -161,7 +161,7 @@ var tour = {
     },
     {
       title: "And don't forget to save!",
-      content: "It's important!",
+      content: "It's important... ヽ(´▽`)/",
       target: "save",
       placement: "bottom"
     }
